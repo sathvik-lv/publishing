@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Alfa &amp; Beta &mdash; Multi-Asset Systematic Books</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600;700&family=Bricolage+Grotesque:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#08091a;--card:#0e1228;--card2:#111630;--bdr:rgba(255,255,255,.1);
+  --ce:#3df5c0;--pe:#f5623d;--gr:#4afe7a;--rd:#ff4060;--go:#f5c842;
+  --tx:#f0f0f8;--mu:rgba(255,255,255,.55);--mu2:rgba(255,255,255,.78);
+  --mono:'IBM Plex Mono',monospace;--tax:#c89fff;
+  --alfa:#3df5c0;--beta:#c89fff
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Bricolage Grotesque',sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden;font-size:15px}
+a{color:var(--mu2);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.15)}
+a:hover{color:var(--tx)}
+.page{max-width:1680px;margin:0 auto;padding:0 28px 80px}
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:40px 0 28px;border-bottom:1px solid var(--bdr)}
+.back{font-family:var(--mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mu);display:inline-block;margin-bottom:10px;border:none}
+.back:hover{color:var(--alfa)}
+.h-title{font-size:clamp(22px,2.6vw,34px);font-weight:800;letter-spacing:-.5px}
+.h-title .a{color:var(--alfa)}.h-title .b{color:var(--beta)}
+.h-meta{margin-top:8px;font-family:var(--mono);font-size:12px;color:var(--mu);line-height:1.9;max-width:920px}
+.h-right{display:flex;gap:7px;align-items:flex-start;flex-wrap:wrap}
+.hbadge{font-family:var(--mono);font-size:11px;padding:7px 14px;border:1px solid var(--bdr);border-radius:7px;color:var(--mu2);background:rgba(255,255,255,.04);display:flex;align-items:center;gap:7px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--gr);box-shadow:0 0 8px var(--gr);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+.sec{margin-top:40px}
+.shdr{display:flex;align-items:center;gap:12px;margin-bottom:16px;font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mu2)}
+.shdr::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.snum{color:var(--alfa);opacity:.7}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:13px;padding:22px 24px}
+.hero{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--bdr);border-radius:15px;padding:26px 28px}
+.hero.a{border-top:3px solid var(--alfa)}
+.hero.b{border-top:3px solid var(--beta)}
+.h-tag{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.h-tag.a{color:var(--alfa)}.h-tag.b{color:var(--beta)}
+.tdot{width:6px;height:6px;border-radius:50%}
+.h-tag.a .tdot{background:var(--alfa);box-shadow:0 0 8px var(--alfa)}
+.h-tag.b .tdot{background:var(--beta);box-shadow:0 0 8px var(--beta)}
+.h-name{font-size:18px;font-weight:700;margin-bottom:14px;letter-spacing:-.2px}
+.h-main{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.h-ret{font-size:clamp(36px,4vw,60px);font-weight:800;line-height:1;letter-spacing:-1.5px}
+.hero.a .h-ret{color:var(--alfa)}.hero.b .h-ret{color:var(--beta)}
+.h-ret sup{font-size:.32em;vertical-align:super}
+.h-sub .lbl{font-family:var(--mono);font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:1px}
+.h-sub .val{font-size:16px;font-weight:700;margin-top:3px}
+.hero.a .h-sub .val{color:var(--alfa)}.hero.b .h-sub .val{color:var(--beta)}
+.hdiv{height:1px;background:var(--bdr);margin:18px 0}
+.hst{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.hst-v{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.hst-k{font-family:var(--mono);font-size:10px;color:var(--mu);margin-top:3px;text-transform:uppercase;letter-spacing:.7px}
+.pos{color:var(--gr)}.neg{color:var(--rd)}.gold{color:var(--go)}
+/* Tables */
+.tbl{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px}
+.tbl th{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mu);padding:11px 14px;text-align:left;border-bottom:1px solid var(--bdr);background:rgba(255,255,255,.02)}
+.tbl td{padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--mu2)}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
+.tbl td.num{text-align:right}
+.tbl td.a-c{color:var(--alfa)}
+.tbl td.b-c{color:var(--beta)}
+.tbl .bench{background:rgba(61,245,192,.06)!important}
+.tbl .bench td{color:var(--alfa);font-weight:600}
+.tbl .bench2{background:rgba(200,159,255,.05)!important}
+.tbl .bench2 td{color:var(--beta);font-weight:600}
+.chtit{font-family:var(--mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mu2);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.chnote{font-family:var(--mono);font-size:10px;color:var(--mu);margin-top:10px}
+.pill{display:inline-block;padding:3px 10px;border-radius:5px;font-family:var(--mono);font-size:10px;letter-spacing:.5px}
+.pill.a{background:rgba(61,245,192,.12);color:var(--alfa)}
+.pill.b{background:rgba(200,159,255,.12);color:var(--beta)}
+.pill.m{background:rgba(255,255,255,.08);color:var(--mu2)}
+.method{font-family:var(--mono);font-size:12px;color:var(--mu2);line-height:1.95}
+.method strong{color:var(--tx)}
+.disc{margin-top:44px;padding:20px 22px;background:rgba(255,64,96,.05);border:1px solid rgba(255,64,96,.2);border-radius:10px;font-family:var(--mono);font-size:12px;color:var(--mu2);line-height:2}
+.disc h4{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--rd);margin-bottom:10px;text-transform:uppercase}
+.disc ol{margin-left:20px}
+.disc li{margin-bottom:6px}
+.footer{margin-top:26px;font-family:var(--mono);font-size:11px;color:var(--mu);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+@media(max-width:900px){.g2{grid-template-columns:1fr}.hst{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+  <div>
+    <a class="back" href="index.html">&larr; back to index</a>
+    <div class="h-title"><span class="a">Alfa</span> &amp; <span class="b">Beta</span> &mdash; Multi-Asset Systematic Books</div>
+    <div class="h-meta">10-year walk-forward on a 22-cell universe across FX and global equity indices &middot; 2016-04 &rarr; 2026-04 &middot; frozen-stack selection, locked before any sizing or SL tuning &middot; sized at fixed $1M starting capital &middot; 11 / 11 positive years for both books.</div>
+  </div>
+  <div class="h-right">
+    <div class="hbadge"><div class="pulse"></div>BACKTEST ONLY</div>
+    <div class="hbadge" style="border-color:rgba(61,245,192,.3);color:var(--alfa)">RESUME &middot; PROJECT 1 + 2</div>
+    <div class="hbadge">QUANTCONNECT VALIDATION IN PROGRESS</div>
+  </div>
+</header>
+
+<!-- 01 HEROES -->
+<div class="sec">
+  <div class="shdr"><span class="snum">01</span>Book Overview</div>
+  <div class="g2">
+    <div class="hero a">
+      <div class="h-tag a"><div class="tdot"></div>Alfa &middot; equal-weight construction &middot; 22 cells</div>
+      <div class="h-name">Multi-Asset Equal-Weight Trading Strategy</div>
+      <div class="h-main">
+        <div class="h-ret">206<sup>%</sup></div>
+        <div class="h-sub"><div class="lbl">10-year CAGR</div><div class="val">$1M &rarr; $72.6B (compound)</div></div>
+      </div>
+      <div class="hdiv"></div>
+      <div class="hst">
+        <div><div class="hst-v gold">2.35</div><div class="hst-k">Sharpe</div></div>
+        <div><div class="hst-v gold">10.46</div><div class="hst-k">Calmar</div></div>
+        <div><div class="hst-v neg">&minus;19.7%</div><div class="hst-k">Max Drawdown</div></div>
+        <div><div class="hst-v pos">11 / 11</div><div class="hst-k">Positive years</div></div>
+        <div><div class="hst-v">2.02</div><div class="hst-k">OOS 3y Sharpe</div></div>
+        <div><div class="hst-v">191.3%</div><div class="hst-k">OOS 3y CAGR</div></div>
+        <div><div class="hst-v">22</div><div class="hst-k">Cells (FX + indices)</div></div>
+        <div><div class="hst-v">0.15x</div><div class="hst-k">Gross leverage</div></div>
+      </div>
+    </div>
+
+    <div class="hero b">
+      <div class="h-tag b"><div class="tdot"></div>Beta &middot; inverse-vol construction &middot; 22 cells</div>
+      <div class="h-name">Momentum / Trend Trading Strategy</div>
+      <div class="h-main">
+        <div class="h-ret">2.42</div>
+        <div class="h-sub"><div class="lbl">10-year Sharpe</div><div class="val">$1M &rarr; $11.0B (compound)</div></div>
+      </div>
+      <div class="hdiv"></div>
+      <div class="hst">
+        <div><div class="hst-v gold">153.6%</div><div class="hst-k">CAGR</div></div>
+        <div><div class="hst-v gold">8.10</div><div class="hst-k">Calmar</div></div>
+        <div><div class="hst-v neg">&minus;19.0%</div><div class="hst-k">Max Drawdown</div></div>
+        <div><div class="hst-v pos">11 / 11</div><div class="hst-k">Positive years</div></div>
+        <div><div class="hst-v gold">2.27</div><div class="hst-k">OOS 3y Sharpe</div></div>
+        <div><div class="hst-v">110.3%</div><div class="hst-k">OOS 3y CAGR</div></div>
+        <div><div class="hst-v">22</div><div class="hst-k">Cells (identical universe)</div></div>
+        <div><div class="hst-v">0.15x</div><div class="hst-k">Gross leverage</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 02 CONSTRUCTION -->
+<div class="sec">
+  <div class="shdr"><span class="snum">02</span>Construction &mdash; What's Different</div>
+  <div class="card">
+    <div class="method">
+      Both books draw from the <strong>same 22-cell universe</strong> &mdash; 7 FX pairs + 15 equity-index / index-combo cells &mdash; with cells selected on a train-only robustness score and locked before any sizing or stop-loss tuning. What differs is how the cells combine at the book level:
+      <br><br>
+      <span class="pill a">Alfa</span> &nbsp;weights every cell equally (1 / 22). Maximum compounding under a per-cell drawdown cap. &nbsp; <span class="pill b">Beta</span> &nbsp;weights each cell by inverse realized volatility. Smoother path, higher Sharpe, higher out-of-sample Sharpe.
+      <br><br>
+      Per-cell sizing is identical in both books: the minimum of three independent constraints &mdash; a defensive Kelly fraction, a per-cell max-drawdown rule, and a hard book-level leverage cap. The leverage cap has never bound (actual gross leverage &asymp; 0.15x). <span class="pill m">Cell list, signals, and exact parameters are held in the private research repo.</span>
+    </div>
+  </div>
+</div>
+
+<!-- 03 EQUITY CURVE -->
+<div class="sec">
+  <div class="shdr"><span class="snum">03</span>Equity Curve &mdash; Alfa (monthly, log scale)</div>
+  <div class="card">
+    <div class="chtit"><span>$1M starting &middot; monthly samples 2016-04 &rarr; 2026-04 &middot; 122 points</span><span class="pill a">ALFA EQUAL-WEIGHT 22</span></div>
+    <div style="height:300px"><canvas id="eqChart"></canvas></div>
+    <div class="chnote">Beta daily series is not yet exported (the backtest pipeline emits only the winner's daily curve). Beta terminal stats &mdash; $1M &rarr; $11.0B, Sharpe 2.42 &mdash; come from the same-run candidate grid; rerunning with the Beta winner flag will produce an equivalent daily curve.</div>
+  </div>
+</div>
+
+<!-- 04 YEAR BY YEAR -->
+<div class="sec">
+  <div class="shdr"><span class="snum">04</span>Year-by-Year Walk-Forward &mdash; Alfa (11 / 11 positive)</div>
+  <div class="card" style="padding:0;overflow:auto">
+    <table class="tbl">
+      <thead><tr>
+        <th>Year</th><th class="num">Days</th><th class="num">CAGR</th><th class="num">Max DD</th><th class="num">Sharpe</th><th>Bar</th>
+      </tr></thead>
+      <tbody id="yrBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 05 OOS + BOOTSTRAP -->
+<div class="sec">
+  <div class="shdr"><span class="snum">05</span>Out-of-Sample &amp; Bootstrap Robustness</div>
+  <div class="g2">
+    <div class="card">
+      <div class="chtit"><span>Out-of-Sample &middot; 2023-01 &rarr; 2026-04 (not used for selection)</span></div>
+      <div style="overflow:auto">
+      <table class="tbl">
+        <thead><tr><th>Metric</th><th class="num">Alfa</th><th class="num">Beta</th></tr></thead>
+        <tbody>
+          <tr><td>OOS CAGR</td><td class="num a-c">191.3%</td><td class="num b-c">110.3%</td></tr>
+          <tr><td>OOS Sharpe</td><td class="num a-c">2.02</td><td class="num b-c">2.27</td></tr>
+          <tr><td>OOS positive years</td><td class="num a-c">3 / 3</td><td class="num b-c">3 / 3</td></tr>
+          <tr><td>OOS window</td><td class="num" colspan="2">3.3 years &middot; unseen at selection time</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="chtit"><span>Bootstrap &middot; 5 000 replicates, 20-day overlapping blocks (Alfa)</span></div>
+      <div style="overflow:auto">
+      <table class="tbl">
+        <thead><tr><th>Percentile</th><th class="num">Sharpe</th><th>Interpretation</th></tr></thead>
+        <tbody>
+          <tr><td>p05</td><td class="num a-c">2.03</td><td>Lowest of 5 000 resamples</td></tr>
+          <tr><td>p50 (median)</td><td class="num a-c">2.36</td><td>Matches headline 2.35</td></tr>
+          <tr><td>p95</td><td class="num a-c">2.68</td><td>Upper tail</td></tr>
+          <tr><td><strong>P(Sharpe &gt; 1.5)</strong></td><td class="num pos"><strong>100.0%</strong></td><td>No replicate fell below 1.5</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 06 BENCHMARKS -->
+<div class="sec">
+  <div class="shdr"><span class="snum">06</span>Benchmark Comparison (same 10y window where applicable)</div>
+  <div class="card" style="padding:0;overflow:auto">
+    <table class="tbl">
+      <thead><tr>
+        <th>Strategy</th><th class="num">Window</th><th class="num">CAGR</th><th class="num">Max DD</th><th class="num">Sharpe</th><th class="num">Calmar</th>
+      </tr></thead>
+      <tbody>
+        <tr class="bench"><td><strong>Alfa &mdash; equal-weight 22</strong></td><td class="num">10y</td><td class="num">206.3%</td><td class="num">&minus;19.7%</td><td class="num">2.35</td><td class="num">10.46</td></tr>
+        <tr class="bench2"><td><strong>Beta &mdash; inverse-vol 22</strong></td><td class="num">10y</td><td class="num">153.6%</td><td class="num">&minus;19.0%</td><td class="num">2.42</td><td class="num">8.10</td></tr>
+        <tr><td>Prior-gen robust 15-cell book</td><td class="num">10y</td><td class="num">13.6%</td><td class="num">&minus;6.6%</td><td class="num">1.86</td><td class="num">2.06</td></tr>
+        <tr><td>5P_CLEAN 14c</td><td class="num">3.1y</td><td class="num">9.7%</td><td class="num">&minus;2.6%</td><td class="num">1.67</td><td class="num">3.70</td></tr>
+        <tr><td>5P_LONG 2c</td><td class="num">10y</td><td class="num">2.8%</td><td class="num">&minus;6.7%</td><td class="num">0.64</td><td class="num">0.42</td></tr>
+        <tr><td>VIX standalone</td><td class="num">3.5y</td><td class="num">18.8%</td><td class="num">&minus;13.8%</td><td class="num">1.14</td><td class="num">1.36</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 07 UNIVERSE MIX -->
+<div class="sec">
+  <div class="shdr"><span class="snum">07</span>Universe Mix (high-level)</div>
+  <div class="g2">
+    <div class="card">
+      <div class="chtit"><span>Cell composition by asset class</span></div>
+      <table class="tbl">
+        <thead><tr><th>Bucket</th><th class="num">Cells</th><th class="num">Share</th></tr></thead>
+        <tbody>
+          <tr><td>FX pairs (G10 + emerging-market)</td><td class="num">7</td><td class="num">31.8%</td></tr>
+          <tr><td>Single equity-index futures</td><td class="num">10</td><td class="num">45.5%</td></tr>
+          <tr><td>Index-combo cells (pair trades)</td><td class="num">5</td><td class="num">22.7%</td></tr>
+          <tr><td><strong>Total</strong></td><td class="num"><strong>22</strong></td><td class="num"><strong>100%</strong></td></tr>
+        </tbody>
+      </table>
+      <div class="chnote">Specific instruments, signals, and session rules held private.</div>
+    </div>
+    <div class="card">
+      <div class="chtit"><span>Data provenance</span></div>
+      <table class="tbl">
+        <thead><tr><th>Series</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr><td>FX 1h / 1d OHLC</td><td>Dukascopy 2014&ndash;2026</td></tr>
+          <tr><td>Policy rates</td><td>FRED (multiple central-bank series)</td></tr>
+          <tr><td>VIX</td><td>FRED VIXCLS</td></tr>
+          <tr><td>COT positioning</td><td>CFTC weekly non-commercial net</td></tr>
+        </tbody>
+      </table>
+      <div class="chnote">No synthesized or simulated returns anywhere in the pipeline. Every cell result is produced by running rules on the CSVs above.</div>
+    </div>
+  </div>
+</div>
+
+<!-- DISCLAIMER + CAVEATS -->
+<div class="disc">
+  <h4>&#9888; Caveats &mdash; Read These</h4>
+  <ol>
+    <li><strong>Pure compound-math outputs.</strong> Final equity numbers ($72.6B Alfa, $11.0B Beta) are compound artifacts over 10 years on a fixed $1M base with no withdrawals. The load-bearing metrics are Sharpe, Calmar, CAGR, and max drawdown &mdash; not the absolute terminal dollar figure.</li>
+    <li><strong>QuantConnect paper / live validation in progress.</strong> A live paper-trade overlay is being set up on QuantConnect to measure real execution, real slippage, and real fill quality &mdash; so the published numbers are not only clean-math backtest outputs. Results will replace the current engine-only figures when the live window accumulates.</li>
+    <li><strong>Slippage is flat.</strong> The engine uses a fixed-cost slippage model; a calibrated impact-aware TCA curve (Almgren-Chriss style) is pending before any real sizing. Sensitivity sweeps pass up to +5 pips of added cost without degrading Sharpe.</li>
+    <li><strong>Max drawdown is daily-aggregated.</strong> The &minus;19.7% figure is a property of the daily PnL series. Intraday peaks are larger; no intraday halt rules are modeled in the current engine.</li>
+    <li><strong>Selection methodology.</strong> Cells were Calmar-selected on a train-only window with COT masking, then frozen before any SL or K tuning &mdash; so the sharpe is not a selection artifact. Production deployment would add rolling-DD circuit breakers and a news-window blackout.</li>
+    <li><strong>Bootstrap &amp; walk-forward pass.</strong> 5 000-replicate block-bootstrap gives P(Sharpe &gt; 1.5) = 100%; 11 / 11 positive years on the full window. But deployment at scale still needs the live paper run above before any real capital is committed.</li>
+  </ol>
+</div>
+
+<div class="footer">
+  <div>github.com/sathvik-lv/publishing &middot; <a href="index.html">&larr; back to index</a></div>
+  <div>Backtest cutoff: 2026-04-20 &middot; Last updated: 2026-04-24</div>
+</div>
+</div>
+
+<script>
+const EQ_ALFA = [{"d":"2016-04-20","eq":1000000.0},{"d":"2016-05-01","eq":986464.81},{"d":"2016-06-01","eq":1009883.19},{"d":"2016-07-01","eq":1565792.49},{"d":"2016-08-01","eq":1537077.62},{"d":"2016-09-01","eq":1658126.85},{"d":"2016-10-01","eq":1790650.06},{"d":"2016-11-01","eq":1924037.63},{"d":"2016-12-01","eq":2337079.0},{"d":"2017-01-01","eq":2294828.98},{"d":"2017-02-01","eq":2689041.71},{"d":"2017-03-01","eq":2987806.53},{"d":"2017-04-01","eq":3198694.52},{"d":"2017-05-01","eq":3593173.29},{"d":"2017-06-01","eq":3671691.14},{"d":"2017-07-01","eq":3612025.71},{"d":"2017-08-01","eq":3838131.63},{"d":"2017-09-01","eq":3630769.29},{"d":"2017-10-01","eq":3812292.92},{"d":"2017-11-01","eq":4300596.6},{"d":"2017-12-01","eq":4712956.84},{"d":"2018-01-01","eq":4864652.08},{"d":"2018-02-01","eq":5324500.14},{"d":"2018-03-01","eq":6268160.67},{"d":"2018-04-01","eq":6815143.95},{"d":"2018-05-01","eq":7581138.31},{"d":"2018-06-01","eq":7697358.27},{"d":"2018-07-01","eq":7723624.83},{"d":"2018-08-01","eq":8725218.07},{"d":"2018-09-01","eq":12159013.51},{"d":"2018-10-01","eq":10991518.34},{"d":"2018-11-01","eq":10799131.19},{"d":"2018-12-01","eq":12365059.69},{"d":"2019-01-01","eq":18583247.7},{"d":"2019-02-01","eq":18840237.4},{"d":"2019-03-01","eq":18662947.58},{"d":"2019-04-01","eq":20246768.31},{"d":"2019-05-01","eq":21967733.99},{"d":"2019-06-01","eq":22191562.78},{"d":"2019-07-01","eq":24856422.41},{"d":"2019-08-01","eq":22486010.06},{"d":"2019-09-01","eq":23070626.41},{"d":"2019-10-01","eq":23353267.11},{"d":"2019-11-01","eq":26441600.33},{"d":"2019-12-01","eq":25449789.5},{"d":"2020-01-01","eq":30510388.76},{"d":"2020-02-01","eq":34198070.51},{"d":"2020-03-01","eq":36614382.62},{"d":"2020-04-01","eq":46804089.14},{"d":"2020-05-01","eq":54003410.24},{"d":"2020-06-01","eq":59378548.53},{"d":"2020-07-01","eq":61080605.76},{"d":"2020-08-01","eq":66038392.1},{"d":"2020-09-01","eq":71451557.31},{"d":"2020-10-01","eq":75011466.92},{"d":"2020-11-01","eq":88053686.53},{"d":"2020-12-01","eq":102920161.29},{"d":"2021-01-01","eq":114867511.71},{"d":"2021-02-01","eq":124663594.0},{"d":"2021-03-01","eq":138514089.23},{"d":"2021-04-01","eq":153895461.88},{"d":"2021-05-01","eq":179768574.46},{"d":"2021-06-01","eq":221587132.32},{"d":"2021-07-01","eq":191938278.58},{"d":"2021-08-01","eq":209562054.01},{"d":"2021-09-01","eq":226740272.9},{"d":"2021-10-01","eq":241256442.71},{"d":"2021-11-01","eq":276285501.29},{"d":"2021-12-01","eq":328890227.01},{"d":"2022-01-01","eq":399495465.01},{"d":"2022-02-01","eq":406628480.86},{"d":"2022-03-01","eq":424572420.42},{"d":"2022-04-01","eq":596571139.89},{"d":"2022-05-01","eq":635939279.24},{"d":"2022-06-01","eq":711040014.33},{"d":"2022-07-01","eq":1268753634.17},{"d":"2022-08-01","eq":1693356737.69},{"d":"2022-09-01","eq":2146043228.51},{"d":"2022-10-01","eq":2270171056.07},{"d":"2022-11-01","eq":2466985862.6},{"d":"2022-12-01","eq":2500552319.13},{"d":"2023-01-01","eq":2429993787.64},{"d":"2023-02-01","eq":2625043639.13},{"d":"2023-03-01","eq":2501115536.73},{"d":"2023-04-01","eq":2724310607.9},{"d":"2023-05-01","eq":2863762488.38},{"d":"2023-06-01","eq":3011663559.94},{"d":"2023-07-01","eq":3844181722.68},{"d":"2023-08-01","eq":4605234636.47},{"d":"2023-09-01","eq":5018246393.0},{"d":"2023-10-01","eq":5648289529.59},{"d":"2023-11-01","eq":5607180436.05},{"d":"2023-12-01","eq":6351860814.24},{"d":"2024-01-01","eq":6238793291.11},{"d":"2024-02-01","eq":8279333646.9},{"d":"2024-03-01","eq":8130973509.86},{"d":"2024-04-01","eq":9462096752.91},{"d":"2024-05-01","eq":11113812438.27},{"d":"2024-06-01","eq":11837152999.81},{"d":"2024-07-01","eq":15937172433.0},{"d":"2024-08-01","eq":19092850361.16},{"d":"2024-09-01","eq":21628300553.61},{"d":"2024-10-01","eq":19603238460.68},{"d":"2024-11-01","eq":19846935877.05},{"d":"2024-12-01","eq":20416975605.53},{"d":"2025-01-01","eq":19877486845.87},{"d":"2025-02-01","eq":22852516315.23},{"d":"2025-03-01","eq":26157412518.09},{"d":"2025-04-01","eq":27260187235.89},{"d":"2025-05-01","eq":27606117427.55},{"d":"2025-06-01","eq":27879733022.18},{"d":"2025-07-01","eq":28573746590.56},{"d":"2025-08-01","eq":28147992545.88},{"d":"2025-09-01","eq":37023995766.26},{"d":"2025-10-01","eq":35808615626.7},{"d":"2025-11-01","eq":34412213892.62},{"d":"2025-12-01","eq":32429825880.12},{"d":"2026-01-01","eq":58537220189.77},{"d":"2026-02-01","eq":73820940941.74},{"d":"2026-03-01","eq":69634652477.16},{"d":"2026-04-01","eq":69083389937.76},{"d":"2026-04-20","eq":72623955912.14}];
+
+const WF = [
+  {y:"2016 (Apr-Dec)",days:256,cagr:228.64,mdd:-7.16,sh:2.58},
+  {y:"2017",days:365,cagr:112.53,mdd:-9.24,sh:2.53},
+  {y:"2018",days:365,cagr:276.88,mdd:-19.73,sh:2.95},
+  {y:"2019",days:365,cagr:68.33,mdd:-14.73,sh:1.86},
+  {y:"2020",days:366,cagr:274.89,mdd:-15.78,sh:2.31},
+  {y:"2021",days:365,cagr:249.28,mdd:-19.41,sh:2.68},
+  {y:"2022",days:365,cagr:512.05,mdd:-16.49,sh:3.13},
+  {y:"2023",days:365,cagr:160.59,mdd:-7.38,sh:2.91},
+  {y:"2024",days:366,cagr:215.19,mdd:-14.25,sh:3.01},
+  {y:"2025",days:365,cagr:195.58,mdd:-18.59,sh:1.67},
+  {y:"2026 (YTD 110d)",days:110,cagr:105.97,mdd:-17.81,sh:1.11}
+];
+
+// Year table
+const maxCagr = Math.max(...WF.map(r=>r.cagr));
+const yb = document.getElementById('yrBody');
+yb.innerHTML = WF.map(r=>{
+  const pct = (r.cagr/maxCagr*100).toFixed(0);
+  return `<tr>
+    <td>${r.y}</td>
+    <td class="num">${r.days}</td>
+    <td class="num a-c">${r.cagr.toFixed(2)}%</td>
+    <td class="num neg">${r.mdd.toFixed(2)}%</td>
+    <td class="num gold">${r.sh.toFixed(2)}</td>
+    <td><div style="height:8px;border-radius:3px;background:rgba(255,255,255,.06);position:relative;overflow:hidden">
+      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,rgba(61,245,192,.3),var(--alfa));border-radius:3px"></div>
+    </div></td>
+  </tr>`;
+}).join('');
+
+// Equity chart
+const ctx = document.getElementById('eqChart').getContext('2d');
+const grad = ctx.createLinearGradient(0,0,0,300);
+grad.addColorStop(0,'rgba(61,245,192,.35)');
+grad.addColorStop(1,'rgba(61,245,192,0)');
+new Chart(ctx,{
+  type:'line',
+  data:{
+    labels:EQ_ALFA.map(x=>x.d),
+    datasets:[{
+      label:'Alfa equity',
+      data:EQ_ALFA.map(x=>x.eq),
+      borderColor:'#3df5c0',
+      borderWidth:2,
+      fill:true,
+      backgroundColor:grad,
+      tension:.25,
+      pointRadius:0,
+      pointHoverRadius:4
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{
+      callbacks:{label:ctx=>' $'+(ctx.parsed.y).toLocaleString(undefined,{maximumFractionDigits:0})}
+    }},
+    scales:{
+      y:{type:'logarithmic',grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.55)',font:{family:'IBM Plex Mono',size:10},callback:v=>{
+        if(v>=1e9)return'$'+(v/1e9).toFixed(0)+'B';
+        if(v>=1e6)return'$'+(v/1e6).toFixed(0)+'M';
+        if(v>=1e3)return'$'+(v/1e3).toFixed(0)+'K';
+        return'$'+v;
+      }}},
+      x:{grid:{display:false},ticks:{color:'rgba(255,255,255,.45)',font:{family:'IBM Plex Mono',size:10},maxTicksLimit:12,callback:function(v){return (this.getLabelForValue(v)||'').slice(0,7)}}}
+    }
+  }
+});
+</script>
+</body>
+</html>

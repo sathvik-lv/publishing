@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Sathvik L · Research Dashboards</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600;700&family=Bricolage+Grotesque:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#08091a;--card:#0e1228;--card2:#111630;--bdr:rgba(255,255,255,.1);
+  --ce:#3df5c0;--pe:#f5623d;--gr:#4afe7a;--rd:#ff4060;--go:#f5c842;
+  --tx:#f0f0f8;--mu:rgba(255,255,255,.55);--mu2:rgba(255,255,255,.78);
+  --mono:'IBM Plex Mono',monospace;--tax:#c89fff
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Bricolage Grotesque',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:15px}
+.page{max-width:1280px;margin:0 auto;padding:0 28px 80px}
+header{padding:44px 0 28px;border-bottom:1px solid var(--bdr)}
+.h-title{font-size:clamp(26px,3.2vw,40px);font-weight:800;letter-spacing:-.6px}
+.h-title .ce{color:var(--ce)}.h-title .pe{color:var(--pe)}.h-title .tx{color:var(--tax)}
+.h-meta{margin-top:8px;font-family:var(--mono);font-size:12px;color:var(--mu);line-height:1.85}
+.h-right{margin-top:14px;display:flex;gap:7px;flex-wrap:wrap}
+.hbadge{font-family:var(--mono);font-size:11px;padding:7px 14px;border:1px solid var(--bdr);border-radius:7px;color:var(--mu2);background:rgba(255,255,255,.04);display:flex;align-items:center;gap:7px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--gr);box-shadow:0 0 8px var(--gr);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+.sec{margin-top:40px}
+.shdr{display:flex;align-items:center;gap:12px;margin-bottom:16px;font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mu2)}
+.shdr::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.snum{color:var(--ce);opacity:.7}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.tile{position:relative;display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:26px 26px 22px;overflow:hidden;transition:.2s border-color,.2s transform}
+.tile:hover{border-color:rgba(255,255,255,.22);transform:translateY(-2px)}
+.tile.ab{border-top:3px solid var(--ce)}
+.tile.fo{border-top:3px solid var(--pe)}
+.tile.sk{border-top:3px solid var(--tax)}
+.t-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:14px;color:var(--mu2)}
+.tdot{width:6px;height:6px;border-radius:50%}
+.tile.ab .tdot{background:var(--ce);box-shadow:0 0 8px var(--ce)}
+.tile.fo .tdot{background:var(--pe);box-shadow:0 0 8px var(--pe)}
+.tile.sk .tdot{background:var(--tax);box-shadow:0 0 8px var(--tax)}
+.t-title{font-size:19px;font-weight:700;letter-spacing:-.3px;line-height:1.25;margin-bottom:8px}
+.t-desc{font-family:var(--mono);font-size:11.5px;color:var(--mu);line-height:1.7;margin-bottom:20px;min-height:60px}
+.t-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.t-stat .v{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.t-stat .k{font-family:var(--mono);font-size:9.5px;color:var(--mu);margin-top:2px;text-transform:uppercase;letter-spacing:.7px}
+.tile.ab .t-stat.a .v{color:var(--ce)}
+.tile.fo .t-stat.a .v{color:var(--pe)}
+.tile.sk .t-stat.a .v{color:var(--tax)}
+.t-cta{font-family:var(--mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;display:flex;align-items:center;gap:8px;padding-top:14px;border-top:1px solid var(--bdr)}
+.tile.ab .t-cta{color:var(--ce)}
+.tile.fo .t-cta{color:var(--pe)}
+.tile.sk .t-cta{color:var(--tax)}
+.t-cta.dim{color:var(--mu);pointer-events:none}
+.arrow{transition:.2s transform}
+.tile:hover .arrow{transform:translateX(4px)}
+.tile.disabled{opacity:.7;cursor:default}
+.tile.disabled:hover{transform:none;border-color:var(--bdr)}
+.about{margin-top:44px;background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:22px 26px;font-family:var(--mono);font-size:12px;color:var(--mu2);line-height:1.85}
+.about strong{color:var(--tx)}
+.disc{margin-top:26px;padding:16px 20px;background:rgba(255,64,96,.05);border:1px solid rgba(255,64,96,.2);border-radius:10px;font-family:var(--mono);font-size:12px;color:var(--mu2);line-height:1.9}
+.disc strong{color:var(--rd)}
+.footer{margin-top:36px;font-family:var(--mono);font-size:11px;color:var(--mu);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.footer a{color:var(--mu2);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.15)}
+.footer a:hover{color:var(--tx)}
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+  <div class="h-title">Research <span class="ce">Dashboards</span> &mdash; Sathvik L</div>
+  <div class="h-meta">Public index &middot; quantitative research, backtests, and analytics &middot; results linked from the GitHub line on my resume &middot; every dashboard below is preliminary and subject to further testing.</div>
+  <div class="h-right">
+    <div class="hbadge"><div class="pulse"></div>PRELIMINARY &middot; RESEARCH ONLY</div>
+    <div class="hbadge">STATIC HTML &middot; NO SERVER</div>
+  </div>
+</header>
+
+<div class="sec">
+  <div class="shdr"><span class="snum">01</span>Dashboards</div>
+  <div class="grid">
+
+    <a class="tile ab" href="alfa_beta.html">
+      <div class="t-tag"><div class="tdot"></div>Multi-asset systematic &middot; FX + indices</div>
+      <div class="t-title">Alfa &amp; Beta Books</div>
+      <div class="t-desc">Two 10-year walk-forward books on the same 22-cell universe: equal-weight (Alfa) and inverse-vol (Beta). Mapped to the resume lines &ldquo;Multi-Asset Equal-Weight&rdquo; and &ldquo;Momentum / Trend.&rdquo;</div>
+      <div class="t-stats">
+        <div class="t-stat a"><div class="v">206.3%</div><div class="k">Alfa CAGR (10y WF)</div></div>
+        <div class="t-stat a"><div class="v">2.42</div><div class="k">Beta Sharpe</div></div>
+        <div class="t-stat"><div class="v">11 / 11</div><div class="k">Positive years</div></div>
+        <div class="t-stat"><div class="v">&minus;19.7%</div><div class="k">Max drawdown</div></div>
+      </div>
+      <div class="t-cta">Open dashboard <span class="arrow">&rarr;</span></div>
+    </a>
+
+    <a class="tile fo" href="fno.html">
+      <div class="t-tag"><div class="tdot"></div>Indian index options &middot; calendar structure</div>
+      <div class="t-title">Indian F&amp;O &mdash; Mixed Calendar v1</div>
+      <div class="t-desc">Index calendar spread research on NSE indices, 2020&ndash;2025. Includes a three-way tax-mode selector: Corporate 115BAA, Personal income, and Zero tax. Data limited and not yet fully backtested.</div>
+      <div class="t-stats">
+        <div class="t-stat a"><div class="v">61.4%</div><div class="k">Win rate (6y)</div></div>
+        <div class="t-stat a"><div class="v">2.28x</div><div class="k">Payoff ratio</div></div>
+        <div class="t-stat"><div class="v">376</div><div class="k">Total trades</div></div>
+        <div class="t-stat"><div class="v">3 views</div><div class="k">Tax scenarios</div></div>
+      </div>
+      <div class="t-cta">Open dashboard <span class="arrow">&rarr;</span></div>
+    </a>
+
+    <a class="tile sk disabled" href="sku.html">
+      <div class="t-tag"><div class="tdot"></div>Retail analytics &middot; SKU-level</div>
+      <div class="t-title">SKU Live Dashboard</div>
+      <div class="t-desc">Live SKU performance view: high-performing vs slow-moving inventory and allocation signals. Source project is a separate repo; dashboard integration in progress.</div>
+      <div class="t-stats">
+        <div class="t-stat a"><div class="v">Soon</div><div class="k">Build status</div></div>
+        <div class="t-stat"><div class="v">150+</div><div class="k">SKUs tracked</div></div>
+        <div class="t-stat"><div class="v">Live</div><div class="k">Update cadence</div></div>
+        <div class="t-stat"><div class="v">&mdash;</div><div class="k">&nbsp;</div></div>
+      </div>
+      <div class="t-cta dim">Coming soon</div>
+    </a>
+
+  </div>
+</div>
+
+<div class="about">
+  <strong>About.</strong> This is the public results hub for research work I do across quant trading (FX, indices, Indian F&amp;O) and retail analytics (SKU). Underlying strategy source and proprietary data stay in private repos &mdash; this site only surfaces rendered dashboards. Nothing here is investment advice. Every number on every dashboard is reproducible from the backtest engine that produced it; I publish only the artifacts, not the recipe.
+</div>
+
+<div class="disc">
+  <strong>&#9888; Disclaimer.</strong> All dashboards display preliminary research. No live orders have been placed. Backtest results are compound-math artifacts on historical data and are not realistic deployment targets. Sharpe, Calmar, CAGR, and max drawdown are the load-bearing metrics &mdash; not the absolute terminal dollar figures. Past performance does not predict future results.
+</div>
+
+<div class="footer">
+  <div>github.com/sathvik-lv/publishing</div>
+  <div>Last updated: 2026-04-24</div>
+</div>
+</div>
+</body>
+</html>
