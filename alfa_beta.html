@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Alfa &amp; Beta &mdash; Multi-Asset Systematic Books</title>
+<title>Multi-Asset Trading Dashboard &amp; Strategy Framework</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600;700&family=Bricolage+Grotesque:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -89,8 +89,8 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:20p
 <header>
   <div>
     <a class="back" href="index.html">&larr; back to index</a>
-    <div class="h-title"><span class="a">Alfa</span> &amp; <span class="b">Beta</span> &mdash; Multi-Asset Systematic Books</div>
-    <div class="h-meta">10-year walk-forward on a 22-cell universe across FX and global equity indices &middot; 2016-04 &rarr; 2026-04 &middot; frozen-stack selection, locked before any sizing or SL tuning &middot; sized at fixed $1M starting capital &middot; 11 / 11 positive years for both books.</div>
+    <div class="h-title"><span class="a">Multi-Asset</span> Trading Dashboard &amp; <span class="b">Strategy Framework</span></div>
+    <div class="h-meta">10-year walk-forward on a 22-cell universe across FX and global equity indices &middot; 2016-04 &rarr; 2026-04 &middot; frozen-stack selection, locked before any sizing or SL tuning &middot; sized at fixed $1M starting capital &middot; 11 / 11 positive years across both book constructions.</div>
   </div>
   <div class="h-right">
     <div class="hbadge"><div class="pulse"></div>BACKTEST ONLY</div>
@@ -104,8 +104,8 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:20p
   <div class="shdr"><span class="snum">01</span>Book Overview</div>
   <div class="g2">
     <div class="hero a">
-      <div class="h-tag a"><div class="tdot"></div>Alfa &middot; equal-weight construction &middot; 22 cells</div>
-      <div class="h-name">Multi-Asset Equal-Weight Trading Strategy</div>
+      <div class="h-tag a"><div class="tdot"></div>Book 1 &middot; equal-weight construction &middot; 22 cells</div>
+      <div class="h-name">Equal-Weight Multi-Asset Book</div>
       <div class="h-main">
         <div class="h-ret">206<sup>%</sup></div>
         <div class="h-sub"><div class="lbl">10-year CAGR</div><div class="val">$1M &rarr; $72.6B (compound)</div></div>
@@ -124,8 +124,8 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:20p
     </div>
 
     <div class="hero b">
-      <div class="h-tag b"><div class="tdot"></div>Beta &middot; inverse-vol construction &middot; 22 cells</div>
-      <div class="h-name">Momentum / Trend Trading Strategy</div>
+      <div class="h-tag b"><div class="tdot"></div>Book 2 &middot; inverse-vol construction &middot; 22 cells</div>
+      <div class="h-name">Diversified-Weight Multi-Asset Book</div>
       <div class="h-main">
         <div class="h-ret">2.42</div>
         <div class="h-sub"><div class="lbl">10-year Sharpe</div><div class="val">$1M &rarr; $11.0B (compound)</div></div>
@@ -152,7 +152,7 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:20p
     <div class="method">
       Both books draw from the <strong>same 22-cell universe</strong> &mdash; 7 FX pairs + 15 equity-index / index-combo cells &mdash; with cells selected on a train-only robustness score and locked before any sizing or stop-loss tuning. What differs is how the cells combine at the book level:
       <br><br>
-      <span class="pill a">Alfa</span> &nbsp;weights every cell equally (1 / 22). Maximum compounding under a per-cell drawdown cap. &nbsp; <span class="pill b">Beta</span> &nbsp;weights each cell by inverse realized volatility. Smoother path, higher Sharpe, higher out-of-sample Sharpe.
+      <span class="pill a">Book 1</span> &nbsp;weights every cell equally (1 / 22). Maximum compounding under a per-cell drawdown cap. &nbsp; <span class="pill b">Book 2</span> &nbsp;weights each cell by inverse realized volatility. Smoother path, higher Sharpe, higher out-of-sample Sharpe.
       <br><br>
       Per-cell sizing is identical in both books: the minimum of three independent constraints &mdash; a defensive Kelly fraction, a per-cell max-drawdown rule, and a hard book-level leverage cap. The leverage cap has never bound (actual gross leverage &asymp; 0.15x). <span class="pill m">Cell list, signals, and exact parameters are held in the private research repo.</span>
     </div>
@@ -161,17 +161,17 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:20p
 
 <!-- 03 EQUITY CURVE -->
 <div class="sec">
-  <div class="shdr"><span class="snum">03</span>Equity Curve &mdash; Alfa (monthly, log scale)</div>
+  <div class="shdr"><span class="snum">03</span>Equity Curve &mdash; Book 1 (monthly, log scale)</div>
   <div class="card">
-    <div class="chtit"><span>$1M starting &middot; monthly samples 2016-04 &rarr; 2026-04 &middot; 122 points</span><span class="pill a">ALFA EQUAL-WEIGHT 22</span></div>
+    <div class="chtit"><span>$1M starting &middot; monthly samples 2016-04 &rarr; 2026-04 &middot; 122 points</span><span class="pill a">EQUAL-WEIGHT 22</span></div>
     <div style="height:300px"><canvas id="eqChart"></canvas></div>
-    <div class="chnote">Beta daily series is not yet exported (the backtest pipeline emits only the winner's daily curve). Beta terminal stats &mdash; $1M &rarr; $11.0B, Sharpe 2.42 &mdash; come from the same-run candidate grid; rerunning with the Beta winner flag will produce an equivalent daily curve.</div>
+    <div class="chnote">Book 2 daily series is not yet exported (the backtest pipeline emits only the winner's daily curve). Book 2 terminal stats &mdash; $1M &rarr; $11.0B, Sharpe 2.42 &mdash; come from the same-run candidate grid; rerunning with the alternative winner flag will produce an equivalent daily curve.</div>
   </div>
 </div>
 
 <!-- 04 YEAR BY YEAR -->
 <div class="sec">
-  <div class="shdr"><span class="snum">04</span>Year-by-Year Walk-Forward &mdash; Alfa (11 / 11 positive)</div>
+  <div class="shdr"><span class="snum">04</span>Year-by-Year Walk-Forward &mdash; Book 1 (11 / 11 positive)</div>
   <div class="card" style="padding:0;overflow:auto">
     <table class="tbl">
       <thead><tr>
@@ -190,7 +190,7 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:20p
       <div class="chtit"><span>Out-of-Sample &middot; 2023-01 &rarr; 2026-04 (not used for selection)</span></div>
       <div style="overflow:auto">
       <table class="tbl">
-        <thead><tr><th>Metric</th><th class="num">Alfa</th><th class="num">Beta</th></tr></thead>
+        <thead><tr><th>Metric</th><th class="num">Book 1</th><th class="num">Book 2</th></tr></thead>
         <tbody>
           <tr><td>OOS CAGR</td><td class="num a-c">191.3%</td><td class="num b-c">110.3%</td></tr>
           <tr><td>OOS Sharpe</td><td class="num a-c">2.02</td><td class="num b-c">2.27</td></tr>
@@ -201,7 +201,7 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:20p
       </div>
     </div>
     <div class="card">
-      <div class="chtit"><span>Bootstrap &middot; 5 000 replicates, 20-day overlapping blocks (Alfa)</span></div>
+      <div class="chtit"><span>Bootstrap &middot; 5 000 replicates, 20-day overlapping blocks (Book 1)</span></div>
       <div style="overflow:auto">
       <table class="tbl">
         <thead><tr><th>Percentile</th><th class="num">Sharpe</th><th>Interpretation</th></tr></thead>
@@ -226,8 +226,8 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:20p
         <th>Strategy</th><th class="num">Window</th><th class="num">CAGR</th><th class="num">Max DD</th><th class="num">Sharpe</th><th class="num">Calmar</th>
       </tr></thead>
       <tbody>
-        <tr class="bench"><td><strong>Alfa &mdash; equal-weight 22</strong></td><td class="num">10y</td><td class="num">206.3%</td><td class="num">&minus;19.7%</td><td class="num">2.35</td><td class="num">10.46</td></tr>
-        <tr class="bench2"><td><strong>Beta &mdash; inverse-vol 22</strong></td><td class="num">10y</td><td class="num">153.6%</td><td class="num">&minus;19.0%</td><td class="num">2.42</td><td class="num">8.10</td></tr>
+        <tr class="bench"><td><strong>Book 1 &mdash; equal-weight 22</strong></td><td class="num">10y</td><td class="num">206.3%</td><td class="num">&minus;19.7%</td><td class="num">2.35</td><td class="num">10.46</td></tr>
+        <tr class="bench2"><td><strong>Book 2 &mdash; inverse-vol 22</strong></td><td class="num">10y</td><td class="num">153.6%</td><td class="num">&minus;19.0%</td><td class="num">2.42</td><td class="num">8.10</td></tr>
         <tr><td>Prior-gen robust 15-cell book</td><td class="num">10y</td><td class="num">13.6%</td><td class="num">&minus;6.6%</td><td class="num">1.86</td><td class="num">2.06</td></tr>
         <tr><td>5P_CLEAN 14c</td><td class="num">3.1y</td><td class="num">9.7%</td><td class="num">&minus;2.6%</td><td class="num">1.67</td><td class="num">3.70</td></tr>
         <tr><td>5P_LONG 2c</td><td class="num">10y</td><td class="num">2.8%</td><td class="num">&minus;6.7%</td><td class="num">0.64</td><td class="num">0.42</td></tr>
@@ -274,7 +274,7 @@ header{display:flex;align-items:flex-start;justify-content:space-between;gap:20p
 <div class="disc">
   <h4>&#9888; Caveats &mdash; Read These</h4>
   <ol>
-    <li><strong>Pure compound-math outputs.</strong> Final equity numbers ($72.6B Alfa, $11.0B Beta) are compound artifacts over 10 years on a fixed $1M base with no withdrawals. The load-bearing metrics are Sharpe, Calmar, CAGR, and max drawdown &mdash; not the absolute terminal dollar figure.</li>
+    <li><strong>Pure compound-math outputs.</strong> Final equity numbers ($72.6B Book 1, $11.0B Book 2) are compound artifacts over 10 years on a fixed $1M base with no withdrawals. The load-bearing metrics are Sharpe, Calmar, CAGR, and max drawdown &mdash; not the absolute terminal dollar figure.</li>
     <li><strong>QuantConnect paper / live validation in progress.</strong> A live paper-trade overlay is being set up on QuantConnect to measure real execution, real slippage, and real fill quality &mdash; so the published numbers are not only clean-math backtest outputs. Results will replace the current engine-only figures when the live window accumulates.</li>
     <li><strong>Slippage is flat.</strong> The engine uses a fixed-cost slippage model; a calibrated impact-aware TCA curve (Almgren-Chriss style) is pending before any real sizing. Sensitivity sweeps pass up to +5 pips of added cost without degrading Sharpe.</li>
     <li><strong>Max drawdown is daily-aggregated.</strong> The &minus;19.7% figure is a property of the daily PnL series. Intraday peaks are larger; no intraday halt rules are modeled in the current engine.</li>
@@ -333,7 +333,7 @@ new Chart(ctx,{
   data:{
     labels:EQ_ALFA.map(x=>x.d),
     datasets:[{
-      label:'Alfa equity',
+      label:'Book 1 equity',
       data:EQ_ALFA.map(x=>x.eq),
       borderColor:'#3df5c0',
       borderWidth:2,
