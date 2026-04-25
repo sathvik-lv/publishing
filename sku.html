@@ -50,6 +50,18 @@ a:hover{text-decoration:underline}
 .nav-right{display:flex;align-items:center;gap:16px}
 .nav-link{font-size:13px;color:var(--text-muted);text-decoration:none;transition:color var(--transition)}
 .nav-link:hover{color:var(--text)}
+.contact-link{width:36px;height:36px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);color:var(--text-mid);display:flex;align-items:center;justify-content:center;transition:background var(--transition),border-color var(--transition),color var(--transition),box-shadow var(--transition);box-shadow:var(--shadow-sm);text-decoration:none}
+.contact-link:hover{background:var(--bg-subtle);color:var(--text);border-color:var(--border-mid);box-shadow:var(--shadow-md);text-decoration:none}
+.contact-link svg{width:16px;height:16px}
+
+.suggest-form{display:flex;flex-direction:column;gap:14px}
+.suggest-form .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.suggest-form .row{grid-template-columns:1fr}}
+.suggest-form input,.suggest-form textarea{font-family:'DM Sans',system-ui,sans-serif;font-size:13.5px;padding:11px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);transition:border-color var(--transition),box-shadow var(--transition);width:100%;resize:vertical}
+.suggest-form input:focus,.suggest-form textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.suggest-form input::placeholder,.suggest-form textarea::placeholder{color:var(--text-muted)}
+.suggest-form .btn{align-self:flex-start;margin-top:0}
+.suggest-status{font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted);margin-top:4px;min-height:14px}
 .theme-toggle{width:36px;height:36px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);color:var(--text-mid);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background var(--transition),border-color var(--transition),color var(--transition),box-shadow var(--transition);box-shadow:var(--shadow-sm)}
 .theme-toggle:hover{background:var(--bg-subtle);color:var(--text);box-shadow:var(--shadow-md)}
 .theme-toggle svg{width:16px;height:16px}
@@ -165,7 +177,12 @@ a:hover{text-decoration:underline}
     <a class="nav-brand" href="index.html">Sathvik Lakumarapu V <span>· Research</span></a>
     <div class="nav-right">
       <a class="nav-link" href="index.html">Index</a>
-      <a class="nav-link" href="https://github.com/sathvik-lv/publishing" target="_blank" rel="noopener">GitHub</a>
+      <a class="contact-link" href="mailto:lakumarapuvsathvik@gmail.com" title="Email" aria-label="Email">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+      </a>
+      <a class="contact-link" href="https://www.linkedin.com/in/lakumarapu-v-sathvik" target="_blank" rel="noopener" title="LinkedIn" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
         <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -316,6 +333,25 @@ a:hover{text-decoration:underline}
     </div>
   </section>
 
+  
+  <section class="section">
+    <div class="section-header"><span class="section-label">10</span><span class="section-title">Suggestions</span></div>
+    <div class="card">
+      <p style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);line-height:1.7;margin-bottom:18px">
+        Saw something off, missing, or have an idea? Drop a quick note &mdash; on submit it opens your email client with a pre-filled message to <strong style="color:var(--accent)">lakumarapuvsathvik@gmail.com</strong>. No signup, no backend, nothing logged in the page or repo.
+      </p>
+      <form class="suggest-form" onsubmit="return sendSuggestion(event,'sku.html')">
+        <div class="row">
+          <input type="text" id="sugName" placeholder="Your name (optional)" />
+          <input type="email" id="sugEmail" placeholder="Your email (optional)" />
+        </div>
+        <textarea id="sugMsg" rows="5" required placeholder="Your suggestion or feedback..."></textarea>
+        <button type="submit" class="btn">Send via email</button>
+        <div class="suggest-status" id="sugStatus"></div>
+      </form>
+    </div>
+  </section>
+
   <div class="disc">
     <h4>&#9888; Caveats &mdash; Read These</h4>
     <ol>
@@ -323,7 +359,6 @@ a:hover{text-decoration:underline}
       <li><strong>Drag-drop is preliminary only.</strong> Browser-side analysis identifies SKUs and tiers them by revenue percentile (top 33% HIGH, mid 33% MID, bottom 33% LOW). It does not compute PBT, vendor cost, or projection &mdash; those require the daily-batch pipeline with cost data.</li>
       <li><strong>Privacy.</strong> Files dropped above never leave your browser. SheetJS reads them in-memory; the formatted Excel download is built client-side and triggered as a local download.</li>
       <li><strong>Reconciliation accuracy.</strong> 100% shrinkage detection on the synthetic ground-truth set comes from the simulator capping shrink at recorded-closing &gt;= 0; on real data this number depends on inventory-counting cadence and adjustment policies.</li>
-      <li><strong>poly_bot isolation.</strong> Statistical APIs (Bayesian, HMM, GARCH, IsotonicCalibrator, ensemble) are imported read-only from a sister repo with a SHA-256 snapshot guard &mdash; no data flows back from this project to those models.</li>
     </ol>
   </div>
 
@@ -527,7 +562,35 @@ renderTable('ageing-table', DATA.ageing_top, [
   }
   function classify(name){const n=name.toLowerCase();if(n.includes('open'))return'opening';if(n.includes('clos'))return'closing';return'sales';}
   function readWorkbook(file){return new Promise((resolve, reject)=>{const reader=new FileReader();reader.onload=(e)=>{try{const wb=XLSX.read(e.target.result,{type:'binary',cellDates:true});const ws=wb.Sheets[wb.SheetNames[0]];resolve(XLSX.utils.sheet_to_json(ws,{defval:null}));}catch(err){reject(err);}};reader.onerror=reject;reader.readAsBinaryString(file);});}
-  function resolveCols(rows){if(!rows.length)return{};const sample=rows[0];const lc={};for(const k of Object.keys(sample))lc[k.trim().toLowerCase()]=k;const pick=(...names)=>{for(const n of names)if(lc[n])return lc[n];return null;};return{sku:pick('sku_id','sku','skuid','item','itemcode','code'),qty:pick('qty','quantity','units','count'),revenue:pick('line_total_inr','amount','total','revenue','sales','net_amount','value'),price:pick('unit_selling_price_inr','unit_price','price','rate'),date:pick('txn_date','date','transaction_date','sale_date'),category:pick('category','cat','class','department'),opening:pick('opening_qty','opening','open_qty','open'),closing:pick('recorded_closing_qty','closing_qty','closing','close_qty','close')};}
+  function resolveCols(rows){
+    if(!rows.length)return{};
+    const sample=rows[0];
+    const lc={};
+    for(const k of Object.keys(sample))lc[k.trim().toLowerCase()]=k;
+    const pick=(...names)=>{for(const n of names)if(lc[n])return lc[n];return null;};
+    return{
+      sku:pick('sku_id','sku','skuid','item','item_code','itemcode','code',
+               'product_id','productid','product_code','productcode',
+               'model_no','modelno','model','part_no','partno',
+               'upc','ean','gtin','barcode',
+               'isbn','drug_code','drugcode','article','art_no'),
+      qty:pick('qty','quantity','units','count','pieces','pcs',
+               'qty_sold','sold_qty','units_sold','sold','num_units','qty_purchased'),
+      revenue:pick('line_total_inr','line_amount','amount','total','revenue','sales',
+                   'net_amount','value','gross','gross_amount','sale_amount','sales_amount',
+                   'line_total','extended_price','ext_price'),
+      price:pick('unit_selling_price_inr','unit_price','price','rate',
+                 'list_price','listprice','mrp','sale_price','saleprice',
+                 'retail_price','retailprice','sell_price','sellprice'),
+      date:pick('txn_date','date','transaction_date','sale_date','order_date','invoice_date'),
+      category:pick('category','cat','class','department','dept','section',
+                    'type','group','family','segment','aisle','genre',
+                    'tech_category','therapeutic_class','product_category','brand_category'),
+      opening:pick('opening_qty','opening','open_qty','open','stock_open','beg_qty','begin_qty'),
+      closing:pick('recorded_closing_qty','closing_qty','closing','close_qty','close',
+                   'stock_close','end_qty','ending_qty')
+    };
+  }
   function aggregate(rows,cols){const skus={};let totalRev=0,totalQty=0,minDate=null,maxDate=null;const byCat={};for(const r of rows){const sku=r[cols.sku];if(sku==null)continue;const qty=Number(r[cols.qty]??1)||0;let rev=Number(r[cols.revenue]??0);if(!rev&&cols.price)rev=(Number(r[cols.price])||0)*qty;if(!skus[sku])skus[sku]={sku,qty:0,revenue:0,transactions:0,category:r[cols.category]||''};skus[sku].qty+=qty;skus[sku].revenue+=rev;skus[sku].transactions+=1;totalRev+=rev;totalQty+=qty;if(cols.date&&r[cols.date]){const d=new Date(r[cols.date]);if(!isNaN(d)){if(!minDate||d<minDate)minDate=d;if(!maxDate||d>maxDate)maxDate=d;}}if(cols.category&&r[cols.category]!=null){const c=r[cols.category];if(!byCat[c])byCat[c]={units:0,revenue:0};byCat[c].units+=qty;byCat[c].revenue+=rev;}}return{skus:Object.values(skus),totalRev,totalQty,minDate,maxDate,byCat};}
   function addTiers(skus){const sorted=[...skus].sort((a,b)=>b.revenue-a.revenue);const n=sorted.length;const hi=Math.ceil(n/3),mid=Math.ceil(2*n/3);sorted.forEach((s,i)=>{s.tier=i<hi?'HIGH':(i<mid?'MID':'LOW');});return sorted;}
   function reconcile(salesAgg,oRows,cRows,oCols,cCols){if(!oRows||!cRows)return null;const om={};for(const r of oRows){const k=r[oCols.sku];if(k!=null)om[k]=(om[k]||0)+Number(r[oCols.opening]||0);}const cm={};for(const r of cRows){const k=r[cCols.sku];if(k!=null)cm[k]=(cm[k]||0)+Number(r[cCols.closing]||0);}const sm={};for(const s of salesAgg.skus)sm[s.sku]=s.qty;const all=new Set([...Object.keys(om),...Object.keys(sm)]);let rc=0,rd=0,ts=0;const top5=[];for(const k of all){const o=om[k]||0,sd=sm[k]||0,cl=cm[k]||0;const exp=o-sd,dis=exp-cl;rc++;if(Math.abs(dis)>0){rd++;if(dis>0){ts+=dis;top5.push({sku:k,open:o,sold:sd,close:cl,discrep:dis});}}}top5.sort((a,b)=>b.discrep-a.discrep);return{rowsCompared:rc,rowsWithDiscrepancy:rd,totalShrink:ts,top5:top5.slice(0,5)};}
@@ -692,6 +755,22 @@ togBtn.addEventListener('click', () => {
   applyTheme(next);
   try { localStorage.setItem('theme', next); } catch(e){}
 });
+
+function sendSuggestion(ev, pageId){
+  ev.preventDefault();
+  const name = (document.getElementById('sugName').value || '').trim();
+  const email = (document.getElementById('sugEmail').value || '').trim();
+  const msg = (document.getElementById('sugMsg').value || '').trim();
+  const status = document.getElementById('sugStatus');
+  if (!msg) { status.textContent = 'Please enter a suggestion before sending.'; status.style.color = 'var(--red, #c00)'; return false; }
+  const subject = encodeURIComponent('Suggestion - ' + pageId);
+  const lines = ['Suggestion / feedback on ' + pageId + ':', '', msg, '', '---', 'From: ' + (name || '(anonymous)') + (email ? ' <' + email + '>' : '')];
+  const body = encodeURIComponent(lines.join('\n'));
+  window.location.href = 'mailto:lakumarapuvsathvik@gmail.com?subject=' + subject + '&body=' + body;
+  status.textContent = 'Opening your email client...';
+  status.style.color = '';
+  return false;
+}
 </script>
 </body>
 </html>
