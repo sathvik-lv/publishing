@@ -130,17 +130,29 @@ footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--bdr);font-fam
 </div>
 
 <div class="sec">
-  <div class="shdr"><span class="snum">08</span><span>Run it locally</span></div>
+  <div class="shdr"><span class="snum">08</span><span>What this page is &amp; how to get the live version</span></div>
   <div class="card">
+    <div class="note" style="margin-bottom:14px;">
+      <strong>What you're seeing</strong> &mdash; a static snapshot of the analytics. All charts and
+      tables are real data, embedded inline, served by GitHub Pages (no backend, free). You can
+      browse everything above without running anything.
+    </div>
+    <div class="note" style="margin-bottom:14px;">
+      <strong>What's not here</strong> &mdash; four features need a running server, so they don't
+      live on a static page: <strong>drag-drop file upload</strong> (drop your own sales / opening
+      / closing files for instant analysis), <strong>SKU classifier</strong> (type a description,
+      get the predicted category), <strong>training-data contribution</strong> (privacy-redacting
+      upload), and the live <strong>reconciliation</strong> API. Those run in the FastAPI
+      dashboard on your own machine.
+    </div>
     <div class="note">
-      Drag-drop upload, classify, contribute-training, and reconciliation endpoints all run in
-      the <strong>FastAPI</strong> dashboard. To launch:
-      <pre style="margin-top:10px;color:var(--mu2);font-size:11.5px">git clone https://github.com/&lt;your-handle&gt;/SKU_Analysis
-cd SKU_Analysis && pip install -r requirements.txt
+      <strong>For developers &mdash; run the full interactive version locally:</strong>
+      <pre style="margin-top:10px;color:var(--mu2);font-size:11.5px">git clone https://github.com/sathvik-lv/SKU_Analysis
+cd SKU_Analysis &amp;&amp; pip install -r requirements.txt
 python dashboard/app.py     # then open http://127.0.0.1:8000</pre>
     </div>
     <div class="cta">
-      <a href="https://github.com/sathvik-lv/SKU_Analysis" target="_blank">SKU_Analysis repo</a>
+      <a href="https://github.com/sathvik-lv/SKU_Analysis" target="_blank">View source repo</a>
       <a href="index.html">Back to index</a>
     </div>
   </div>
