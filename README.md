@@ -13,3 +13,7 @@ Open [`index.html`](index.html) to start.
 Static HTML + Chart.js (via CDN). No build step. Opens locally or on GitHub Pages.
 
 All dashboards display preliminary research. Underlying strategy code and data stay in private repos. Not investment advice.
+
+---
+
+© 2026 Sathvik Lakumarapu V. All Rights Reserved. See [LICENSE](LICENSE) for terms — no copying, redistribution, derivative use, or AI/ML training is permitted without written consent.
