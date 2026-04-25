@@ -1,325 +1,345 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SKU Analytics &mdash; any retail vertical</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600;700&family=Bricolage+Grotesque:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<title>Sales Analytics Automation (SKU-Level)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
-<!-- xlsx-js-style is a maintained fork of SheetJS that supports cell styling
-     (so we can write conditional-formatted Excel files entirely in-browser). -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 <script>
-// Apply persisted theme before paint to avoid FOUC
-(function(){try{var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+(function(){try{var s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);}else if(window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();
 </script>
 <style>
-:root{
-  --bg:#08091a;--card:#0e1228;--card2:#111630;--bdr:rgba(255,255,255,.1);
-  --tax:#c89fff;--gr:#4afe7a;--ye:#f5c842;--rd:#ff4060;--go:#f5c842;
-  --tx:#f0f0f8;--mu:rgba(255,255,255,.55);--mu2:rgba(255,255,255,.78);
-  --row-hover:rgba(255,255,255,.02);--cell-bdr:rgba(255,255,255,.04);
-  --th-bg:rgba(255,255,255,.02);--accent-soft:rgba(200,159,255,.06);
-  --accent-bdr:rgba(200,159,255,.18);--accent-strong:rgba(200,159,255,.35);
-  --mono:'IBM Plex Mono',monospace;
+:root {
+  --bg: oklch(0.985 0.004 80); --bg-subtle: oklch(0.960 0.006 80); --bg-card: oklch(1 0 0);
+  --border: oklch(0.880 0.005 80); --border-mid: oklch(0.840 0.005 80);
+  --text: oklch(0.130 0.012 260); --text-mid: oklch(0.380 0.010 260); --text-muted: oklch(0.560 0.008 260);
+  --accent: oklch(0.520 0.185 248); --accent-bg: oklch(0.960 0.025 248); --accent-text: oklch(0.380 0.185 248);
+  --green: oklch(0.520 0.140 155); --green-bg: oklch(0.960 0.030 155);
+  --amber: oklch(0.600 0.140 65); --amber-bg: oklch(0.970 0.030 65);
+  --red: oklch(0.560 0.200 25); --red-bg: oklch(0.965 0.030 25);
+  --violet: oklch(0.520 0.180 290); --violet-bg: oklch(0.960 0.030 290);
+  --shadow-sm: 0 1px 3px oklch(0 0 0 /.06), 0 1px 2px oklch(0 0 0 /.04);
+  --shadow-md: 0 4px 12px oklch(0 0 0 /.07), 0 2px 4px oklch(0 0 0 /.04);
+  --shadow-lg: 0 8px 24px oklch(0 0 0 /.09), 0 2px 6px oklch(0 0 0 /.05);
+  --radius: 10px; --radius-sm: 6px; --transition: 200ms ease;
 }
-[data-theme="light"]{
-  --bg:#f4f4f0;--card:#ffffff;--card2:#fafaf6;--bdr:rgba(10,10,30,.12);
-  --tax:#7c3aed;--gr:#0a8a3a;--ye:#a06a00;--rd:#c8254a;--go:#a06a00;
-  --tx:#1a1a2e;--mu:rgba(20,20,40,.55);--mu2:rgba(20,20,40,.78);
-  --row-hover:rgba(124,58,237,.05);--cell-bdr:rgba(10,10,30,.06);
-  --th-bg:rgba(10,10,30,.03);--accent-soft:rgba(124,58,237,.06);
-  --accent-bdr:rgba(124,58,237,.22);--accent-strong:rgba(124,58,237,.4);
+[data-theme="dark"] {
+  --bg: oklch(0.105 0.012 260); --bg-subtle: oklch(0.140 0.014 260); --bg-card: oklch(0.155 0.014 260);
+  --border: oklch(0.240 0.016 260); --border-mid: oklch(0.290 0.016 260);
+  --text: oklch(0.935 0.005 80); --text-mid: oklch(0.720 0.006 260); --text-muted: oklch(0.540 0.008 260);
+  --accent: oklch(0.620 0.185 248); --accent-bg: oklch(0.200 0.060 248); --accent-text: oklch(0.720 0.185 248);
+  --green: oklch(0.640 0.140 155); --green-bg: oklch(0.180 0.045 155);
+  --amber: oklch(0.720 0.140 65); --amber-bg: oklch(0.200 0.040 65);
+  --red: oklch(0.660 0.200 25); --red-bg: oklch(0.220 0.060 25);
+  --violet: oklch(0.700 0.180 290); --violet-bg: oklch(0.200 0.050 290);
+  --shadow-sm: 0 1px 3px oklch(0 0 0 /.30); --shadow-md: 0 4px 12px oklch(0 0 0 /.35); --shadow-lg: 0 8px 24px oklch(0 0 0 /.40);
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{transition:background-color .18s ease,color .18s ease}
-body{font-family:'Bricolage Grotesque',sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden;font-size:15px}
-a{color:var(--mu2);text-decoration:none;border-bottom:1px solid var(--cell-bdr)}
-a:hover{color:var(--tx)}
-.page{max-width:1680px;margin:0 auto;padding:0 28px 80px}
-header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:40px 0 28px;border-bottom:1px solid var(--bdr)}
-.back{font-family:var(--mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mu);display:inline-block;margin-bottom:10px;border:none}
-.back:hover{color:var(--tax)}
-.h-title{font-size:clamp(22px,2.6vw,34px);font-weight:800;letter-spacing:-.5px}
-.h-title .tx{color:var(--tax)}
-.h-meta{margin-top:8px;font-family:var(--mono);font-size:12px;color:var(--mu);line-height:1.9;max-width:920px}
-.h-meta strong{color:var(--mu2)}
-.h-right{display:flex;gap:7px;align-items:flex-start;flex-wrap:wrap}
-.hbadge{font-family:var(--mono);font-size:11px;padding:7px 14px;border:1px solid var(--bdr);border-radius:7px;color:var(--mu2);background:var(--card2);display:flex;align-items:center;gap:7px}
-.pulse{width:7px;height:7px;border-radius:50%;background:var(--gr);box-shadow:0 0 8px var(--gr);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
-.theme-tog{font-family:var(--mono);font-size:11px;padding:7px 12px;border:1px solid var(--bdr);border-radius:7px;color:var(--mu2);background:var(--card2);display:flex;align-items:center;gap:7px;cursor:pointer;transition:.18s color,.18s border-color}
-.theme-tog:hover{border-color:var(--accent-strong);color:var(--tax)}
-.theme-tog svg{width:13px;height:13px}
-.theme-tog .lbl{letter-spacing:1px;text-transform:uppercase}
-[data-theme="dark"] .theme-tog .ic-sun{display:inline-block}[data-theme="dark"] .theme-tog .ic-moon{display:none}
-[data-theme="light"] .theme-tog .ic-sun{display:none}[data-theme="light"] .theme-tog .ic-moon{display:inline-block}
-.sec{margin-top:40px}
-.shdr{display:flex;align-items:center;gap:12px;margin-bottom:16px;font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mu2)}
-.shdr::after{content:'';flex:1;height:1px;background:var(--bdr)}
-.snum{color:var(--tax);opacity:.7}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-.card{background:var(--card);border:1px solid var(--bdr);border-radius:13px;padding:22px 24px}
-.hero{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--bdr);border-radius:15px;padding:26px 28px;border-top:3px solid var(--tax)}
-.h-tag{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:12px;color:var(--tax)}
-.tdot{width:6px;height:6px;border-radius:50%;background:var(--tax);box-shadow:0 0 8px var(--tax)}
-.h-name{font-size:18px;font-weight:700;margin-bottom:14px;letter-spacing:-.2px;color:var(--tx)}
-.h-main{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
-.h-ret{font-size:clamp(36px,4vw,60px);font-weight:800;line-height:1;letter-spacing:-1.5px;color:var(--tax)}
-.h-ret sup{font-size:.32em;vertical-align:super}
-.h-sub .lbl{font-family:var(--mono);font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:1px}
-.h-sub .val{font-size:16px;font-weight:700;margin-top:3px;color:var(--tax)}
-.hdiv{height:1px;background:var(--bdr);margin:18px 0}
-.hst{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.hst-v{font-size:17px;font-weight:700;letter-spacing:-.3px;color:var(--tx)}
-.hst-k{font-family:var(--mono);font-size:10px;color:var(--mu);margin-top:3px;text-transform:uppercase;letter-spacing:.7px}
-.pos{color:var(--gr)}.neg{color:var(--rd)}.gold{color:var(--go)}.tax{color:var(--tax)}
-/* Tables */
-.tbl{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px}
-.tbl th{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mu);padding:11px 14px;text-align:left;border-bottom:1px solid var(--bdr);background:var(--th-bg);font-weight:500}
-.tbl td{padding:9px 14px;border-bottom:1px solid var(--cell-bdr);color:var(--mu2)}
-.tbl tr:hover td{background:var(--row-hover)}
-.tbl td.num{text-align:right}
-.tbl td.tax-c{color:var(--tax)}
-.chtit{font-family:var(--mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mu2);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.chnote{font-family:var(--mono);font-size:10px;color:var(--mu);margin-top:10px;line-height:1.7}
-.chart{width:100%;height:340px}
-.pill{display:inline-block;padding:3px 10px;border-radius:5px;font-family:var(--mono);font-size:10px;letter-spacing:.5px}
-.pill.HIGH{background:rgba(74,254,122,.12);color:var(--gr)}
-.pill.MID{background:rgba(245,200,66,.14);color:var(--ye)}
-.pill.LOW{background:rgba(255,64,96,.14);color:var(--rd)}
-.pill.act{background:var(--accent-soft);color:var(--tax);border:1px solid var(--accent-bdr)}
-.pill.m{background:var(--card2);color:var(--mu2);border:1px solid var(--bdr)}
-[data-theme="light"] .pill.HIGH{background:rgba(10,138,58,.12)}
-[data-theme="light"] .pill.MID{background:rgba(160,106,0,.14)}
-[data-theme="light"] .pill.LOW{background:rgba(200,37,74,.14)}
-.method{font-family:var(--mono);font-size:12px;color:var(--mu2);line-height:1.95}
-.method strong{color:var(--tx)}
-/* KPI tiles */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;transition:background var(--transition),color var(--transition);min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:color-mix(in oklch,var(--bg) 85%,transparent);backdrop-filter:blur(12px) saturate(160%);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center}
+.nav-inner{max-width:1280px;margin:0 auto;padding:0 32px;width:100%;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-size:14px;font-weight:500;color:var(--text);text-decoration:none;letter-spacing:-.01em}
+.nav-brand span{color:var(--text-muted);font-weight:400}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav-link{font-size:13px;color:var(--text-muted);text-decoration:none;transition:color var(--transition)}
+.nav-link:hover{color:var(--text)}
+.theme-toggle{width:36px;height:36px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);color:var(--text-mid);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background var(--transition),border-color var(--transition),color var(--transition),box-shadow var(--transition);box-shadow:var(--shadow-sm)}
+.theme-toggle:hover{background:var(--bg-subtle);color:var(--text);box-shadow:var(--shadow-md)}
+.theme-toggle svg{width:16px;height:16px}
+
+.main{max-width:1280px;margin:0 auto;padding:0 32px;padding-top:56px}
+
+.hero{padding:56px 0 40px;border-bottom:1px solid var(--border)}
+.hero-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;padding:4px 10px;border-radius:99px;border:1px solid}
+.badge-warn{background:var(--amber-bg);color:var(--amber);border-color:color-mix(in oklch,var(--amber) 35%,transparent)}
+.badge-accent{background:var(--accent-bg);color:var(--accent);border-color:color-mix(in oklch,var(--accent) 35%,transparent)}
+.badge-green{background:var(--green-bg);color:var(--green);border-color:color-mix(in oklch,var(--green) 35%,transparent)}
+.badge-violet{background:var(--violet-bg);color:var(--violet);border-color:color-mix(in oklch,var(--violet) 35%,transparent)}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;animation:pulse 2.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.hero-title{font-size:clamp(28px,4vw,40px);font-weight:600;letter-spacing:-.025em;line-height:1.2;margin-bottom:14px}
+.hero-title .sub-title{color:var(--text-muted);font-weight:500}
+.hero-sub{font-size:15px;color:var(--text-muted);max-width:820px;line-height:1.7;font-weight:300}
+.hero-sub strong{color:var(--text-mid);font-weight:500}
+.back{display:inline-block;margin-bottom:18px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);text-decoration:none}
+.back:hover{color:var(--text)}
+
+.section{padding:48px 0 0}
+.section-header{display:flex;align-items:baseline;gap:12px;margin-bottom:24px}
+.section-label{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);padding:3px 8px;border:1px solid var(--border-mid);border-radius:4px}
+.section-title{font-size:18px;font-weight:500;letter-spacing:-.015em}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:24px 26px}
+
+/* KPI grid */
 .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-@media(max-width:1000px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:520px){.kpi-grid{grid-template-columns:1fr}}
-.kpi{background:var(--card);border:1px solid var(--bdr);border-top:3px solid var(--tax);border-radius:12px;padding:20px 22px}
-.kpi .k{font-family:var(--mono);font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mu);margin-bottom:10px}
-.kpi .v{font-size:24px;font-weight:700;letter-spacing:-.3px;color:var(--tx)}
-.kpi .s{margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--mu)}
-/* Drag-drop block */
+.kpi{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:18px 20px;border-top:3px solid var(--accent)}
+.kpi .k{font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;font-weight:500}
+.kpi .v{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;letter-spacing:-.018em;color:var(--text);line-height:1.15}
+.kpi .s{margin-top:6px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted)}
+
+/* Tables */
+.tbl-wrap{overflow:auto;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-card);box-shadow:var(--shadow-sm)}
+.tbl{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:12.5px}
+.tbl th{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);padding:12px 16px;text-align:left;border-bottom:1px solid var(--border);background:var(--bg-subtle);font-weight:500}
+.tbl td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--text-mid)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--bg-subtle)}
+.tbl td.num,.tbl th.num{text-align:right;font-variant-numeric:tabular-nums}
+.tbl td.a-c{color:var(--accent);font-weight:500}
+.tbl td.pos{color:var(--green);font-weight:500}
+.tbl td.neg{color:var(--red);font-weight:500}
+
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-family:'DM Mono',monospace;font-size:10.5px;font-weight:500;letter-spacing:.04em}
+.pill.HIGH{background:var(--green-bg);color:var(--green);border:1px solid color-mix(in oklch,var(--green) 30%,transparent)}
+.pill.MID{background:var(--amber-bg);color:var(--amber);border:1px solid color-mix(in oklch,var(--amber) 30%,transparent)}
+.pill.LOW{background:var(--red-bg);color:var(--red);border:1px solid color-mix(in oklch,var(--red) 30%,transparent)}
+.pill.act{background:var(--accent-bg);color:var(--accent);border:1px solid color-mix(in oklch,var(--accent) 30%,transparent)}
+
+.chart-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:20px 22px}
+.chart{width:100%;height:340px}
+.chtit{font-family:'DM Mono',monospace;font-size:11.5px;letter-spacing:.04em;color:var(--text-muted);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.chnote{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text-muted);margin-top:14px;line-height:1.7}
+
+/* Drag-drop */
 .req-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
-@media(max-width:900px){.req-grid{grid-template-columns:1fr}}
-.req-card{background:var(--card2);border:1px solid var(--bdr);border-radius:9px;padding:14px 16px}
-.req-card .hdr{font-family:var(--mono);font-size:11px;color:var(--tax);letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px}
-.req-card .body{font-family:var(--mono);font-size:11.5px;color:var(--mu2);line-height:1.85}
-.req-card .body strong{color:var(--tx)}
-.req-card .body em{color:var(--tax);font-style:normal}
+.req-card{background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+.req-card .hdr{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;font-weight:500}
+.req-card .body{font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-mid);line-height:1.85}
+.req-card .body strong{color:var(--text);font-weight:600}
+.req-card .body em{color:var(--accent);font-style:normal;font-weight:500}
 .req-card .body .indent{margin-left:10px}
-.sample-row{margin-top:10px;display:flex;flex-direction:column;gap:5px}
-.sample-row a{color:var(--tax);border-bottom:1px solid var(--accent-bdr);font-size:11.5px}
-.sample-row a:hover{color:var(--tax);border-bottom-color:var(--tax)}
-.drop{border:2px dashed var(--accent-strong);border-radius:14px;padding:28px;text-align:center;background:var(--accent-soft);transition:.18s border-color,.18s background}
-.drop.hot{border-color:var(--tax);background:var(--accent-soft)}
-.drop p{font-family:var(--mono);font-size:12px;color:var(--mu2);line-height:1.85}
-.drop p strong{color:var(--tax)}
-.drop .small{color:var(--mu);font-size:11px}
+.sample-row{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+.sample-row a{color:var(--accent);font-size:11.5px;text-decoration:none}
+.sample-row a:hover{text-decoration:underline}
+
+.drop{border:2px dashed color-mix(in oklch,var(--accent) 40%,transparent);border-radius:var(--radius);padding:28px;text-align:center;background:var(--accent-bg);transition:.18s border-color,.18s background}
+.drop.hot{border-color:var(--accent);background:color-mix(in oklch,var(--accent) 10%,var(--bg-card))}
+.drop p{font-family:'DM Mono',monospace;font-size:12px;color:var(--text-mid);line-height:1.85}
+.drop p strong{color:var(--accent);font-weight:600}
+.drop .small{color:var(--text-muted);font-size:11px}
 .drop input[type=file]{display:none}
-.drop label{display:inline-block;margin-top:14px;padding:8px 18px;background:var(--accent-soft);border:1px solid var(--accent-bdr);border-radius:7px;cursor:pointer;color:var(--mu2);font-family:var(--mono);font-size:11.5px;letter-spacing:.5px}
-.drop label:hover{background:var(--accent-soft);border-color:var(--tax);color:var(--tx)}
-.file-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--mu2)}
-.file-row .chip{padding:4px 12px;border:1px solid var(--bdr);border-radius:6px;background:var(--card2)}
-.btn{margin-top:16px;padding:9px 22px;background:var(--tax);color:#1a0f2e;border:none;border-radius:7px;cursor:pointer;font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
-[data-theme="light"] .btn{color:#fff}
-.btn:hover{filter:brightness(1.1)}
-.btn:disabled{background:var(--card2);color:var(--mu);cursor:not-allowed;border:1px solid var(--bdr);filter:none}
-.privacy{margin-top:14px;font-family:var(--mono);font-size:10.5px;color:var(--mu);font-style:italic}
-.upload-result{margin-top:22px}
+.drop label{display:inline-block;margin-top:14px;padding:8px 18px;background:var(--bg-card);border:1px solid color-mix(in oklch,var(--accent) 40%,transparent);border-radius:var(--radius-sm);cursor:pointer;color:var(--accent);font-family:'DM Mono',monospace;font-size:11.5px;letter-spacing:.04em;font-weight:500;transition:.18s}
+.drop label:hover{background:color-mix(in oklch,var(--accent) 10%,var(--bg-card))}
+.file-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;justify-content:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--text-mid)}
+.file-row .chip{padding:5px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card)}
+.btn{margin-top:16px;padding:10px 22px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;font-family:'DM Mono',monospace;font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;transition:.18s}
+.btn:hover{filter:brightness(1.1);box-shadow:var(--shadow-sm)}
+.btn:disabled{background:var(--bg-subtle);color:var(--text-muted);cursor:not-allowed;border:1px solid var(--border);filter:none;box-shadow:none}
+.privacy{margin-top:14px;font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text-muted);font-style:italic}
+
+.upload-result{margin-top:24px}
 .upload-mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
-@media(max-width:720px){.upload-mini-grid{grid-template-columns:repeat(2,1fr)}}
-.umk{background:var(--accent-soft);border:1px solid var(--accent-bdr);border-radius:9px;padding:14px 16px}
-.umk .k{font-family:var(--mono);font-size:9.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
-.umk .v{font-size:18px;font-weight:700;color:var(--tx);letter-spacing:-.2px}
-.disc{margin-top:44px;padding:20px 22px;background:rgba(255,64,96,.05);border:1px solid rgba(255,64,96,.2);border-radius:10px;font-family:var(--mono);font-size:12px;color:var(--mu2);line-height:2}
-[data-theme="light"] .disc{background:rgba(200,37,74,.05);border-color:rgba(200,37,74,.25)}
-.disc h4{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--rd);margin-bottom:10px;text-transform:uppercase}
-.disc strong{color:var(--tx)}
-.footer{margin-top:26px;font-family:var(--mono);font-size:11px;color:var(--mu);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-@media(max-width:900px){.g2{grid-template-columns:1fr}.g3{grid-template-columns:1fr}.hst{grid-template-columns:repeat(2,1fr)}}
+.umk{background:var(--accent-bg);border:1px solid color-mix(in oklch,var(--accent) 25%,transparent);border-radius:var(--radius-sm);padding:14px 16px}
+.umk .k{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-weight:500}
+.umk .v{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);letter-spacing:-.015em}
+
+.disc{margin-top:48px;padding:24px 26px;background:var(--red-bg);border:1px solid color-mix(in oklch,var(--red) 30%,transparent);border-radius:var(--radius)}
+.disc h4{font-family:'DM Mono',monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:14px;font-weight:600}
+.disc ol{margin-left:20px;font-size:13.5px;color:var(--text-mid);line-height:1.85}
+.disc li{margin-bottom:8px}
+.disc strong{color:var(--text);font-weight:600}
+
+.footer{border-top:1px solid var(--border);margin-top:48px;padding:32px 0 18px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--text-muted)}
+.footer-bottom{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;padding:16px 0 40px;font-size:11.5px;color:var(--text-muted);opacity:.85}
+
+@media(max-width:1000px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.upload-mini-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.g2{grid-template-columns:1fr}.req-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.kpi-grid{grid-template-columns:1fr}}
+@media(max-width:700px){.main{padding:0 20px;padding-top:56px}.nav-inner{padding:0 20px}}
 </style>
 </head>
 <body>
-<div class="page">
-<header>
-  <div>
-    <a class="back" href="index.html">&larr; back to index</a>
-    <div class="h-title">SKU <span class="tx">Analytics</span></div>
-    <div class="h-meta">
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">Sathvik Lakumarapu V <span>· Research</span></a>
+    <div class="nav-right">
+      <a class="nav-link" href="index.html">Index</a>
+      <a class="nav-link" href="https://github.com/sathvik-lv/publishing" target="_blank" rel="noopener">GitHub</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+
+  <section class="hero">
+    <a class="back" href="index.html">&larr; Back to index</a>
+    <div class="hero-eyebrow">
+      <span class="badge badge-warn"><span class="badge-dot"></span>Static snapshot</span>
+      <span class="badge badge-accent">Python &middot; FastAPI</span>
+      <span class="badge badge-violet">poly_bot &middot; stats APIs</span>
+    </div>
+    <h1 class="hero-title">Sales Analytics Automation <span class="sub-title">(SKU-Level)</span></h1>
+    <p class="hero-sub">
       Domain-agnostic SKU analytics &mdash; demonstrated below on a jewellery dataset
       (154 SKUs, 10 yrs of synthetic sales, 114k transactions, 1.6k reviews + 1.3k CRE inquiries),
       but the upload flow at the bottom works for <strong>any retail vertical</strong>.
       Built on <strong>poly_bot</strong>'s statistical APIs (Bayesian, HMM, GARCH, Isotonic-calibrated
       ensemble), with reconciliation engine, CRE-driven recommendations, and PBT-aware profit
-      projection. ML classifier auto-tags free-text descriptions back into SKU/category labels
-      &mdash; retrainable on your own domain via <em>contribute-training</em>.
+      projection. ML classifier auto-tags free-text descriptions back into SKU/category labels &mdash;
+      retrainable on your own domain via <em>contribute-training</em>.
+    </p>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">01</span><span class="section-title">Headline metrics</span></div>
+    <div class="kpi-grid" id="kpi-grid"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">02</span><span class="section-title">10-year revenue and units</span></div>
+    <div class="chart-card"><div id="chart-yearly" class="chart"></div></div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">03</span><span class="section-title">Mix &amp; performance</span></div>
+    <div class="g2">
+      <div class="chart-card"><div class="chtit"><span>Revenue by category</span></div><div id="chart-category" class="chart"></div></div>
+      <div class="chart-card"><div class="chtit"><span>SKU performance tiers (Bayesian + ensemble composite)</span></div><div id="chart-tiers" class="chart"></div></div>
     </div>
-  </div>
-  <div class="h-right">
-    <span class="hbadge"><span class="pulse"></span>STATIC SNAPSHOT</span>
-    <span class="hbadge">PYTHON &middot; FASTAPI</span>
-    <span class="hbadge">POLY_BOT &middot; STATS APIs</span>
-    <button class="theme-tog" id="themeTog" aria-label="Toggle theme" title="Toggle dark / light theme">
-      <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-      <svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      <span class="lbl" id="themeLbl">Dark</span>
-    </button>
-  </div>
-</header>
+  </section>
 
-<div class="sec">
-  <div class="shdr"><span class="snum">01</span><span>Headline metrics</span></div>
-  <div class="kpi-grid" id="kpi-grid"></div>
-</div>
+  <section class="section">
+    <div class="section-header"><span class="section-label">04</span><span class="section-title">PBT-aware recommendations</span></div>
+    <div class="card">
+      <p style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.7">
+        Top recommendations ranked by <strong style="color:var(--accent)">profit_priority_score</strong>
+        (lost walk-ins &times; avg margin), with PBT-uplift forecast included.
+      </p>
+      <div id="rec-table"></div>
+    </div>
+  </section>
 
-<div class="sec">
-  <div class="shdr"><span class="snum">02</span><span>10-year revenue and units</span></div>
-  <div class="card"><div id="chart-yearly" class="chart"></div></div>
-</div>
+  <section class="section">
+    <div class="section-header"><span class="section-label">05</span><span class="section-title">Projected revenue &amp; PBT uplift</span></div>
+    <div class="card"><div id="proj-table"></div></div>
+  </section>
 
-<div class="sec">
-  <div class="shdr"><span class="snum">03</span><span>Mix &amp; Performance</span></div>
-  <div class="g2">
-    <div class="card"><h3>Revenue by category</h3><div id="chart-category" class="chart"></div></div>
-    <div class="card"><h3>SKU performance tiers (Bayesian + ensemble composite)</h3><div id="chart-tiers" class="chart"></div></div>
-  </div>
-</div>
+  <section class="section">
+    <div class="section-header"><span class="section-label">06</span><span class="section-title">Top SKUs by composite score</span></div>
+    <div class="card"><div id="sku-table"></div></div>
+  </section>
 
-<div class="sec">
-  <div class="shdr"><span class="snum">04</span><span>PBT-aware recommendations</span></div>
-  <div class="card">
-    <p style="font-family:var(--mono);font-size:12px;color:var(--mu);margin-bottom:14px;line-height:1.7">
-      Top recommendations ranked by <strong style="color:var(--tax)">profit_priority_score</strong>
-      (lost walk-ins x avg margin), with PBT-uplift forecast included.
-    </p>
-    <div id="rec-table"></div>
-  </div>
-</div>
+  <section class="section">
+    <div class="section-header"><span class="section-label">07</span><span class="section-title">Ageing stock</span></div>
+    <div class="card"><div id="ageing-table"></div></div>
+  </section>
 
-<div class="sec">
-  <div class="shdr"><span class="snum">05</span><span>Projected revenue &amp; PBT uplift</span></div>
-  <div class="card">
-    <div id="proj-table"></div>
-  </div>
-</div>
+  <section class="section">
+    <div class="section-header"><span class="section-label">08</span><span class="section-title">Formatted Excel workbooks &mdash; ready to download</span></div>
+    <div class="card">
+      <p style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);line-height:1.8;margin-bottom:14px">
+        Auto-formatted with frozen headers, conditional formatting (severity / tier / margin colour scales),
+        autofilters, real Excel Tables (filter / sort / structured references), and pivot-style summary
+        sheets. Open <strong style="color:var(--accent)">MasterIndex.xlsx</strong> first &mdash; it links
+        to every other workbook.
+      </p>
+      <div id="excel-list"></div>
+    </div>
+  </section>
 
-<div class="sec">
-  <div class="shdr"><span class="snum">06</span><span>Top SKUs by composite score</span></div>
-  <div class="card"><div id="sku-table"></div></div>
-</div>
+  <section class="section">
+    <div class="section-header"><span class="section-label">09</span><span class="section-title">Analyze your own data &mdash; SKU identification &amp; HIGH/MID/LOW tiering</span></div>
+    <div class="card">
+      <p style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);line-height:1.8;margin-bottom:18px">
+        Drop your own sales file (CSV or XLSX) to identify SKUs and classify them as
+        <strong style="color:var(--green)">HIGH</strong> /
+        <strong style="color:var(--amber)">MID</strong> /
+        <strong style="color:var(--red)">LOW</strong> performers by revenue percentile.
+        Optionally drop opening &amp; closing inventory files for a basic reconciliation.
+        No projections / PBT / vendor-cost analysis &mdash; that's the daily-batch pipeline.
+      </p>
 
-<div class="sec">
-  <div class="shdr"><span class="snum">07</span><span>Ageing stock</span></div>
-  <div class="card"><div id="ageing-table"></div></div>
-</div>
-
-<div class="sec">
-  <div class="shdr"><span class="snum">08</span><span>Formatted Excel workbooks &mdash; ready to download</span></div>
-  <div class="card">
-    <p style="font-family:var(--mono);font-size:12px;color:var(--mu);line-height:1.8;margin-bottom:14px">
-      Auto-formatted with frozen headers, conditional formatting (severity / tier / margin colour scales),
-      autofilters, real Excel Tables (filter / sort / structured references), and pivot-style summary
-      sheets. Open <strong style="color:var(--tax)">MasterIndex.xlsx</strong> first &mdash; it links
-      to every other workbook.
-    </p>
-    <div id="excel-list"></div>
-  </div>
-</div>
-
-<div class="sec">
-  <div class="shdr"><span class="snum">09</span><span>Analyze your own data &mdash; SKU identification &amp; HIGH/MID/LOW tiering</span></div>
-  <div class="card">
-    <p style="font-family:var(--mono);font-size:12px;color:var(--mu);line-height:1.8;margin-bottom:16px">
-      Drop your own sales file (CSV or XLSX) to identify SKUs and classify them as
-      <strong style="color:#4afe7a">HIGH</strong> /
-      <strong style="color:#f5c842">MID</strong> /
-      <strong style="color:#ff4060">LOW</strong> performers by revenue percentile.
-      Optionally drop opening &amp; closing inventory files for a basic reconciliation.
-      No projections / PBT / vendor-cost analysis &mdash; that's the daily-batch pipeline.
-    </p>
-
-    <div class="req-grid">
-      <div class="req-card">
-        <div class="hdr">What we need to perform the analysis</div>
-        <div class="body">
-          <div><strong>Required &mdash; sales file:</strong></div>
-          <div class="indent">&bull; a SKU / item-code column &mdash; any of: <em>sku_id, sku, item, itemcode, code</em></div>
-          <div class="indent">&bull; revenue per row &mdash; any of: <em>amount, total, revenue, line_total_inr, sales</em></div>
-          <div class="indent">&bull; <em>OR</em> quantity + unit price (revenue is computed): <em>qty/quantity/units</em> &times; <em>price/rate/unit_price</em></div>
-          <div style="margin-top:8px"><strong>Optional &mdash; sales file:</strong></div>
-          <div class="indent">&bull; <em>category / cat / class / department</em> &rarr; enables category mix donut</div>
-          <div class="indent">&bull; <em>date / txn_date / transaction_date</em> &rarr; enables date-range detection</div>
-          <div style="margin-top:8px"><strong>For reconciliation (both optional):</strong></div>
-          <div class="indent">&bull; opening file with <em>sku + opening_qty</em> (filename containing "open")</div>
-          <div class="indent">&bull; closing file with <em>sku + closing_qty</em> (filename containing "clos")</div>
-        </div>
-      </div>
-      <div class="req-card">
-        <div class="hdr">Try with sample files</div>
-        <div class="body">
-          Don't have a file handy? Download a sample, drop it in, watch the analysis appear.
-          Each sample uses a different real-world column-naming style so you can see the resolver
-          handle whatever your shop uses.
-          <div class="sample-row">
-            <a href="sku_samples/sample_sales_standard.xlsx" download>&darr; sample_sales_standard.xlsx</a>
-            <a href="sku_samples/sample_sales_renamed.csv" download>&darr; sample_sales_renamed.csv (Title-case columns)</a>
-            <a href="sku_samples/sample_sales_minimal.csv" download>&darr; sample_sales_minimal.csv (just item + total)</a>
-            <a href="sku_samples/sample_sales_qty_price.csv" download>&darr; sample_sales_qty_price.csv (no revenue, qty x price)</a>
-            <a href="sku_samples/sample_opening.csv" download>&darr; sample_opening.csv</a>
-            <a href="sku_samples/sample_closing.csv" download>&darr; sample_closing.csv</a>
+      <div class="req-grid">
+        <div class="req-card">
+          <div class="hdr">What we need to perform the analysis</div>
+          <div class="body">
+            <div><strong>Required &mdash; sales file:</strong></div>
+            <div class="indent">&bull; a SKU / item-code column &mdash; any of: <em>sku_id, sku, item, itemcode, code</em></div>
+            <div class="indent">&bull; revenue per row &mdash; any of: <em>amount, total, revenue, line_total_inr, sales</em></div>
+            <div class="indent">&bull; <em>OR</em> quantity + unit price (revenue is computed): <em>qty/quantity/units</em> &times; <em>price/rate/unit_price</em></div>
+            <div style="margin-top:10px"><strong>Optional &mdash; sales file:</strong></div>
+            <div class="indent">&bull; <em>category / cat / class / department</em> &rarr; enables category mix donut</div>
+            <div class="indent">&bull; <em>date / txn_date / transaction_date</em> &rarr; enables date-range detection</div>
+            <div style="margin-top:10px"><strong>For reconciliation (both optional):</strong></div>
+            <div class="indent">&bull; opening file with <em>sku + opening_qty</em> (filename containing "open")</div>
+            <div class="indent">&bull; closing file with <em>sku + closing_qty</em> (filename containing "clos")</div>
           </div>
-          <div style="margin-top:10px;color:var(--mu);font-size:10.5px;font-style:italic">
-            For full reconciliation, drop sample_sales_standard.* + sample_opening.csv + sample_closing.csv together.
+        </div>
+        <div class="req-card">
+          <div class="hdr">Try with sample files</div>
+          <div class="body">
+            Don't have a file handy? Download a sample, drop it in, watch the analysis appear.
+            Each sample uses a different real-world column-naming style so you can see the resolver
+            handle whatever your shop uses.
+            <div class="sample-row">
+              <a href="sku_samples/sample_sales_standard.xlsx" download>&darr; sample_sales_standard.xlsx</a>
+              <a href="sku_samples/sample_sales_renamed.csv" download>&darr; sample_sales_renamed.csv (Title-case columns)</a>
+              <a href="sku_samples/sample_sales_minimal.csv" download>&darr; sample_sales_minimal.csv (just item + total)</a>
+              <a href="sku_samples/sample_sales_qty_price.csv" download>&darr; sample_sales_qty_price.csv (no revenue, qty x price)</a>
+              <a href="sku_samples/sample_opening.csv" download>&darr; sample_opening.csv</a>
+              <a href="sku_samples/sample_closing.csv" download>&darr; sample_closing.csv</a>
+            </div>
+            <div style="margin-top:12px;color:var(--text-muted);font-size:10.5px;font-style:italic">
+              For full reconciliation, drop sample_sales_standard.* + sample_opening.csv + sample_closing.csv together.
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="drop" id="drop">
-      <p><strong>Drag &amp; drop</strong> sales file here (.csv or .xlsx).</p>
-      <p class="small">Optional: also drop files with "opening" / "closing" in the filename for a quick reconciliation.</p>
-      <input type="file" id="files" multiple accept=".csv,.xlsx,.xls"/>
-      <label for="files">or browse files</label>
-      <div class="file-row" id="file-list"></div>
-      <button class="btn" id="btn-analyze" disabled>Analyze</button>
-      <div class="privacy">
-        Your data is processed entirely in this browser tab using SheetJS. Nothing is uploaded.
+
+      <div class="drop" id="drop">
+        <p><strong>Drag &amp; drop</strong> sales file here (.csv or .xlsx).</p>
+        <p class="small">Optional: also drop files with "opening" / "closing" in the filename for a quick reconciliation.</p>
+        <input type="file" id="files" multiple accept=".csv,.xlsx,.xls"/>
+        <label for="files">or browse files</label>
+        <div class="file-row" id="file-list"></div>
+        <button class="btn" id="btn-analyze" disabled>Analyze</button>
+        <div class="privacy">
+          Your data is processed entirely in this browser tab using SheetJS. Nothing is uploaded.
+        </div>
       </div>
+      <div class="upload-result" id="upload-result"></div>
     </div>
-    <div class="upload-result" id="upload-result"></div>
+  </section>
+
+  <div class="disc">
+    <h4>&#9888; Caveats &mdash; Read These</h4>
+    <ol>
+      <li><strong>Synthetic dataset.</strong> The 154-SKU jewellery dataset is generated by a Poisson-driven simulator with explicit COVID-2020 dip and vendor-cost drift. Numbers on this page are properties of that simulator, not of any real shop &mdash; the architecture, reconciliation logic, and PBT-aware recommendations are what's being demonstrated.</li>
+      <li><strong>Drag-drop is preliminary only.</strong> Browser-side analysis identifies SKUs and tiers them by revenue percentile (top 33% HIGH, mid 33% MID, bottom 33% LOW). It does not compute PBT, vendor cost, or projection &mdash; those require the daily-batch pipeline with cost data.</li>
+      <li><strong>Privacy.</strong> Files dropped above never leave your browser. SheetJS reads them in-memory; the formatted Excel download is built client-side and triggered as a local download.</li>
+      <li><strong>Reconciliation accuracy.</strong> 100% shrinkage detection on the synthetic ground-truth set comes from the simulator capping shrink at recorded-closing &gt;= 0; on real data this number depends on inventory-counting cadence and adjustment policies.</li>
+      <li><strong>poly_bot isolation.</strong> Statistical APIs (Bayesian, HMM, GARCH, IsotonicCalibrator, ensemble) are imported read-only from a sister repo with a SHA-256 snapshot guard &mdash; no data flows back from this project to those models.</li>
+    </ol>
   </div>
-</div>
 
-<!-- DISCLAIMER -->
-<div class="disc">
-  <h4>&#9888; Caveats &mdash; Read These</h4>
-  <ol style="margin-left:20px">
-    <li><strong>Synthetic dataset.</strong> The 154-SKU jewellery dataset is generated by a Poisson-driven simulator with explicit COVID-2020 dip and vendor-cost drift. Numbers on this page are properties of that simulator, not of any real shop &mdash; the architecture, reconciliation logic, and PBT-aware recommendations are what's being demonstrated.</li>
-    <li><strong>Drag-drop is preliminary only.</strong> Browser-side analysis identifies SKUs and tiers them by revenue percentile (top 33% HIGH, mid 33% MID, bottom 33% LOW). It does not compute PBT, vendor cost, or projection &mdash; those require the daily-batch pipeline with cost data.</li>
-    <li><strong>Privacy.</strong> Files dropped above never leave your browser. SheetJS reads them in-memory; the formatted Excel download is built client-side and triggered as a local download.</li>
-    <li><strong>Reconciliation accuracy.</strong> 100% shrinkage detection on the synthetic ground-truth set comes from the simulator capping shrink at recorded-closing &gt;= 0; on real data this number depends on inventory-counting cadence and adjustment policies.</li>
-    <li><strong>poly_bot isolation.</strong> Statistical APIs (Bayesian, HMM, GARCH, IsotonicCalibrator, ensemble) are imported read-only from a sister repo with a SHA-256 snapshot guard &mdash; no data flows back from this project to those models.</li>
-  </ol>
-</div>
+  <div class="footer">
+    <div>Sales Analytics Automation (SKU-Level) &middot; static snapshot &middot; <a href="index.html">&larr; back to index</a></div>
+    <div>generated <span id="gen-ts"></span></div>
+  </div>
+  <div class="footer-bottom">
+    <div>&copy; 2026 Sathvik Lakumarapu V &middot; All Rights Reserved</div>
+    <div>No copying, redistribution, or AI/ML training without written consent</div>
+  </div>
 
-<div class="footer">
-  <div>Jewellery SKU Analytics &middot; static snapshot &middot; <a href="index.html">&larr; back to index</a></div>
-  <div>generated <span id="gen-ts"></span></div>
-</div>
-<div class="footer" style="margin-top:8px;opacity:.7">
-  <div>&copy; 2026 Sathvik Lakumarapu V &middot; All Rights Reserved</div>
-  <div>No copying, redistribution, or AI/ML training without written consent</div>
-</div>
-</div>
+</main>
 
 <script>
 const DATA = {"summary":{"total_skus":154,"total_transactions":114088,"total_units_sold":265968,"total_revenue_inr":73186365855.7,"years_covered":[2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],"avg_review_rating":3.71,"cre_inquiries":1300,"cre_conversion_pct":20.7,"reconciliation_exception_rows":3416},"excel_files":[{"name":"MasterIndex.xlsx","description":"Landing index with KPIs + hyperlinks to every workbook","size_kb":6,"src_path":"C:\\Users\\sathv\\Desktop\\SKU_Analysis\\output\\excel\\MasterIndex.xlsx"},{"name":"SalesReport.xlsx","description":"10 yrs x 4 quarters segregated worksheets (40 sheets) + Pivot_ByCategory / ByMaterial / BySegment + Year Summary","size_kb":8070,"src_path":"C:\\Users\\sathv\\Desktop\\SKU_Analysis\\output\\excel\\SalesReport.xlsx"},{"name":"InventoryBook.xlsx","description":"Opening + Closing + Reconciliation + Pivot_BySeverity (severity colour-banded)","size_kb":618,"src_path":"C:\\Users\\sathv\\Desktop\\SKU_Analysis\\output\\excel\\InventoryBook.xlsx"},{"name":"SkuPerformance.xlsx","description":"All SKUs ranked + segregated HIGH / MID / LOW performer tabs","size_kb":43,"src_path":"C:\\Users\\sathv\\Desktop\\SKU_Analysis\\output\\excel\\SkuPerformance.xlsx"},{"name":"PBTAnalysis.xlsx","description":"Profit per SKU per year, margin colour-banded + yearly P&L roll-up","size_kb":93,"src_path":"C:\\Users\\sathv\\Desktop\\SKU_Analysis\\output\\excel\\PBTAnalysis.xlsx"},{"name":"Recommendations.xlsx","description":"Segregated by recommended_action, sorted by projected uplift","size_kb":26,"src_path":"C:\\Users\\sathv\\Desktop\\SKU_Analysis\\output\\excel\\Recommendations.xlsx"}],"by_year":[{"year":2016,"transactions":9817,"units":22748,"revenue_inr":4161209876.36},{"year":2017,"transactions":10726,"units":25021,"revenue_inr":4875630353.84},{"year":2018,"transactions":11280,"units":26220,"revenue_inr":5614772509.92},{"year":2019,"transactions":12239,"units":28381,"revenue_inr":6518250752.97},{"year":2020,"transactions":7085,"units":16444,"revenue_inr":4096839336.02},{"year":2021,"transactions":9064,"units":20985,"revenue_inr":5862841211.72},{"year":2022,"transactions":11550,"units":26859,"revenue_inr":8108906792.59},{"year":2023,"transactions":12060,"units":27990,"revenue_inr":9046130418.17},{"year":2024,"transactions":14291,"units":33521,"revenue_inr":11446866519.6},{"year":2025,"transactions":15976,"units":37799,"revenue_inr":13454918084.51}],"by_category":[{"category":"Bangle","units_sold":48289,"revenue_inr":23329559074.01},{"category":"Necklace","units_sold":22358,"revenue_inr":22760366034.11},{"category":"Ring","units_sold":87935,"revenue_inr":10164361241.38},{"category":"Earring","units_sold":51146,"revenue_inr":7243063396.1},{"category":"BridalSet","units_sold":2043,"revenue_inr":3750625964.36},{"category":"Pendant","units_sold":31648,"revenue_inr":2660917278.25},{"category":"Coin","units_sold":6629,"revenue_inr":1305512989.57},{"category":"Mangalsutra","units_sold":2944,"revenue_inr":928457523.31},{"category":"Armlet","units_sold":508,"revenue_inr":273841669.39},{"category":"HairOrnament","units_sold":877,"revenue_inr":215055561.06},{"category":"SilverArticle","units_sold":4618,"revenue_inr":173456327.02},{"category":"NosePin","units_sold":4982,"revenue_inr":152913217.09},{"category":"Cufflinks","units_sold":1215,"revenue_inr":130250610.4},{"category":"Anklet","units_sold":397,"revenue_inr":97468367.49},{"category":"ToeRing","units_sold":379,"revenue_inr":516602.16}],"by_segment":[{"target_segment":"Bridal","units_sold":70954,"revenue_inr":44907635779.61},{"target_segment":"Occasion","units_sold":78348,"revenue_inr":14200301577.86},{"target_segment":"Daily","units_sold":81196,"revenue_inr":10250180341.17},{"target_segment":"Gift","units_sold":32394,"revenue_inr":2543512834.27},{"target_segment":"Investment","units_sold":3076,"revenue_inr":1284735322.79}],"tier_counts":{"MID":52,"LOW":51,"HIGH":51},"ageing_buckets":{"fast(<30d)":101,"healthy(30-90d)":9,"slow(90-180d)":4,"stale(180-365d)":1,"dead(>365d)":0},"rec_action_counts":{"INVESTIGATE":46,"INTRODUCE_VALUE_VARIANT":18,"INTRODUCE_LIGHTWEIGHT_VARIANT":6,"RESTOCK_AND_PROMOTE":5,"REFRESH_DESIGN":3,"MONITOR":1},"latest_year_pbt_margin_pct":18.34,"latest_year_pbt_inr":2468019154.5099998,"latest_year_revenue_inr":13454918084.51,"projected_uplift_inr":260697182.0,"projected_uplift_pct":1.94,"top_skus":[{"sku_id":"GOL-NEC-TEMPLE-0001","category":"Necklace","sub_category":"Temple","material":"Gold","target_segment":"Bridal","units_sold":502,"revenue_inr":526441862.73,"performance_tier":"LOW","composite_score":0.3586888699053217,"current_regime":"lean"},{"sku_id":"GOL-NEC-NAKSHI-0002","category":"Necklace","sub_category":"Nakshi","material":"Gold","target_segment":"Bridal","units_sold":1293,"revenue_inr":789967670.84,"performance_tier":"MID","composite_score":0.371660687965428,"current_regime":"festive"},{"sku_id":"GOL-NEC-KASUMA-0003","category":"Necklace","sub_category":"Kasumala","material":"Gold","target_segment":"Bridal","units_sold":1268,"revenue_inr":1678068263.78,"performance_tier":"MID","composite_score":0.4585731978797822,"current_regime":"festive"},{"sku_id":"GOL-NEC-GUTTAP-0004","category":"Necklace","sub_category":"Guttapusalu","material":"Gold","target_segment":"Bridal","units_sold":1148,"revenue_inr":2495122323.02,"performance_tier":"MID","composite_score":0.5382773084124988,"current_regime":"festive"},{"sku_id":"GOL-NEC-WADAYA-0005","category":"Necklace","sub_category":"Wadayanam","material":"Gold","target_segment":"Bridal","units_sold":1184,"revenue_inr":1760814998.0,"performance_tier":"MID","composite_score":0.4669070253663475,"current_regime":"festive"},{"sku_id":"GOL-NEC-SATLAD-0006","category":"Necklace","sub_category":"Satlada","material":"Gold","target_segment":"Bridal","units_sold":203,"revenue_inr":544154585.3,"performance_tier":"LOW","composite_score":0.3328968518364149,"current_regime":"festive"},{"sku_id":"GOL-NEC-PLAIN-0007","category":"Necklace","sub_category":"Plain-Chain","material":"Gold","target_segment":"Daily","units_sold":533,"revenue_inr":103532847.94,"performance_tier":"LOW","composite_score":0.2633151987738071,"current_regime":"lean"},{"sku_id":"GOL-NEC-STUDDE-0008","category":"Necklace","sub_category":"Studded-Diamond","material":"Gold","target_segment":"Occasion","units_sold":1102,"revenue_inr":320025193.56,"performance_tier":"LOW","composite_score":0.3185211273041378,"current_regime":"festive"},{"sku_id":"GOL-NEC-STUDDE-0009","category":"Necklace","sub_category":"Studded-Diamond","material":"Gold","target_segment":"Occasion","units_sold":1103,"revenue_inr":560699438.61,"performance_tier":"MID","composite_score":0.3824295340248204,"current_regime":"festive"},{"sku_id":"GOL-NEC-STUDDE-0010","category":"Necklace","sub_category":"Studded-Diamond","material":"Gold","target_segment":"Occasion","units_sold":1075,"revenue_inr":756141437.11,"performance_tier":"MID","composite_score":0.3766097546963814,"current_regime":"festive"},{"sku_id":"GOL-NEC-STUDDE-0011","category":"Necklace","sub_category":"Studded-Diamond","material":"Gold","target_segment":"Occasion","units_sold":381,"revenue_inr":115198656.56,"performance_tier":"LOW","composite_score":0.2803636601309076,"current_regime":"lean"},{"sku_id":"GOL-NEC-POLKI-0012","category":"Necklace","sub_category":"Polki-Set","material":"Gold","target_segment":"Bridal","units_sold":1205,"revenue_inr":1887149226.23,"performance_tier":"MID","composite_score":0.4892586661378088,"current_regime":"festive"},{"sku_id":"GOL-NEC-POLKI-0013","category":"Necklace","sub_category":"Polki-Set","material":"Gold","target_segment":"Bridal","units_sold":1220,"revenue_inr":921584139.57,"performance_tier":"MID","composite_score":0.3999628266403242,"current_regime":"festive"},{"sku_id":"GOL-NEC-POLKI-0014","category":"Necklace","sub_category":"Polki-Set","material":"Gold","target_segment":"Bridal","units_sold":1311,"revenue_inr":1355767923.58,"performance_tier":"MID","composite_score":0.4802121280236338,"current_regime":"festive"},{"sku_id":"GOL-NEC-POLKI-0015","category":"Necklace","sub_category":"Polki-Set","material":"Gold","target_segment":"Bridal","units_sold":1274,"revenue_inr":1550484394.41,"performance_tier":"MID","composite_score":0.4817903752308358,"current_regime":"festive"},{"sku_id":"GOL-NEC-KUNDAN-0016","category":"Necklace","sub_category":"Kundan-Set","material":"Gold","target_segment":"Bridal","units_sold":501,"revenue_inr":555639688.03,"performance_tier":"LOW","composite_score":0.3520170119015959,"current_regime":"lean"},{"sku_id":"GOL-NEC-KUNDAN-0017","category":"Necklace","sub_category":"Kundan-Set","material":"Gold","target_segment":"Bridal","units_sold":1221,"revenue_inr":1977826490.75,"performance_tier":"MID","composite_score":0.4700404184244357,"current_regime":"festive"},{"sku_id":"GOL-NEC-KUNDAN-0018","category":"Necklace","sub_category":"Kundan-Set","material":"Gold","target_segment":"Bridal","units_sold":1321,"revenue_inr":2651632629.56,"performance_tier":"HIGH","composite_score":0.5715967536120844,"current_regime":"festive"},{"sku_id":"GOL-NEC-KUNDAN-0019","category":"Necklace","sub_category":"Kundan-Set","material":"Gold","target_segment":"Bridal","units_sold":1182,"revenue_inr":1955231679.6,"performance_tier":"MID","composite_score":0.4937809855319837,"current_regime":"festive"},{"sku_id":"GOL-NEC-PENDAN-0020","category":"Necklace","sub_category":"Pendant-Chain","material":"Gold","target_segment":"Daily","units_sold":494,"revenue_inr":64479918.58,"performance_tier":"LOW","composite_score":0.2602250113030267,"current_regime":"lean"},{"sku_id":"GOL-EAR-CHANDB-0021","category":"Earring","sub_category":"Chandbali","material":"Gold","target_segment":"Bridal","units_sold":1336,"revenue_inr":355725843.94,"performance_tier":"MID","composite_score":0.5379925771707226,"current_regime":"lean"},{"sku_id":"GOL-EAR-JHUMKA-0022","category":"Earring","sub_category":"Jhumka","material":"Gold","target_segment":"Occasion","units_sold":945,"revenue_inr":272102778.13,"performance_tier":"HIGH","composite_score":0.6767524375662115,"current_regime":"festive"},{"sku_id":"GOL-EAR-STUDD-0023","category":"Earring","sub_category":"Stud-Diamond","material":"Gold","target_segment":"Daily","units_sold":4505,"revenue_inr":155062267.59,"performance_tier":"HIGH","composite_score":0.594376125905441,"current_regime":"festive"},{"sku_id":"GOL-EAR-STUDD-0024","category":"Earring","sub_category":"Stud-Diamond","material":"Gold","target_segment":"Daily","units_sold":1878,"revenue_inr":232311115.13,"performance_tier":"HIGH","composite_score":0.5884636701436983,"current_regime":"festive"},{"sku_id":"GOL-EAR-STUDD-0025","category":"Earring","sub_category":"Stud-Diamond","material":"Gold","target_segment":"Daily","units_sold":1562,"revenue_inr":91205303.48,"performance_tier":"MID","composite_score":0.5213349282389059,"current_regime":"lean"},{"sku_id":"GOL-EAR-STUDD-0026","category":"Earring","sub_category":"Stud-Diamond","material":"Gold","target_segment":"Daily","units_sold":820,"revenue_inr":87120648.9,"performance_tier":"HIGH","composite_score":0.6223873035128508,"current_regime":"festive"},{"sku_id":"GOL-EAR-STUDP-0027","category":"Earring","sub_category":"Stud-Plain-Gold","material":"Gold","target_segment":"Daily","units_sold":1604,"revenue_inr":51960831.47,"performance_tier":"MID","composite_score":0.505811561435916,"current_regime":"lean"},{"sku_id":"GOL-EAR-STUDP-0028","category":"Earring","sub_category":"Stud-Plain-Gold","material":"Gold","target_segment":"Daily","units_sold":4480,"revenue_inr":233939047.06,"performance_tier":"HIGH","composite_score":0.6201480428935723,"current_regime":"festive"},{"sku_id":"GOL-EAR-STUDP-0029","category":"Earring","sub_category":"Stud-Plain-Gold","material":"Gold","target_segment":"Daily","units_sold":752,"revenue_inr":33820374.87,"performance_tier":"MID","composite_score":0.5617674808751927,"current_regime":"festive"},{"sku_id":"GOL-EAR-DROPP-0030","category":"Earring","sub_category":"Drop-Polki","material":"Gold","target_segment":"Bridal","units_sold":3839,"revenue_inr":1138926083.33,"performance_tier":"HIGH","composite_score":0.7824824844725075,"current_regime":"festive"},{"sku_id":"GOL-EAR-DROPP-0031","category":"Earring","sub_category":"Drop-Polki","material":"Gold","target_segment":"Bridal","units_sold":1332,"revenue_inr":198562232.88,"performance_tier":"MID","composite_score":0.5167701818003515,"current_regime":"lean"},{"sku_id":"GOL-EAR-DROPP-0032","category":"Earring","sub_category":"Drop-Polki","material":"Gold","target_segment":"Bridal","units_sold":3776,"revenue_inr":926312584.09,"performance_tier":"HIGH","composite_score":0.7231510946091053,"current_regime":"festive"},{"sku_id":"GOL-EAR-DROPP-0033","category":"Earring","sub_category":"Drop-Polki","material":"Gold","target_segment":"Bridal","units_sold":3864,"revenue_inr":797504670.44,"performance_tier":"HIGH","composite_score":0.7058077253501865,"current_regime":"festive"},{"sku_id":"GOL-EAR-DROPK-0034","category":"Earring","sub_category":"Drop-Kundan","material":"Gold","target_segment":"Bridal","units_sold":3848,"revenue_inr":563808976.78,"performance_tier":"HIGH","composite_score":0.7127846002477642,"current_regime":"festive"},{"sku_id":"GOL-EAR-DROPK-0035","category":"Earring","sub_category":"Drop-Kundan","material":"Gold","target_segment":"Bridal","units_sold":3912,"revenue_inr":544413344.74,"performance_tier":"HIGH","composite_score":0.7031079165815213,"current_regime":"festive"},{"sku_id":"GOL-EAR-DROPK-0036","category":"Earring","sub_category":"Drop-Kundan","material":"Gold","target_segment":"Bridal","units_sold":3723,"revenue_inr":455607232.28,"performance_tier":"HIGH","composite_score":0.6679833045894665,"current_regime":"festive"},{"sku_id":"GOL-EAR-DROPK-0037","category":"Earring","sub_category":"Drop-Kundan","material":"Gold","target_segment":"Bridal","units_sold":3612,"revenue_inr":871308252.39,"performance_tier":"HIGH","composite_score":0.6977184154258965,"current_regime":"festive"},{"sku_id":"GOL-EAR-HOOP-0038","category":"Earring","sub_category":"Hoop","material":"Gold","target_segment":"Daily","units_sold":1742,"revenue_inr":72586341.44,"performance_tier":"HIGH","composite_score":0.6328976929238213,"current_regime":"festive"},{"sku_id":"GOL-EAR-EARCU-0039","category":"Earring","sub_category":"Ear-Cuff","material":"Gold","target_segment":"Occasion","units_sold":1282,"revenue_inr":129786792.09,"performance_tier":"MID","composite_score":0.5559136740297731,"current_regime":"lean"},{"sku_id":"GOL-BAN-PLAIN-0040","category":"Bangle","sub_category":"Plain-22kt","material":"Gold","target_segment":"Daily","units_sold":1110,"revenue_inr":165667224.85999998,"performance_tier":"MID","composite_score":0.3854789987659638,"current_regime":"lean"},{"sku_id":"GOL-BAN-KADAC-0041","category":"Bangle","sub_category":"Kada-Carved","material":"Gold","target_segment":"Bridal","units_sold":2559,"revenue_inr":2036901422.02,"performance_tier":"HIGH","composite_score":0.6993900809072728,"current_regime":"festive"},{"sku_id":"GOL-BAN-DIAMON-0042","category":"Bangle","sub_category":"Diamond-Studded","material":"Gold","target_segment":"Occasion","units_sold":849,"revenue_inr":436521403.03,"performance_tier":"MID","composite_score":0.4175619690295358,"current_regime":"lean"},{"sku_id":"GOL-BAN-DIAMON-0043","category":"Bangle","sub_category":"Diamond-Studded","material":"Gold","target_segment":"Occasion","units_sold":2259,"revenue_inr":1575898014.1,"performance_tier":"HIGH","composite_score":0.6604833912152579,"current_regime":"festive"},{"sku_id":"GOL-BAN-DIAMON-0044","category":"Bangle","sub_category":"Diamond-Studded","material":"Gold","target_segment":"Occasion","units_sold":2467,"revenue_inr":1047920073.69,"performance_tier":"HIGH","composite_score":0.5859869003117371,"current_regime":"festive"},{"sku_id":"GOL-BAN-DIAMON-0045","category":"Bangle","sub_category":"Diamond-Studded","material":"Gold","target_segment":"Occasion","units_sold":868,"revenue_inr":687305425.23,"performance_tier":"MID","composite_score":0.4919147430954851,"current_regime":"lean"},{"sku_id":"GOL-BAN-POLKI-0046","category":"Bangle","sub_category":"Polki-Bangle","material":"Gold","target_segment":"Bridal","units_sold":2664,"revenue_inr":1722102450.73,"performance_tier":"HIGH","composite_score":0.6558754892564557,"current_regime":"festive"},{"sku_id":"GOL-BAN-POLKI-0047","category":"Bangle","sub_category":"Polki-Bangle","material":"Gold","target_segment":"Bridal","units_sold":2670,"revenue_inr":2033510939.61,"performance_tier":"HIGH","composite_score":0.6783485992875906,"current_regime":"festive"},{"sku_id":"GOL-BAN-POLKI-0048","category":"Bangle","sub_category":"Polki-Bangle","material":"Gold","target_segment":"Bridal","units_sold":1026,"revenue_inr":500611389.94,"performance_tier":"MID","composite_score":0.4578790396820448,"current_regime":"lean"},{"sku_id":"GOL-BAN-POLKI-0049","category":"Bangle","sub_category":"Polki-Bangle","material":"Gold","target_segment":"Bridal","units_sold":1057,"revenue_inr":287768582.11,"performance_tier":"MID","composite_score":0.519892777474261,"current_regime":"lean"},{"sku_id":"GOL-BAN-KUNDAN-0050","category":"Bangle","sub_category":"Kundan-Bangle","material":"Gold","target_segment":"Bridal","units_sold":2788,"revenue_inr":2665693295.83,"performance_tier":"HIGH","composite_score":0.7765447229916694,"current_regime":"festive"},{"sku_id":"GOL-BAN-KUNDAN-0051","category":"Bangle","sub_category":"Kundan-Bangle","material":"Gold","target_segment":"Bridal","units_sold":2738,"revenue_inr":2305504569.85,"performance_tier":"HIGH","composite_score":0.716174384964986,"current_regime":"festive"},{"sku_id":"GOL-BAN-KUNDAN-0052","category":"Bangle","sub_category":"Kundan-Bangle","material":"Gold","target_segment":"Bridal","units_sold":409,"revenue_inr":461265330.94,"performance_tier":"HIGH","composite_score":0.5780195141593067,"current_regime":"festive"},{"sku_id":"GOL-BAN-KUNDAN-0053","category":"Bangle","sub_category":"Kundan-Bangle","material":"Gold","target_segment":"Bridal","units_sold":983,"revenue_inr":994784638.68,"performance_tier":"HIGH","composite_score":0.6125908588767726,"current_regime":"festive"},{"sku_id":"GOL-BAN-BRACEL-0054","category":"Bangle","sub_category":"Bracelet-Diamond","material":"Gold","target_segment":"Daily","units_sold":1301,"revenue_inr":208533847.24,"performance_tier":"MID","composite_score":0.5049376268348167,"current_regime":"festive"},{"sku_id":"GOL-BAN-BRACEL-0055","category":"Bangle","sub_category":"Bracelet-Diamond","material":"Gold","target_segment":"Daily","units_sold":3254,"revenue_inr":429261798.43,"performance_tier":"MID","composite_score":0.5094643035777631,"current_regime":"festive"},{"sku_id":"GOL-BAN-BRACEL-0056","category":"Bangle","sub_category":"Bracelet-Diamond","material":"Gold","target_segment":"Daily","units_sold":3199,"revenue_inr":1028912905.72,"performance_tier":"MID","composite_score":0.5405654349500637,"current_regime":"festive"},{"sku_id":"GOL-BAN-BRACEL-0057","category":"Bangle","sub_category":"Bracelet-Diamond","material":"Gold","target_segment":"Daily","units_sold":1227,"revenue_inr":222348895.88,"performance_tier":"MID","composite_score":0.4559129568767551,"current_regime":"lean"},{"sku_id":"GOL-BAN-BRACEL-0058","category":"Bangle","sub_category":"Bracelet-Charm","material":"Gold","target_segment":"Gift","units_sold":3556,"revenue_inr":572709031.47,"performance_tier":"MID","composite_score":0.5069902046210623,"current_regime":"festive"},{"sku_id":"GOL-BAN-MENSK-0059","category":"Bangle","sub_category":"Mens-Kada","material":"Gold","target_segment":"Daily","units_sold":3360,"revenue_inr":1304951172.06,"performance_tier":"HIGH","composite_score":0.6017681689322252,"current_regime":"festive"},{"sku_id":"GOL-BAN-MENSK-0060","category":"Bangle","sub_category":"Mens-Kada","material":"Gold","target_segment":"Daily","units_sold":3290,"revenue_inr":1636935047.36,"performance_tier":"HIGH","composite_score":0.6449676847802794,"current_regime":"festive"},{"sku_id":"GOL-BAN-MENSK-0061","category":"Bangle","sub_category":"Mens-Kada","material":"Gold","target_segment":"Daily","units_sold":1112,"revenue_inr":530968474.02,"performance_tier":"MID","composite_score":0.4065808950395307,"current_regime":"lean"},{"sku_id":"GOL-RIN-SOLITA-0062","category":"Ring","sub_category":"Solitaire-Diamond","material":"Gold","target_segment":"Occasion","units_sold":3707,"revenue_inr":363206509.66,"performance_tier":"HIGH","composite_score":0.7026310996965506,"current_regime":"festive"},{"sku_id":"GOL-RIN-SOLITA-0063","category":"Ring","sub_category":"Solitaire-Diamond","material":"Gold","target_segment":"Occasion","units_sold":3918,"revenue_inr":477947089.03,"performance_tier":"HIGH","composite_score":0.6980764334185183,"current_regime":"festive"},{"sku_id":"GOL-RIN-SOLITA-0064","category":"Ring","sub_category":"Solitaire-Diamond","material":"Gold","target_segment":"Occasion","units_sold":1430,"revenue_inr":117017107.69,"performance_tier":"HIGH","composite_score":0.584650190470175,"current_regime":"lean"},{"sku_id":"GOL-RIN-SOLITA-0065","category":"Ring","sub_category":"Solitaire-Diamond","material":"Gold","target_segment":"Occasion","units_sold":3810,"revenue_inr":425411439.18,"performance_tier":"HIGH","composite_score":0.6931549891837833,"current_regime":"festive"},{"sku_id":"GOL-RIN-ENGAGE-0066","category":"Ring","sub_category":"Engagement-Halo","material":"Gold","target_segment":"Occasion","units_sold":3663,"revenue_inr":589290399.52,"performance_tier":"HIGH","composite_score":0.7157929801825359,"current_regime":"festive"},{"sku_id":"GOL-RIN-ENGAGE-0067","category":"Ring","sub_category":"Engagement-Halo","material":"Gold","target_segment":"Occasion","units_sold":3848,"revenue_inr":587204513.12,"performance_tier":"HIGH","composite_score":0.7362518708566105,"current_regime":"festive"},{"sku_id":"GOL-RIN-ENGAGE-0068","category":"Ring","sub_category":"Engagement-Halo","material":"Gold","target_segment":"Occasion","units_sold":3837,"revenue_inr":494230800.96,"performance_tier":"HIGH","composite_score":0.6791495890027127,"current_regime":"festive"},{"sku_id":"GOL-RIN-ENGAGE-0069","category":"Ring","sub_category":"Engagement-Halo","material":"Gold","target_segment":"Occasion","units_sold":1434,"revenue_inr":165372559.54,"performance_tier":"MID","composite_score":0.546390476913243,"current_regime":"lean"},{"sku_id":"GOL-RIN-PLAIN-0070","category":"Ring","sub_category":"Plain-Band","material":"Gold","target_segment":"Daily","units_sold":1933,"revenue_inr":111140840.02,"performance_tier":"MID","composite_score":0.5255929606196776,"current_regime":"lean"},{"sku_id":"GOL-RIN-PLAIN-0071","category":"Ring","sub_category":"Plain-Band","material":"Gold","target_segment":"Daily","units_sold":2000,"revenue_inr":79840632.73,"performance_tier":"HIGH","composite_score":0.5737998491334285,"current_regime":"lean"},{"sku_id":"GOL-RIN-PLAIN-0072","category":"Ring","sub_category":"Plain-Band","material":"Gold","target_segment":"Daily","units_sold":5221,"revenue_inr":242411342.14,"performance_tier":"HIGH","composite_score":0.6593835732356608,"current_regime":"festive"},{"sku_id":"GOL-RIN-COCKTA-0073","category":"Ring","sub_category":"Cocktail-Polki","material":"Gold","target_segment":"Occasion","units_sold":3849,"revenue_inr":808786102.09,"performance_tier":"HIGH","composite_score":0.7448177167795259,"current_regime":"festive"},{"sku_id":"GOL-RIN-COCKTA-0074","category":"Ring","sub_category":"Cocktail-Polki","material":"Gold","target_segment":"Occasion","units_sold":1499,"revenue_inr":190238213.34,"performance_tier":"MID","composite_score":0.5583326527523258,"current_regime":"lean"},{"sku_id":"GOL-RIN-COCKTA-0075","category":"Ring","sub_category":"Cocktail-Polki","material":"Gold","target_segment":"Occasion","units_sold":3939,"revenue_inr":595367351.42,"performance_tier":"HIGH","composite_score":0.7526070352232193,"current_regime":"festive"},{"sku_id":"GOL-RIN-COCKTA-0076","category":"Ring","sub_category":"Cocktail-Polki","material":"Gold","target_segment":"Occasion","units_sold":3831,"revenue_inr":699535273.55,"performance_tier":"HIGH","composite_score":0.7147915730099073,"current_regime":"festive"},{"sku_id":"GOL-RIN-COCKTA-0077","category":"Ring","sub_category":"Cocktail-Kundan","material":"Gold","target_segment":"Occasion","units_sold":3894,"revenue_inr":451450119.43,"performance_tier":"HIGH","composite_score":0.7158657398719002,"current_regime":"festive"},{"sku_id":"GOL-RIN-COCKTA-0078","category":"Ring","sub_category":"Cocktail-Kundan","material":"Gold","target_segment":"Occasion","units_sold":613,"revenue_inr":110655526.72,"performance_tier":"HIGH","composite_score":0.5756891010841546,"current_regime":"festive"},{"sku_id":"GOL-RIN-COCKTA-0079","category":"Ring","sub_category":"Cocktail-Kundan","material":"Gold","target_segment":"Occasion","units_sold":594,"revenue_inr":80720793.66,"performance_tier":"MID","composite_score":0.4462475873173163,"current_regime":"festive"},{"sku_id":"GOL-RIN-COCKTA-0080","category":"Ring","sub_category":"Cocktail-Kundan","material":"Gold","target_segment":"Occasion","units_sold":3744,"revenue_inr":705051835.81,"performance_tier":"HIGH","composite_score":0.741095835263334,"current_regime":"festive"}],"ageing_top":[{"sku_id":"GOL-BRI-POLKI-0120","category":"BridalSet","sub_category":"Polki-Full-Set","material":"Gold","recorded_closing_qty":6,"annual_qty_sold":9,"daily_sell_rate":0.0246575342465753,"days_to_clear":243.33333333333331,"ageing_bucket":"stale(180-365d)"},{"sku_id":"GOL-BRI-KUNDAN-0121","category":"BridalSet","sub_category":"Kundan-Full-Set","material":"Gold","recorded_closing_qty":7,"annual_qty_sold":19,"daily_sell_rate":0.0520547945205479,"days_to_clear":134.4736842105263,"ageing_bucket":"slow(90-180d)"},{"sku_id":"GOL-BRI-POLKI-0118","category":"BridalSet","sub_category":"Polki-Full-Set","material":"Gold","recorded_closing_qty":5,"annual_qty_sold":14,"daily_sell_rate":0.0383561643835616,"days_to_clear":130.35714285714286,"ageing_bucket":"slow(90-180d)"},{"sku_id":"GOL-BRI-KUNDAN-0122","category":"BridalSet","sub_category":"Kundan-Full-Set","material":"Gold","recorded_closing_qty":5,"annual_qty_sold":17,"daily_sell_rate":0.0465753424657534,"days_to_clear":107.35294117647058,"ageing_bucket":"slow(90-180d)"},{"sku_id":"GOL-BRI-POLKI-0119","category":"BridalSet","sub_category":"Polki-Full-Set","material":"Gold","recorded_closing_qty":6,"annual_qty_sold":23,"daily_sell_rate":0.0630136986301369,"days_to_clear":95.2173913043478,"ageing_bucket":"slow(90-180d)"},{"sku_id":"GOL-BRI-KUNDAN-0124","category":"BridalSet","sub_category":"Kundan-Full-Set","material":"Gold","recorded_closing_qty":7,"annual_qty_sold":29,"daily_sell_rate":0.0794520547945205,"days_to_clear":88.10344827586206,"ageing_bucket":"healthy(30-90d)"},{"sku_id":"GOL-BRI-DIAMON-0127","category":"BridalSet","sub_category":"Diamond-Full-Set","material":"Gold","recorded_closing_qty":3,"annual_qty_sold":13,"daily_sell_rate":0.0356164383561643,"days_to_clear":84.23076923076923,"ageing_bucket":"healthy(30-90d)"},{"sku_id":"GOL-BRI-DIAMON-0125","category":"BridalSet","sub_category":"Diamond-Full-Set","material":"Gold","recorded_closing_qty":5,"annual_qty_sold":23,"daily_sell_rate":0.0630136986301369,"days_to_clear":79.34782608695652,"ageing_bucket":"healthy(30-90d)"},{"sku_id":"GOL-BRI-DIAMON-0126","category":"BridalSet","sub_category":"Diamond-Full-Set","material":"Gold","recorded_closing_qty":6,"annual_qty_sold":29,"daily_sell_rate":0.0794520547945205,"days_to_clear":75.51724137931033,"ageing_bucket":"healthy(30-90d)"},{"sku_id":"GOL-BRI-POLKI-0117","category":"BridalSet","sub_category":"Polki-Full-Set","material":"Gold","recorded_closing_qty":5,"annual_qty_sold":29,"daily_sell_rate":0.0794520547945205,"days_to_clear":62.93103448275861,"ageing_bucket":"healthy(30-90d)"},{"sku_id":"GOL-ARM-VANKI-0104","category":"Armlet","sub_category":"Vanki","material":"Gold","recorded_closing_qty":5,"annual_qty_sold":30,"daily_sell_rate":0.0821917808219178,"days_to_clear":60.833333333333336,"ageing_bucket":"healthy(30-90d)"},{"sku_id":"GOL-BRI-DIAMON-0128","category":"BridalSet","sub_category":"Diamond-Full-Set","material":"Gold","recorded_closing_qty":3,"annual_qty_sold":18,"daily_sell_rate":0.0493150684931506,"days_to_clear":60.833333333333336,"ageing_bucket":"healthy(30-90d)"},{"sku_id":"GOL-BRI-KUNDAN-0123","category":"BridalSet","sub_category":"Kundan-Full-Set","material":"Gold","recorded_closing_qty":3,"annual_qty_sold":24,"daily_sell_rate":0.0657534246575342,"days_to_clear":45.62500000000001,"ageing_bucket":"healthy(30-90d)"},{"sku_id":"GOL-HAI-TIKAM-0107","category":"HairOrnament","sub_category":"Tika-Maang","material":"Gold","recorded_closing_qty":7,"annual_qty_sold":69,"daily_sell_rate":0.1890410958904109,"days_to_clear":37.028985507246375,"ageing_bucket":"healthy(30-90d)"},{"sku_id":"GOL-CUF-PLAIN-0146","category":"Cufflinks","sub_category":"Plain-Gold-Cufflinks","material":"Gold","recorded_closing_qty":4,"annual_qty_sold":56,"daily_sell_rate":0.1534246575342465,"days_to_clear":26.07142857142857,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-MAN-MODERN-0102","category":"Mangalsutra","sub_category":"Modern-Diamond","material":"Gold","recorded_closing_qty":6,"annual_qty_sold":109,"daily_sell_rate":0.2986301369863013,"days_to_clear":20.091743119266056,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-ANK-GOLDP-0110","category":"Anklet","sub_category":"Gold-Payal","material":"Gold","recorded_closing_qty":3,"annual_qty_sold":58,"daily_sell_rate":0.1589041095890411,"days_to_clear":18.879310344827584,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-HAI-JADAB-0106","category":"HairOrnament","sub_category":"Jada-Billa","material":"Gold","recorded_closing_qty":3,"annual_qty_sold":61,"daily_sell_rate":0.1671232876712328,"days_to_clear":17.950819672131146,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-MAN-CLASSI-0098","category":"Mangalsutra","sub_category":"Classic-Lakshmi","material":"Gold","recorded_closing_qty":4,"annual_qty_sold":84,"daily_sell_rate":0.2301369863013698,"days_to_clear":17.38095238095238,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-CUF-PLAIN-0145","category":"Cufflinks","sub_category":"Plain-Gold-Cufflinks","material":"Gold","recorded_closing_qty":3,"annual_qty_sold":71,"daily_sell_rate":0.1945205479452054,"days_to_clear":15.422535211267606,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-MAN-LONGB-0103","category":"Mangalsutra","sub_category":"Long-Black-Bead","material":"Gold","recorded_closing_qty":3,"annual_qty_sold":81,"daily_sell_rate":0.2219178082191781,"days_to_clear":13.51851851851852,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-NEC-WADAYA-0005","category":"Necklace","sub_category":"Wadayanam","material":"Gold","recorded_closing_qty":5,"annual_qty_sold":137,"daily_sell_rate":0.3753424657534246,"days_to_clear":13.32116788321168,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-MAN-MODERN-0100","category":"Mangalsutra","sub_category":"Modern-Diamond","material":"Gold","recorded_closing_qty":3,"annual_qty_sold":99,"daily_sell_rate":0.2712328767123287,"days_to_clear":11.06060606060606,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-NOS-DIAMON-0112","category":"NosePin","sub_category":"Diamond-Nath","material":"Gold","recorded_closing_qty":5,"annual_qty_sold":168,"daily_sell_rate":0.4602739726027397,"days_to_clear":10.86309523809524,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-NEC-POLKI-0012","category":"Necklace","sub_category":"Polki-Set","material":"Gold","recorded_closing_qty":5,"annual_qty_sold":169,"daily_sell_rate":0.4630136986301369,"days_to_clear":10.798816568047338,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-NEC-KUNDAN-0018","category":"Necklace","sub_category":"Kundan-Set","material":"Gold","recorded_closing_qty":5,"annual_qty_sold":169,"daily_sell_rate":0.4630136986301369,"days_to_clear":10.798816568047338,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-NEC-STUDDE-0010","category":"Necklace","sub_category":"Studded-Diamond","material":"Gold","recorded_closing_qty":4,"annual_qty_sold":136,"daily_sell_rate":0.3726027397260274,"days_to_clear":10.735294117647058,"ageing_bucket":"fast(<30d)"},{"sku_id":"PLA-NEC-PLATIN-0139","category":"Necklace","sub_category":"Platinum-Chain","material":"Platinum","recorded_closing_qty":6,"annual_qty_sold":204,"daily_sell_rate":0.5589041095890411,"days_to_clear":10.735294117647058,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-NEC-GUTTAP-0004","category":"Necklace","sub_category":"Guttapusalu","material":"Gold","recorded_closing_qty":5,"annual_qty_sold":177,"daily_sell_rate":0.4849315068493151,"days_to_clear":10.310734463276836,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-ARM-LAKSHM-0105","category":"Armlet","sub_category":"Lakshmi-Kadyam","material":"Gold","recorded_closing_qty":1,"annual_qty_sold":38,"daily_sell_rate":0.1041095890410958,"days_to_clear":9.605263157894736,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-NEC-SATLAD-0006","category":"Necklace","sub_category":"Satlada","material":"Gold","recorded_closing_qty":3,"annual_qty_sold":125,"daily_sell_rate":0.3424657534246575,"days_to_clear":8.76,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-COI-GANESH-0153","category":"Coin","sub_category":"Ganesh-Coin-22kt","material":"Gold","recorded_closing_qty":4,"annual_qty_sold":207,"daily_sell_rate":0.5671232876712329,"days_to_clear":7.053140096618358,"ageing_bucket":"fast(<30d)"},{"sku_id":"SIL-SIL-GIFTB-0136","category":"SilverArticle","sub_category":"Gift-Box-Set","material":"Silver","recorded_closing_qty":5,"annual_qty_sold":260,"daily_sell_rate":0.7123287671232876,"days_to_clear":7.01923076923077,"ageing_bucket":"fast(<30d)"},{"sku_id":"SIL-SIL-POOJA-0133","category":"SilverArticle","sub_category":"Pooja-Lamp","material":"Silver","recorded_closing_qty":4,"annual_qty_sold":208,"daily_sell_rate":0.5698630136986301,"days_to_clear":7.019230769230769,"ageing_bucket":"fast(<30d)"},{"sku_id":"SIL-SIL-POOJA-0134","category":"SilverArticle","sub_category":"Pooja-Plate","material":"Silver","recorded_closing_qty":3,"annual_qty_sold":171,"daily_sell_rate":0.4684931506849315,"days_to_clear":6.4035087719298245,"ageing_bucket":"fast(<30d)"},{"sku_id":"SIL-COI-SILVER-0132","category":"Coin","sub_category":"Silver-Coin","material":"Silver","recorded_closing_qty":7,"annual_qty_sold":408,"daily_sell_rate":1.1178082191780825,"days_to_clear":6.262254901960784,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-NOS-PLAIN-0116","category":"NosePin","sub_category":"Plain-Stud","material":"Gold","recorded_closing_qty":3,"annual_qty_sold":180,"daily_sell_rate":0.4931506849315068,"days_to_clear":6.083333333333334,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-COI-LAKSHM-0130","category":"Coin","sub_category":"Lakshmi-Coin-22kt","material":"Gold","recorded_closing_qty":4,"annual_qty_sold":260,"daily_sell_rate":0.7123287671232876,"days_to_clear":5.615384615384616,"ageing_bucket":"fast(<30d)"},{"sku_id":"GOL-BAN-DIAMON-0044","category":"Bangle","sub_category":"Diamond-Studded","material":"Gold","recorded_closing_qty":5,"annual_qty_sold":329,"daily_sell_rate":0.9013698630136986,"days_to_clear":5.547112462006079,"ageing_bucket":"fast(<30d)"},{"sku_id":"SIL-SIL-IDOLS-0135","category":"SilverArticle","sub_category":"Idol-Small","material":"Silver","recorded_closing_qty":4,"annual_qty_sold":285,"daily_sell_rate":0.7808219178082192,"days_to_clear":5.12280701754386,"ageing_bucket":"fast(<30d)"}],"projection_top":[{"looked_for_category":"Necklace","looked_for_sub_category":"Satlada","looked_for_material":"Gold","recommended_action":"RESTOCK_AND_PROMOTE","total_lost":15.0,"capture_rate":0.6,"avg_ticket_inr":5674161.681803279,"projected_units_recovered":9,"projected_revenue_uplift_inr":51067455.0,"margin_pct_avg":20.346207370111152,"projected_pbt_uplift_inr":1039029029.0},{"looked_for_category":"BridalSet","looked_for_sub_category":"Diamond-Full-Set","looked_for_material":"Gold","recommended_action":"INTRODUCE_VALUE_VARIANT","total_lost":17.0,"capture_rate":0.4,"avg_ticket_inr":5849509.382820513,"projected_units_recovered":7,"projected_revenue_uplift_inr":40946566.0,"margin_pct_avg":21.98226764138466,"projected_pbt_uplift_inr":900098373.0},{"looked_for_category":"Necklace","looked_for_sub_category":"Guttapusalu","looked_for_material":"Gold","recommended_action":"INTRODUCE_LIGHTWEIGHT_VARIANT","total_lost":13.0,"capture_rate":0.4,"avg_ticket_inr":5948977.769425287,"projected_units_recovered":5,"projected_revenue_uplift_inr":29744889.0,"margin_pct_avg":22.62717564106267,"projected_pbt_uplift_inr":673042828.0},{"looked_for_category":"Necklace","looked_for_sub_category":"Kasumala","looked_for_material":"Gold","recommended_action":"INTRODUCE_VALUE_VARIANT","total_lost":21.0,"capture_rate":0.4,"avg_ticket_inr":3509694.1694117645,"projected_units_recovered":8,"projected_revenue_uplift_inr":28077553.0,"margin_pct_avg":17.930778419116713,"projected_pbt_uplift_inr":503452381.0},{"looked_for_category":"BridalSet","looked_for_sub_category":"Kundan-Full-Set","looked_for_material":"Gold","recommended_action":"INTRODUCE_LIGHTWEIGHT_VARIANT","total_lost":13.0,"capture_rate":0.4,"avg_ticket_inr":4634488.133043478,"projected_units_recovered":5,"projected_revenue_uplift_inr":23172441.0,"margin_pct_avg":20.08711849860381,"projected_pbt_uplift_inr":465467568.0},{"looked_for_category":"Anklet","looked_for_sub_category":"Gold-Payal","looked_for_material":"Gold","recommended_action":"RESTOCK_AND_PROMOTE","total_lost":15.0,"capture_rate":0.6,"avg_ticket_inr":1484285.4142857145,"projected_units_recovered":9,"projected_revenue_uplift_inr":13358569.0,"margin_pct_avg":17.106373476745368,"projected_pbt_uplift_inr":228516670.0},{"looked_for_category":"Mangalsutra","looked_for_sub_category":"Long-Black-Bead","looked_for_material":"Gold","recommended_action":"REFRESH_DESIGN","total_lost":15.0,"capture_rate":0.4,"avg_ticket_inr":1388497.2720930234,"projected_units_recovered":6,"projected_revenue_uplift_inr":8330984.0,"margin_pct_avg":22.423025034893552,"projected_pbt_uplift_inr":186805863.0},{"looked_for_category":"Bangle","looked_for_sub_category":"Polki-Bangle","looked_for_material":"Gold","recommended_action":"INTRODUCE_LIGHTWEIGHT_VARIANT","total_lost":16.0,"capture_rate":0.4,"avg_ticket_inr":1864006.834214876,"projected_units_recovered":6,"projected_revenue_uplift_inr":11184041.0,"margin_pct_avg":13.720320562840218,"projected_pbt_uplift_inr":153448628.0},{"looked_for_category":"Necklace","looked_for_sub_category":"Nakshi","looked_for_material":"Gold","recommended_action":"INTRODUCE_VALUE_VARIANT","total_lost":12.0,"capture_rate":0.4,"avg_ticket_inr":1784599.3553333331,"projected_units_recovered":5,"projected_revenue_uplift_inr":8922997.0,"margin_pct_avg":15.415832271324971,"projected_pbt_uplift_inr":137555425.0},{"looked_for_category":"Necklace","looked_for_sub_category":"Studded-Diamond","looked_for_material":"Gold","recommended_action":"INTRODUCE_VALUE_VARIANT","total_lost":16.0,"capture_rate":0.4,"avg_ticket_inr":1340501.0615420565,"projected_units_recovered":6,"projected_revenue_uplift_inr":8043006.0,"margin_pct_avg":15.65143350518259,"projected_pbt_uplift_inr":125884574.0},{"looked_for_category":"Armlet","looked_for_sub_category":"Lakshmi-Kadyam","looked_for_material":"Gold","recommended_action":"INTRODUCE_VALUE_VARIANT","total_lost":14.0,"capture_rate":0.4,"avg_ticket_inr":1541881.251176471,"projected_units_recovered":6,"projected_revenue_uplift_inr":9251288.0,"margin_pct_avg":12.710366971813414,"projected_pbt_uplift_inr":117587265.0},{"looked_for_category":"Bangle","looked_for_sub_category":"Bracelet-Charm","looked_for_material":"Gold","recommended_action":"INTRODUCE_VALUE_VARIANT","total_lost":14.0,"capture_rate":0.4,"avg_ticket_inr":648775.6378571428,"projected_units_recovered":6,"projected_revenue_uplift_inr":3892654.0,"margin_pct_avg":25.30112450357783,"projected_pbt_uplift_inr":98488524.0},{"looked_for_category":"Coin","looked_for_sub_category":"Lakshmi-Coin-22kt","looked_for_material":"Gold","recommended_action":"INTRODUCE_VALUE_VARIANT","total_lost":15.0,"capture_rate":0.4,"avg_ticket_inr":780897.0609302325,"projected_units_recovered":6,"projected_revenue_uplift_inr":4685382.0,"margin_pct_avg":18.066232816552457,"projected_pbt_uplift_inr":84647202.0},{"looked_for_category":"Ring","looked_for_sub_category":"Engagement-Halo","looked_for_material":"Gold","recommended_action":"INTRODUCE_VALUE_VARIANT","total_lost":17.0,"capture_rate":0.4,"avg_ticket_inr":396740.7356688742,"projected_units_recovered":7,"projected_revenue_uplift_inr":2777185.0,"margin_pct_avg":18.281487088810614,"projected_pbt_uplift_inr":50771072.0},{"looked_for_category":"Pendant","looked_for_sub_category":"Diamond-Pendant","looked_for_material":"Gold","recommended_action":"INTRODUCE_LIGHTWEIGHT_VARIANT","total_lost":13.0,"capture_rate":0.4,"avg_ticket_inr":424822.4057048458,"projected_units_recovered":5,"projected_revenue_uplift_inr":2124112.0,"margin_pct_avg":22.562663112311537,"projected_pbt_uplift_inr":47925623.0},{"looked_for_category":"Earring","looked_for_sub_category":"Stud-Diamond","looked_for_material":"Gold","recommended_action":"INTRODUCE_VALUE_VARIANT","total_lost":23.0,"capture_rate":0.4,"avg_ticket_inr":276948.7551816745,"projected_units_recovered":9,"projected_revenue_uplift_inr":2492539.0,"margin_pct_avg":17.120291474946118,"projected_pbt_uplift_inr":42672994.0},{"looked_for_category":"Cufflinks","looked_for_sub_category":"Plain-Gold-Cufflinks","looked_for_material":"Gold","recommended_action":"INTRODUCE_VALUE_VARIANT","total_lost":14.0,"capture_rate":0.4,"avg_ticket_inr":373173.82113636367,"projected_units_recovered":6,"projected_revenue_uplift_inr":2239043.0,"margin_pct_avg":18.472421470567376,"projected_pbt_uplift_inr":41360546.0},{"looked_for_category":"Pendant","looked_for_sub_category":"Mens-Cross","looked_for_material":"Gold","recommended_action":"RESTOCK_AND_PROMOTE","total_lost":17.0,"capture_rate":0.6,"avg_ticket_inr":209138.56262857144,"projected_units_recovered":10,"projected_revenue_uplift_inr":2091386.0,"margin_pct_avg":16.95587978201889,"projected_pbt_uplift_inr":35461290.0},{"looked_for_category":"Ring","looked_for_sub_category":"Cocktail-Kundan","looked_for_material":"Gold","recommended_action":"INTRODUCE_VALUE_VARIANT","total_lost":13.0,"capture_rate":0.4,"avg_ticket_inr":367490.26752127655,"projected_units_recovered":5,"projected_revenue_uplift_inr":1837451.0,"margin_pct_avg":17.25026674076708,"projected_pbt_uplift_inr":31696520.0},{"looked_for_category":"Earring","looked_for_sub_category":"Drop-Kundan","looked_for_material":"Gold","recommended_action":"INTRODUCE_VALUE_VARIANT","total_lost":10.0,"capture_rate":0.4,"avg_ticket_inr":427797.56407945737,"projected_units_recovered":4,"projected_revenue_uplift_inr":1711190.0,"margin_pct_avg":17.31962156590533,"projected_pbt_uplift_inr":29637163.0},{"looked_for_category":"Coin","looked_for_sub_category":"Ganesh-Coin-22kt","looked_for_material":"Gold","recommended_action":"REFRESH_DESIGN","total_lost":15.0,"capture_rate":0.4,"avg_ticket_inr":181996.7469230769,"projected_units_recovered":6,"projected_revenue_uplift_inr":1091980.0,"margin_pct_avg":23.314359452350477,"projected_pbt_uplift_inr":25458814.0},{"looked_for_category":"SilverArticle","looked_for_sub_category":"Pooja-Plate","looked_for_material":"Silver","recommended_action":"INTRODUCE_VALUE_VARIANT","total_lost":13.0,"capture_rate":0.4,"avg_ticket_inr":267856.3398214286,"projected_units_recovered":5,"projected_revenue_uplift_inr":1339282.0,"margin_pct_avg":17.617459217142727,"projected_pbt_uplift_inr":23594746.0},{"looked_for_category":"Pendant","looked_for_sub_category":"Solitaire-Pendant","looked_for_material":"Gold","recommended_action":"INTRODUCE_VALUE_VARIANT","total_lost":12.0,"capture_rate":0.4,"avg_ticket_inr":199136.2204718693,"projected_units_recovered":5,"projected_revenue_uplift_inr":995681.0,"margin_pct_avg":19.76915553989452,"projected_pbt_uplift_inr":19683773.0},{"looked_for_category":"Pendant","looked_for_sub_category":"Kids-Cartoon","looked_for_material":"Gold","recommended_action":"INTRODUCE_VALUE_VARIANT","total_lost":14.0,"capture_rate":0.4,"avg_ticket_inr":75210.70022900763,"projected_units_recovered":6,"projected_revenue_uplift_inr":451264.0,"margin_pct_avg":26.3857872391641,"projected_pbt_uplift_inr":11906956.0},{"looked_for_category":"NosePin","looked_for_sub_category":"Diamond-Nath","looked_for_material":"Gold","recommended_action":"INTRODUCE_LIGHTWEIGHT_VARIANT","total_lost":16.0,"capture_rate":0.4,"avg_ticket_inr":110233.82371257484,"projected_units_recovered":6,"projected_revenue_uplift_inr":661403.0,"margin_pct_avg":17.79323599868783,"projected_pbt_uplift_inr":11768500.0}],"recommendations_top":[{"looked_for_category":"Earring","looked_for_sub_category":"Hoop","looked_for_material":"Gold","alternative_elsewhere":1.0,"design":5.0,"just_browsing":3.0,"no_stock":5.0,"price":4.0,"weight":3.0,"will_return":1.0,"total_lost":22.0,"category":"Earring","sub_category":"Hoop","material":"Gold","n_skus":1,"any_high_tier":true,"category_mlk":"Earring","sub_category_mlk":"Hoop","material_mlk":"Gold","margin_pct_avg":18.719684361062765,"pbt_inr_total":4832073.760000002,"recommended_action":"INVESTIGATE","profit_priority_score":411.83,"sku_id":""},{"looked_for_category":"Earring","looked_for_sub_category":"Stud-Diamond","looked_for_material":"Gold","alternative_elsewhere":3.0,"design":4.0,"just_browsing":3.0,"no_stock":4.0,"price":7.0,"weight":1.0,"will_return":1.0,"total_lost":23.0,"category":"Earring","sub_category":"Stud-Diamond","material":"Gold","n_skus":4,"any_high_tier":true,"category_mlk":"Earring","sub_category_mlk":"Stud-Diamond","material_mlk":"Gold","margin_pct_avg":17.120291474946118,"pbt_inr_total":32256919.799999986,"recommended_action":"INTRODUCE_VALUE_VARIANT","profit_priority_score":393.77,"sku_id":""},{"looked_for_category":"Coin","looked_for_sub_category":"Silver-Coin","looked_for_material":"Silver","alternative_elsewhere":1.0,"design":1.0,"just_browsing":1.0,"no_stock":2.0,"price":6.0,"weight":1.0,"will_return":0.0,"total_lost":12.0,"category":"Coin","sub_category":"Silver-Coin","material":"Silver","n_skus":1,"any_high_tier":false,"category_mlk":"Coin","sub_category_mlk":"Silver-Coin","material_mlk":"Silver","margin_pct_avg":32.23918177590187,"pbt_inr_total":1183363.9300000002,"recommended_action":"INTRODUCE_VALUE_VARIANT","profit_priority_score":386.87,"sku_id":""},{"looked_for_category":"Necklace","looked_for_sub_category":"Silver-Layered","looked_for_material":"Silver","alternative_elsewhere":0.0,"design":3.0,"just_browsing":0.0,"no_stock":6.0,"price":3.0,"weight":4.0,"will_return":0.0,"total_lost":16.0,"category":"Necklace","sub_category":"Silver-Layered","material":"Silver","n_skus":1,"any_high_tier":false,"category_mlk":"Necklace","sub_category_mlk":"Silver-Layered","material_mlk":"Silver","margin_pct_avg":24.166159565991453,"pbt_inr_total":122188.82000000008,"recommended_action":"RESTOCK_AND_PROMOTE","profit_priority_score":386.66,"sku_id":""},{"looked_for_category":"Necklace","looked_for_sub_category":"Kasumala","looked_for_material":"Gold","alternative_elsewhere":2.0,"design":1.0,"just_browsing":4.0,"no_stock":2.0,"price":6.0,"weight":6.0,"will_return":0.0,"total_lost":21.0,"category":"Necklace","sub_category":"Kasumala","material":"Gold","n_skus":1,"any_high_tier":false,"category_mlk":"Necklace","sub_category_mlk":"Kasumala","material_mlk":"Gold","margin_pct_avg":17.930778419116713,"pbt_inr_total":53491816.19999999,"recommended_action":"INTRODUCE_VALUE_VARIANT","profit_priority_score":376.55,"sku_id":""},{"looked_for_category":"BridalSet","looked_for_sub_category":"Diamond-Full-Set","looked_for_material":"Gold","alternative_elsewhere":2.0,"design":2.0,"just_browsing":0.0,"no_stock":4.0,"price":6.0,"weight":3.0,"will_return":0.0,"total_lost":17.0,"category":"BridalSet","sub_category":"Diamond-Full-Set","material":"Gold","n_skus":4,"any_high_tier":false,"category_mlk":"BridalSet","sub_category_mlk":"Diamond-Full-Set","material_mlk":"Gold","margin_pct_avg":21.98226764138466,"pbt_inr_total":52488656.64,"recommended_action":"INTRODUCE_VALUE_VARIANT","profit_priority_score":373.7,"sku_id":""},{"looked_for_category":"Pendant","looked_for_sub_category":"Kids-Cartoon","looked_for_material":"Gold","alternative_elsewhere":0.0,"design":3.0,"just_browsing":1.0,"no_stock":3.0,"price":6.0,"weight":1.0,"will_return":0.0,"total_lost":14.0,"category":"Pendant","sub_category":"Kids-Cartoon","material":"Gold","n_skus":1,"any_high_tier":false,"category_mlk":"Pendant","sub_category_mlk":"Kids-Cartoon","material_mlk":"Gold","margin_pct_avg":26.3857872391641,"pbt_inr_total":2599686.530000001,"recommended_action":"INTRODUCE_VALUE_VARIANT","profit_priority_score":369.4,"sku_id":""},{"looked_for_category":"Bangle","looked_for_sub_category":"Bracelet-Charm","looked_for_material":"Gold","alternative_elsewhere":1.0,"design":1.0,"just_browsing":2.0,"no_stock":3.0,"price":5.0,"weight":2.0,"will_return":0.0,"total_lost":14.0,"category":"Bangle","sub_category":"Bracelet-Charm","material":"Gold","n_skus":1,"any_high_tier":false,"category_mlk":"Bangle","sub_category_mlk":"Bracelet-Charm","material_mlk":"Gold","margin_pct_avg":25.30112450357783,"pbt_inr_total":25278719.91000001,"recommended_action":"INTRODUCE_VALUE_VARIANT","profit_priority_score":354.22,"sku_id":""},{"looked_for_category":"Coin","looked_for_sub_category":"Ganesh-Coin-22kt","looked_for_material":"Gold","alternative_elsewhere":0.0,"design":5.0,"just_browsing":0.0,"no_stock":1.0,"price":4.0,"weight":3.0,"will_return":2.0,"total_lost":15.0,"category":"Coin","sub_category":"Ganesh-Coin-22kt","material":"Gold","n_skus":1,"any_high_tier":false,"category_mlk":"Coin","sub_category_mlk":"Ganesh-Coin-22kt","material_mlk":"Gold","margin_pct_avg":23.314359452350477,"pbt_inr_total":4412863.079999998,"recommended_action":"REFRESH_DESIGN","profit_priority_score":349.72,"sku_id":""},{"looked_for_category":"Mangalsutra","looked_for_sub_category":"Long-Black-Bead","looked_for_material":"Gold","alternative_elsewhere":2.0,"design":6.0,"just_browsing":2.0,"no_stock":1.0,"price":3.0,"weight":0.0,"will_return":1.0,"total_lost":15.0,"category":"Mangalsutra","sub_category":"Long-Black-Bead","material":"Gold","n_skus":1,"any_high_tier":false,"category_mlk":"Mangalsutra","sub_category_mlk":"Long-Black-Bead","material_mlk":"Gold","margin_pct_avg":22.423025034893552,"pbt_inr_total":13387752.910000004,"recommended_action":"REFRESH_DESIGN","profit_priority_score":336.35,"sku_id":""},{"looked_for_category":"Ring","looked_for_sub_category":"Engagement-Halo","looked_for_material":"Gold","alternative_elsewhere":2.0,"design":3.0,"just_browsing":0.0,"no_stock":4.0,"price":5.0,"weight":3.0,"will_return":0.0,"total_lost":17.0,"category":"Ring","sub_category":"Engagement-Halo","material":"Gold","n_skus":4,"any_high_tier":true,"category_mlk":"Ring","sub_category_mlk":"Engagement-Halo","material_mlk":"Gold","margin_pct_avg":18.281487088810614,"pbt_inr_total":55072609.43000001,"recommended_action":"INTRODUCE_VALUE_VARIANT","profit_priority_score":310.79,"sku_id":""},{"looked_for_category":"Necklace","looked_for_sub_category":"Satlada","looked_for_material":"Gold","alternative_elsewhere":1.0,"design":1.0,"just_browsing":1.0,"no_stock":6.0,"price":2.0,"weight":4.0,"will_return":0.0,"total_lost":15.0,"category":"Necklace","sub_category":"Satlada","material":"Gold","n_skus":1,"any_high_tier":false,"category_mlk":"Necklace","sub_category_mlk":"Satlada","material_mlk":"Gold","margin_pct_avg":20.346207370111152,"pbt_inr_total":70423078.83999997,"recommended_action":"RESTOCK_AND_PROMOTE","profit_priority_score":305.19,"sku_id":""},{"looked_for_category":"Necklace","looked_for_sub_category":"Platinum-Chain","looked_for_material":"Platinum","alternative_elsewhere":2.0,"design":2.0,"just_browsing":2.0,"no_stock":3.0,"price":3.0,"weight":2.0,"will_return":0.0,"total_lost":14.0,"category":"Necklace","sub_category":"Platinum-Chain","material":"Platinum","n_skus":1,"any_high_tier":false,"category_mlk":"Necklace","sub_category_mlk":"Platinum-Chain","material_mlk":"Platinum","margin_pct_avg":21.32798363195628,"pbt_inr_total":3667208.7700000014,"recommended_action":"INVESTIGATE","profit_priority_score":298.59,"sku_id":""},{"looked_for_category":"Coin","looked_for_sub_category":"Akshaya-Coin","looked_for_material":"Silver","alternative_elsewhere":0.0,"design":2.0,"just_browsing":1.0,"no_stock":3.0,"price":3.0,"weight":2.0,"will_return":0.0,"total_lost":11.0,"category":"Coin","sub_category":"Akshaya-Coin","material":"Silver","n_skus":1,"any_high_tier":false,"category_mlk":"Coin","sub_category_mlk":"Akshaya-Coin","material_mlk":"Silver","margin_pct_avg":27.08813034208885,"pbt_inr_total":97296.91,"recommended_action":"INVESTIGATE","profit_priority_score":297.97,"sku_id":""},{"looked_for_category":"Necklace","looked_for_sub_category":"Guttapusalu","looked_for_material":"Gold","alternative_elsewhere":1.0,"design":3.0,"just_browsing":1.0,"no_stock":2.0,"price":2.0,"weight":4.0,"will_return":0.0,"total_lost":13.0,"category":"Necklace","sub_category":"Guttapusalu","material":"Gold","n_skus":1,"any_high_tier":false,"category_mlk":"Necklace","sub_category_mlk":"Guttapusalu","material_mlk":"Gold","margin_pct_avg":22.62717564106267,"pbt_inr_total":117109451.44,"recommended_action":"INTRODUCE_LIGHTWEIGHT_VARIANT","profit_priority_score":294.15,"sku_id":""},{"looked_for_category":"Pendant","looked_for_sub_category":"Diamond-Pendant","looked_for_material":"Gold","alternative_elsewhere":3.0,"design":1.0,"just_browsing":1.0,"no_stock":1.0,"price":2.0,"weight":4.0,"will_return":1.0,"total_lost":13.0,"category":"Pendant","sub_category":"Diamond-Pendant","material":"Gold","n_skus":4,"any_high_tier":true,"category_mlk":"Pendant","sub_category_mlk":"Diamond-Pendant","material_mlk":"Gold","margin_pct_avg":22.562663112311537,"pbt_inr_total":45674573.38999999,"recommended_action":"INTRODUCE_LIGHTWEIGHT_VARIANT","profit_priority_score":293.31,"sku_id":""},{"looked_for_category":"Pendant","looked_for_sub_category":"Mens-Cross","looked_for_material":"Gold","alternative_elsewhere":2.0,"design":2.0,"just_browsing":1.0,"no_stock":6.0,"price":3.0,"weight":1.0,"will_return":2.0,"total_lost":17.0,"category":"Pendant","sub_category":"Mens-Cross","material":"Gold","n_skus":1,"any_high_tier":false,"category_mlk":"Pendant","sub_category_mlk":"Mens-Cross","material_mlk":"Gold","margin_pct_avg":16.95587978201889,"pbt_inr_total":6205724.57,"recommended_action":"RESTOCK_AND_PROMOTE","profit_priority_score":288.25,"sku_id":""},{"looked_for_category":"Ring","looked_for_sub_category":"Plain-Band","looked_for_material":"Gold","alternative_elsewhere":0.0,"design":3.0,"just_browsing":1.0,"no_stock":4.0,"price":3.0,"weight":3.0,"will_return":0.0,"total_lost":14.0,"category":"Ring","sub_category":"Plain-Band","material":"Gold","n_skus":3,"any_high_tier":true,"category_mlk":"Ring","sub_category_mlk":"Plain-Band","material_mlk":"Gold","margin_pct_avg":20.53450231064414,"pbt_inr_total":9737996.4,"recommended_action":"INVESTIGATE","profit_priority_score":287.48,"sku_id":""},{"looked_for_category":"NosePin","looked_for_sub_category":"Diamond-Nath","looked_for_material":"Gold","alternative_elsewhere":3.0,"design":2.0,"just_browsing":4.0,"no_stock":2.0,"price":1.0,"weight":4.0,"will_return":0.0,"total_lost":16.0,"category":"NosePin","sub_category":"Diamond-Nath","material":"Gold","n_skus":4,"any_high_tier":false,"category_mlk":"NosePin","sub_category_mlk":"Diamond-Nath","material_mlk":"Gold","margin_pct_avg":17.79323599868783,"pbt_inr_total":3357629.600000001,"recommended_action":"INTRODUCE_LIGHTWEIGHT_VARIANT","profit_priority_score":284.69,"sku_id":""},{"looked_for_category":"Mangalsutra","looked_for_sub_category":"Modern-Diamond","looked_for_material":"Gold","alternative_elsewhere":3.0,"design":1.0,"just_browsing":2.0,"no_stock":3.0,"price":3.0,"weight":3.0,"will_return":0.0,"total_lost":15.0,"category":"Mangalsutra","sub_category":"Modern-Diamond","material":"Gold","n_skus":4,"any_high_tier":false,"category_mlk":"Mangalsutra","sub_category_mlk":"Modern-Diamond","material_mlk":"Gold","margin_pct_avg":18.51827361539797,"pbt_inr_total":13360955.670000002,"recommended_action":"INVESTIGATE","profit_priority_score":277.77,"sku_id":""},{"looked_for_category":"HairOrnament","looked_for_sub_category":"Jada-Billa","looked_for_material":"Gold","alternative_elsewhere":2.0,"design":0.0,"just_browsing":1.0,"no_stock":3.0,"price":1.0,"weight":3.0,"will_return":1.0,"total_lost":11.0,"category":"HairOrnament","sub_category":"Jada-Billa","material":"Gold","n_skus":1,"any_high_tier":false,"category_mlk":"HairOrnament","sub_category_mlk":"Jada-Billa","material_mlk":"Gold","margin_pct_avg":24.97997727507668,"pbt_inr_total":5949655.98,"recommended_action":"INVESTIGATE","profit_priority_score":274.78,"sku_id":""},{"looked_for_category":"Coin","looked_for_sub_category":"Lakshmi-Coin-22kt","looked_for_material":"Gold","alternative_elsewhere":3.0,"design":3.0,"just_browsing":1.0,"no_stock":2.0,"price":5.0,"weight":1.0,"will_return":0.0,"total_lost":15.0,"category":"Coin","sub_category":"Lakshmi-Coin-22kt","material":"Gold","n_skus":1,"any_high_tier":false,"category_mlk":"Coin","sub_category_mlk":"Lakshmi-Coin-22kt","material_mlk":"Gold","margin_pct_avg":18.066232816552457,"pbt_inr_total":18199149.86,"recommended_action":"INTRODUCE_VALUE_VARIANT","profit_priority_score":270.99,"sku_id":""},{"looked_for_category":"Earring","looked_for_sub_category":"Drop-Polki","looked_for_material":"Gold","alternative_elsewhere":2.0,"design":4.0,"just_browsing":2.0,"no_stock":3.0,"price":1.0,"weight":2.0,"will_return":1.0,"total_lost":15.0,"category":"Earring","sub_category":"Drop-Polki","material":"Gold","n_skus":4,"any_high_tier":true,"category_mlk":"Earring","sub_category_mlk":"Drop-Polki","material_mlk":"Gold","margin_pct_avg":17.812836186701936,"pbt_inr_total":87463063.16000004,"recommended_action":"INVESTIGATE","profit_priority_score":267.19,"sku_id":""},{"looked_for_category":"BridalSet","looked_for_sub_category":"Kundan-Full-Set","looked_for_material":"Gold","alternative_elsewhere":3.0,"design":1.0,"just_browsing":0.0,"no_stock":2.0,"price":2.0,"weight":4.0,"will_return":1.0,"total_lost":13.0,"category":"BridalSet","sub_category":"Kundan-Full-Set","material":"Gold","n_skus":4,"any_high_tier":false,"category_mlk":"BridalSet","sub_category_mlk":"Kundan-Full-Set","material_mlk":"Gold","margin_pct_avg":20.08711849860381,"pbt_inr_total":44439366.63000001,"recommended_action":"INTRODUCE_LIGHTWEIGHT_VARIANT","profit_priority_score":261.13,"sku_id":""},{"looked_for_category":"Cufflinks","looked_for_sub_category":"Plain-Gold-Cufflinks","looked_for_material":"Gold","alternative_elsewhere":1.0,"design":3.0,"just_browsing":2.0,"no_stock":1.0,"price":5.0,"weight":1.0,"will_return":1.0,"total_lost":14.0,"category":"Cufflinks","sub_category":"Plain-Gold-Cufflinks","material":"Gold","n_skus":2,"any_high_tier":false,"category_mlk":"Cufflinks","sub_category_mlk":"Plain-Gold-Cufflinks","material_mlk":"Gold","margin_pct_avg":18.472421470567376,"pbt_inr_total":2962467.320000001,"recommended_action":"INTRODUCE_VALUE_VARIANT","profit_priority_score":258.61,"sku_id":""}]};
-
 const fmt = (n) => {
   if (n === null || n === undefined || isNaN(n)) return '-';
   const x = Number(n);
@@ -328,48 +348,20 @@ const fmt = (n) => {
   if (Math.abs(x) >= 1e3) return (x/1e3).toFixed(1) + 'k';
   return x.toLocaleString('en-IN');
 };
+const fmtINR = (n) => 'Rs. ' + fmt(n);
 
 document.getElementById('gen-ts').textContent = new Date().toISOString().slice(0,10);
 
-// ===== Theme toggle (shared with publishing/index.html via localStorage 'theme') =====
-function readCSSVar(name){
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
+function readVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
 function plotTheme(){
-  const bg = readCSSVar('--card');
-  const fg = readCSSVar('--mu2');
-  const muted = readCSSVar('--mu');
-  const grid = readCSSVar('--cell-bdr');
-  return {paper_bgcolor:bg, plot_bgcolor:bg, font:{color:fg, family:"'IBM Plex Mono',monospace", size:11}, gridcolor:grid, mutedcolor:muted};
+  const bg = readVar('--bg-card');
+  const fg = readVar('--text-mid');
+  const grid = readVar('--border');
+  return {paper_bgcolor:bg, plot_bgcolor:bg, font:{color:fg, family:"'DM Mono',monospace", size:11}, gridcolor:grid};
 }
-const PLOT_IDS = ['chart-yearly','chart-category','chart-tiers'];
-function repaintAllCharts(){
-  const t = plotTheme();
-  PLOT_IDS.concat(['up-tiers','up-cat']).forEach(id => {
-    const el = document.getElementById(id);
-    if (!el || !el.data) return;
-    Plotly.relayout(id, {
-      paper_bgcolor: t.paper_bgcolor, plot_bgcolor: t.plot_bgcolor,
-      'font.color': t.font.color,
-      'xaxis.gridcolor': t.gridcolor, 'yaxis.gridcolor': t.gridcolor,
-      'yaxis2.gridcolor': t.gridcolor,
-    });
-  });
-}
-(function setupThemeToggle(){
-  const tog = document.getElementById('themeTog');
-  const lbl = document.getElementById('themeLbl');
-  function syncLabel(){ lbl.textContent = (document.documentElement.getAttribute('data-theme')||'dark') === 'dark' ? 'Dark' : 'Light'; }
-  syncLabel();
-  tog.addEventListener('click', () => {
-    const cur = document.documentElement.getAttribute('data-theme') || 'dark';
-    const next = cur === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    try { localStorage.setItem('theme', next); } catch(e){}
-    syncLabel();
-    repaintAllCharts();
-  });
-})();
+const PALETTE_LIGHT = ['#3b82f6','#7c3aed','#06b6d4','#14b8a6','#22c55e','#a855f7','#ec4899','#f59e0b','#ef4444','#10b981','#0ea5e9','#8b5cf6'];
+const PALETTE_DARK  = ['#60a5fa','#a78bfa','#22d3ee','#5eead4','#4ade80','#c084fc','#f472b6','#fbbf24','#f87171','#34d399','#38bdf8','#a78bfa'];
+function palette(){return document.documentElement.getAttribute('data-theme') === 'dark' ? PALETTE_DARK : PALETTE_LIGHT;}
 
 const kpis = [
   {k:'Total SKUs',         v: DATA.summary.total_skus},
@@ -384,57 +376,54 @@ const kpis = [
 document.getElementById('kpi-grid').innerHTML = kpis.map(k =>
   `<div class="kpi"><div class="k">${k.k}</div><div class="v">${k.v}</div>${k.s?`<div class="s">${k.s}</div>`:''}</div>`).join('');
 
-const PALETTE = ['#c89fff','#a778db','#8b5cf6','#7c3aed','#6d28d9','#581c87','#4338ca','#3b82f6','#06b6d4','#14b8a6','#22c55e','#84cc16'];
-
-const yr = DATA.by_year || [];
-{
+function buildYearlyChart(){
+  const yr = DATA.by_year || [];
   const t = plotTheme();
   Plotly.newPlot('chart-yearly', [
-    {x:yr.map(d=>d.year), y:yr.map(d=>d.revenue_inr/1e7), type:'bar', name:'Revenue (Cr INR)', marker:{color:readCSSVar('--tax')}, opacity:0.9},
-    {x:yr.map(d=>d.year), y:yr.map(d=>d.units), type:'scatter', mode:'lines+markers', name:'Units sold', yaxis:'y2', line:{color:readCSSVar('--go')}},
+    {x:yr.map(d=>d.year), y:yr.map(d=>d.revenue_inr/1e7), type:'bar', name:'Revenue (Cr INR)', marker:{color:readVar('--accent')}, opacity:.92},
+    {x:yr.map(d=>d.year), y:yr.map(d=>d.units), type:'scatter', mode:'lines+markers', name:'Units sold', yaxis:'y2', line:{color:readVar('--amber'), width:2.5}, marker:{size:6}}
   ],{
     paper_bgcolor:t.paper_bgcolor, plot_bgcolor:t.plot_bgcolor, font:t.font,
     xaxis:{title:'', gridcolor:t.gridcolor},
     yaxis:{title:'Revenue (Crore INR)', gridcolor:t.gridcolor},
     yaxis2:{title:'Units sold', overlaying:'y', side:'right', showgrid:false},
-    margin:{t:20, r:40, l:60, b:40},
-    legend:{orientation:'h', y:1.12},
+    margin:{t:24, r:50, l:60, b:40},
+    legend:{orientation:'h', y:1.14}
   }, {displayModeBar:false, responsive:true});
 }
-
-const cat = (DATA.by_category || []).slice(0, 12);
-{
+function buildCategoryChart(){
+  const cat = (DATA.by_category || []).slice(0, 12);
   const t = plotTheme();
   Plotly.newPlot('chart-category', [{
     labels: cat.map(d=>d.category),
     values: cat.map(d=>d.revenue_inr),
-    type:'pie', hole:0.55, textinfo:'label+percent', textfont:{size:11},
-    marker:{colors: PALETTE}
+    type:'pie', hole:0.55, textinfo:'label+percent', textfont:{size:11, color:readVar('--text-mid')},
+    marker:{colors: palette()}
   }],{
     paper_bgcolor:t.paper_bgcolor, plot_bgcolor:t.plot_bgcolor, font:t.font,
-    margin:{t:10, b:10}, showlegend:false,
+    margin:{t:10, b:10}, showlegend:false
   }, {displayModeBar:false, responsive:true});
 }
-
-const tc = DATA.tier_counts || {};
-{
+function buildTiersChart(){
+  const tc = DATA.tier_counts || {};
   const t = plotTheme();
   Plotly.newPlot('chart-tiers', [{
     x:['HIGH','MID','LOW'],
     y:[tc.HIGH||0, tc.MID||0, tc.LOW||0],
     type:'bar',
-    marker:{color:[readCSSVar('--gr'), readCSSVar('--ye'), readCSSVar('--rd')]},
-    text:[tc.HIGH||0, tc.MID||0, tc.LOW||0], textposition:'outside',
+    marker:{color:[readVar('--green'), readVar('--amber'), readVar('--red')]},
+    text:[tc.HIGH||0, tc.MID||0, tc.LOW||0], textposition:'outside', textfont:{color:readVar('--text-mid')}
   }],{
     paper_bgcolor:t.paper_bgcolor, plot_bgcolor:t.plot_bgcolor, font:t.font,
     xaxis:{gridcolor:t.gridcolor}, yaxis:{title:'# SKUs', gridcolor:t.gridcolor},
-    margin:{t:30, r:40, l:60, b:40},
+    margin:{t:30, r:40, l:60, b:40}
   }, {displayModeBar:false, responsive:true});
 }
+buildYearlyChart(); buildCategoryChart(); buildTiersChart();
 
 function renderTable(elId, rows, cols) {
   if (!rows || rows.length === 0) {
-    document.getElementById(elId).innerHTML = '<div style="padding:14px;color:var(--mu);font-family:var(--mono);font-size:12px">no rows</div>';
+    document.getElementById(elId).innerHTML = '<div style="padding:14px;color:var(--text-muted);font-family:\'DM Mono\',monospace;font-size:12px">no rows</div>';
     return;
   }
   const head = '<tr>' + cols.map(c => `<th${c.fmt && (c.fmt==='inr'||c.fmt==='pct'||c.fmt==='num') ? ' class="num"' : ''}>${c.label}</th>`).join('') + '</tr>';
@@ -448,7 +437,7 @@ function renderTable(elId, rows, cols) {
     if (c.cls === 'act' && v)  return `<td><span class="pill act">${v}</span></td>`;
     return `<td${numClass}>${v == null ? '' : v}</td>`;
   }).join('') + '</tr>').join('');
-  document.getElementById(elId).innerHTML = `<div style="overflow:auto"><table class="tbl"><thead>${head}</thead><tbody>${body}</tbody></table></div>`;
+  document.getElementById(elId).innerHTML = `<div class="tbl-wrap" style="border:none;box-shadow:none"><table class="tbl"><thead>${head}</thead><tbody>${body}</tbody></table></div>`;
 }
 
 renderTable('rec-table', DATA.recommendations_top, [
@@ -460,9 +449,8 @@ renderTable('rec-table', DATA.recommendations_top, [
   {key:'price', label:'Price'},
   {key:'margin_pct_avg', label:'Avg margin', fmt:'pct'},
   {key:'profit_priority_score', label:'Profit priority'},
-  {key:'recommended_action', label:'Action', cls:'act'},
+  {key:'recommended_action', label:'Action', cls:'act'}
 ]);
-
 renderTable('proj-table', DATA.projection_top, [
   {key:'looked_for_category', label:'Category'},
   {key:'looked_for_sub_category', label:'Sub-cat'},
@@ -471,9 +459,8 @@ renderTable('proj-table', DATA.projection_top, [
   {key:'capture_rate', label:'Capture', fmt:'pct'},
   {key:'projected_units_recovered', label:'Units'},
   {key:'projected_revenue_uplift_inr', label:'Revenue uplift', fmt:'inr'},
-  {key:'projected_pbt_uplift_inr', label:'PBT uplift', fmt:'inr'},
+  {key:'projected_pbt_uplift_inr', label:'PBT uplift', fmt:'inr'}
 ]);
-
 renderTable('sku-table', DATA.top_skus.slice(0, 30), [
   {key:'sku_id', label:'SKU'},
   {key:'category', label:'Cat'},
@@ -482,9 +469,8 @@ renderTable('sku-table', DATA.top_skus.slice(0, 30), [
   {key:'units_sold', label:'Units'},
   {key:'revenue_inr', label:'Revenue', fmt:'inr'},
   {key:'composite_score', label:'Score', fmt:'pct'},
-  {key:'performance_tier', label:'Tier', cls:'tier'},
+  {key:'performance_tier', label:'Tier', cls:'tier'}
 ]);
-
 renderTable('ageing-table', DATA.ageing_top, [
   {key:'sku_id', label:'SKU'},
   {key:'category', label:'Cat'},
@@ -493,31 +479,29 @@ renderTable('ageing-table', DATA.ageing_top, [
   {key:'recorded_closing_qty', label:'Stock'},
   {key:'annual_qty_sold', label:'Sold (yr)'},
   {key:'days_to_clear', label:'Days to clear'},
-  {key:'ageing_bucket', label:'Bucket'},
+  {key:'ageing_bucket', label:'Bucket'}
 ]);
 
-// ---- Excel downloads ----
-(function renderExcelList() {
+// Excel downloads
+(function(){
   const files = DATA.excel_files || [];
   if (!files.length) {
-    document.getElementById('excel-list').innerHTML =
-      '<div style="color:var(--mu);font-family:var(--mono);font-size:12px">no excel files</div>';
+    document.getElementById('excel-list').innerHTML = '<div style="color:var(--text-muted);font-family:\'DM Mono\',monospace;font-size:12px">no excel files</div>';
     return;
   }
-  const html = '<div style="overflow:auto"><table class="tbl">' +
+  const html = '<div class="tbl-wrap" style="border:none;box-shadow:none"><table class="tbl">' +
     '<thead><tr><th>Workbook</th><th>What\'s inside</th><th class="num">Size</th><th></th></tr></thead><tbody>' +
-    files.map(f => `
-      <tr>
-        <td class="tax-c"><b>${f.name}</b></td>
-        <td>${f.description}</td>
-        <td class="num">${f.size_kb.toLocaleString('en-IN')} KB</td>
-        <td><a href="sku_excel/${f.name}" download style="color:var(--tax);border-bottom:1px solid var(--accent-bdr)">Download &darr;</a></td>
-      </tr>`).join('') +
+    files.map(f => `<tr>
+      <td class="a-c"><b>${f.name}</b></td>
+      <td>${f.description}</td>
+      <td class="num">${f.size_kb.toLocaleString('en-IN')} KB</td>
+      <td><a href="sku_excel/${f.name}" download style="color:var(--accent)">Download &darr;</a></td>
+    </tr>`).join('') +
     '</tbody></table></div>';
   document.getElementById('excel-list').innerHTML = html;
 })();
 
-// ---- Client-side drag-drop: identify SKUs + classify HIGH/MID/LOW ----
+// ---- Client-side drag-drop ----
 (function setupClientDragDrop() {
   const drop = document.getElementById('drop');
   const filesInput = document.getElementById('files');
@@ -541,275 +525,35 @@ renderTable('ageing-table', DATA.ageing_top, [
       `<span class="chip">&#128196; ${f.name} &middot; ${(f.size/1024).toFixed(1)} KB</span>`).join('');
     btn.disabled = dropped.length === 0;
   }
+  function classify(name){const n=name.toLowerCase();if(n.includes('open'))return'opening';if(n.includes('clos'))return'closing';return'sales';}
+  function readWorkbook(file){return new Promise((resolve, reject)=>{const reader=new FileReader();reader.onload=(e)=>{try{const wb=XLSX.read(e.target.result,{type:'binary',cellDates:true});const ws=wb.Sheets[wb.SheetNames[0]];resolve(XLSX.utils.sheet_to_json(ws,{defval:null}));}catch(err){reject(err);}};reader.onerror=reject;reader.readAsBinaryString(file);});}
+  function resolveCols(rows){if(!rows.length)return{};const sample=rows[0];const lc={};for(const k of Object.keys(sample))lc[k.trim().toLowerCase()]=k;const pick=(...names)=>{for(const n of names)if(lc[n])return lc[n];return null;};return{sku:pick('sku_id','sku','skuid','item','itemcode','code'),qty:pick('qty','quantity','units','count'),revenue:pick('line_total_inr','amount','total','revenue','sales','net_amount','value'),price:pick('unit_selling_price_inr','unit_price','price','rate'),date:pick('txn_date','date','transaction_date','sale_date'),category:pick('category','cat','class','department'),opening:pick('opening_qty','opening','open_qty','open'),closing:pick('recorded_closing_qty','closing_qty','closing','close_qty','close')};}
+  function aggregate(rows,cols){const skus={};let totalRev=0,totalQty=0,minDate=null,maxDate=null;const byCat={};for(const r of rows){const sku=r[cols.sku];if(sku==null)continue;const qty=Number(r[cols.qty]??1)||0;let rev=Number(r[cols.revenue]??0);if(!rev&&cols.price)rev=(Number(r[cols.price])||0)*qty;if(!skus[sku])skus[sku]={sku,qty:0,revenue:0,transactions:0,category:r[cols.category]||''};skus[sku].qty+=qty;skus[sku].revenue+=rev;skus[sku].transactions+=1;totalRev+=rev;totalQty+=qty;if(cols.date&&r[cols.date]){const d=new Date(r[cols.date]);if(!isNaN(d)){if(!minDate||d<minDate)minDate=d;if(!maxDate||d>maxDate)maxDate=d;}}if(cols.category&&r[cols.category]!=null){const c=r[cols.category];if(!byCat[c])byCat[c]={units:0,revenue:0};byCat[c].units+=qty;byCat[c].revenue+=rev;}}return{skus:Object.values(skus),totalRev,totalQty,minDate,maxDate,byCat};}
+  function addTiers(skus){const sorted=[...skus].sort((a,b)=>b.revenue-a.revenue);const n=sorted.length;const hi=Math.ceil(n/3),mid=Math.ceil(2*n/3);sorted.forEach((s,i)=>{s.tier=i<hi?'HIGH':(i<mid?'MID':'LOW');});return sorted;}
+  function reconcile(salesAgg,oRows,cRows,oCols,cCols){if(!oRows||!cRows)return null;const om={};for(const r of oRows){const k=r[oCols.sku];if(k!=null)om[k]=(om[k]||0)+Number(r[oCols.opening]||0);}const cm={};for(const r of cRows){const k=r[cCols.sku];if(k!=null)cm[k]=(cm[k]||0)+Number(r[cCols.closing]||0);}const sm={};for(const s of salesAgg.skus)sm[s.sku]=s.qty;const all=new Set([...Object.keys(om),...Object.keys(sm)]);let rc=0,rd=0,ts=0;const top5=[];for(const k of all){const o=om[k]||0,sd=sm[k]||0,cl=cm[k]||0;const exp=o-sd,dis=exp-cl;rc++;if(Math.abs(dis)>0){rd++;if(dis>0){ts+=dis;top5.push({sku:k,open:o,sold:sd,close:cl,discrep:dis});}}}top5.sort((a,b)=>b.discrep-a.discrep);return{rowsCompared:rc,rowsWithDiscrepancy:rd,totalShrink:ts,top5:top5.slice(0,5)};}
 
-  function classify(name) {
-    const n = name.toLowerCase();
-    if (n.includes('open')) return 'opening';
-    if (n.includes('clos')) return 'closing';
-    return 'sales';
-  }
-
-  function readWorkbook(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const wb = XLSX.read(e.target.result, { type: 'binary', cellDates: true });
-          const ws = wb.Sheets[wb.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json(ws, { defval: null });
-          resolve(rows);
-        } catch (err) { reject(err); }
-      };
-      reader.onerror = reject;
-      reader.readAsBinaryString(file);
-    });
-  }
-
-  // column resolver — tolerant of common naming variants
-  function resolveCols(rows) {
-    if (!rows.length) return {};
-    const sample = rows[0];
-    const lc = {};
-    for (const k of Object.keys(sample)) lc[k.trim().toLowerCase()] = k;
-    const pick = (...names) => {
-      for (const n of names) if (lc[n]) return lc[n];
-      return null;
-    };
-    return {
-      sku:      pick('sku_id','sku','skuid','item','itemcode','code'),
-      qty:      pick('qty','quantity','units','count'),
-      revenue:  pick('line_total_inr','amount','total','revenue','sales','net_amount','value'),
-      price:    pick('unit_selling_price_inr','unit_price','price','rate'),
-      date:     pick('txn_date','date','transaction_date','sale_date'),
-      category: pick('category','cat','class','department'),
-      opening:  pick('opening_qty','opening','open_qty','open'),
-      closing:  pick('recorded_closing_qty','closing_qty','closing','close_qty','close'),
-    };
-  }
-
-  function aggregate(rows, cols) {
-    const skus = {};
-    let totalRev = 0, totalQty = 0;
-    let minDate = null, maxDate = null;
-    const byCat = {};
-    for (const r of rows) {
-      const sku = r[cols.sku]; if (sku == null) continue;
-      const qty = Number(r[cols.qty] ?? 1) || 0;
-      let rev  = Number(r[cols.revenue] ?? 0);
-      if (!rev && cols.price) rev = (Number(r[cols.price]) || 0) * qty;
-      if (!skus[sku]) skus[sku] = { sku, qty: 0, revenue: 0, transactions: 0,
-                                       category: r[cols.category] || '' };
-      skus[sku].qty += qty;
-      skus[sku].revenue += rev;
-      skus[sku].transactions += 1;
-      totalRev += rev; totalQty += qty;
-      if (cols.date && r[cols.date]) {
-        const d = new Date(r[cols.date]);
-        if (!isNaN(d)) {
-          if (!minDate || d < minDate) minDate = d;
-          if (!maxDate || d > maxDate) maxDate = d;
-        }
-      }
-      if (cols.category && r[cols.category] != null) {
-        const c = r[cols.category];
-        if (!byCat[c]) byCat[c] = { units: 0, revenue: 0 };
-        byCat[c].units += qty; byCat[c].revenue += rev;
-      }
-    }
-    return { skus: Object.values(skus), totalRev, totalQty, minDate, maxDate, byCat };
-  }
-
-  // tiering by revenue percentile (top 33% HIGH, mid 33% MID, bottom 33% LOW)
-  function addTiers(skus) {
-    const sorted = [...skus].sort((a,b) => b.revenue - a.revenue);
-    const n = sorted.length;
-    const hiCutoff = Math.ceil(n / 3);
-    const midCutoff = Math.ceil(2 * n / 3);
-    sorted.forEach((s, i) => {
-      s.tier = i < hiCutoff ? 'HIGH' : (i < midCutoff ? 'MID' : 'LOW');
-    });
-    return sorted;
-  }
-
-  function reconcile(salesAgg, openingRows, closingRows, openCols, closeCols) {
-    if (!openingRows || !closingRows) return null;
-    const openMap = {};
-    for (const r of openingRows) {
-      const k = r[openCols.sku]; if (k != null) openMap[k] = (openMap[k]||0) + Number(r[openCols.opening]||0);
-    }
-    const closeMap = {};
-    for (const r of closingRows) {
-      const k = r[closeCols.sku]; if (k != null) closeMap[k] = (closeMap[k]||0) + Number(r[closeCols.closing]||0);
-    }
-    const salesMap = {};
-    for (const s of salesAgg.skus) salesMap[s.sku] = s.qty;
-    const allSkus = new Set([...Object.keys(openMap), ...Object.keys(salesMap)]);
-    let rowsCompared = 0, rowsWithDiscrepancy = 0, totalShrink = 0;
-    const top5 = [];
-    for (const k of allSkus) {
-      const open = openMap[k] || 0;
-      const sold = salesMap[k] || 0;
-      const close = closeMap[k] || 0;
-      const expected = open - sold;
-      const discrep = expected - close;
-      rowsCompared++;
-      if (Math.abs(discrep) > 0) {
-        rowsWithDiscrepancy++;
-        if (discrep > 0) totalShrink += discrep;
-        if (discrep > 0) top5.push({ sku: k, open, sold, close, discrep });
-      }
-    }
-    top5.sort((a,b) => b.discrep - a.discrep);
-    return { rowsCompared, rowsWithDiscrepancy, totalShrink, top5: top5.slice(0,5) };
-  }
-
-  const fmtINR = (n) => 'Rs. ' + fmt(n);
-
-  // ===== Build a formatted Excel workbook entirely in-browser =====
   function buildAndDownloadExcel(tiered, agg, recon, cols, dateRange, originalName) {
     const wb = XLSX.utils.book_new();
-    const TIER_FILL = {
-      'HIGH': { patternType: 'solid', fgColor: { rgb: 'D1FAE5' } },
-      'MID':  { patternType: 'solid', fgColor: { rgb: 'FEF3C7' } },
-      'LOW':  { patternType: 'solid', fgColor: { rgb: 'FEE2E2' } },
-    };
-    const HEADER_STYLE = {
-      font: { bold: true, color: { rgb: 'FFFFFF' } },
-      fill: { patternType: 'solid', fgColor: { rgb: '1F2937' } },
-      alignment: { horizontal: 'center' },
-      border: { top:{style:'thin',color:{rgb:'334155'}}, bottom:{style:'thin',color:{rgb:'334155'}},
-                left:{style:'thin',color:{rgb:'334155'}}, right:{style:'thin',color:{rgb:'334155'}} },
-    };
-    const TIER_FONT = {
-      'HIGH': { bold: true, color: { rgb: '065F46' } },
-      'MID':  { color: { rgb: '92400E' } },
-      'LOW':  { color: { rgb: '991B1B' } },
-    };
-    const INR_FMT = '"Rs. "#,##,##0';
-    const PCT_FMT = '0.0%';
-    const INT_FMT = '#,##0';
-
-    function writeSheet(rowsArr, sheetName, opts) {
-      opts = opts || {};
-      const ws = XLSX.utils.aoa_to_sheet(rowsArr);
-      // Apply header style
-      const headerRow = rowsArr[0];
-      for (let c = 0; c < headerRow.length; c++) {
-        const cell = ws[XLSX.utils.encode_cell({ r: 0, c })];
-        if (cell) cell.s = HEADER_STYLE;
-      }
-      // Apply per-row tier colouring + number formats
-      for (let r = 1; r < rowsArr.length; r++) {
-        for (let c = 0; c < headerRow.length; c++) {
-          const cell = ws[XLSX.utils.encode_cell({ r, c })];
-          if (!cell) continue;
-          const colName = headerRow[c];
-          // Tier-coloured cell on the Tier column
-          if (opts.tierCol === c && TIER_FILL[cell.v]) {
-            cell.s = { ...cell.s, fill: TIER_FILL[cell.v], font: TIER_FONT[cell.v], alignment: { horizontal: 'center' } };
-          }
-          // INR columns get currency format
-          if (opts.inrCols && opts.inrCols.indexOf(c) >= 0 && typeof cell.v === 'number') {
-            cell.z = INR_FMT;
-            cell.s = { ...cell.s, fill: opts.tierCol === c ? cell.s.fill : undefined };
-          }
-          if (opts.intCols && opts.intCols.indexOf(c) >= 0 && typeof cell.v === 'number') {
-            cell.z = INT_FMT;
-          }
-          // Whole-row tint by tier (light alternating banding for Tier rows)
-          if (opts.rowTierCol !== undefined) {
-            const tierVal = rowsArr[r][opts.rowTierCol];
-            if (TIER_FILL[tierVal] && opts.tierCol !== c) {
-              cell.s = { ...cell.s, fill: { patternType: 'solid', fgColor: { rgb: tierVal === 'HIGH' ? 'ECFDF5' : tierVal === 'MID' ? 'FFFBEB' : 'FEF2F2' } } };
-            }
-          }
-        }
-      }
-      // Autofilter on header row
-      ws['!autofilter'] = { ref: ws['!ref'] };
-      // Freeze header row
-      ws['!freeze'] = { xSplit: 0, ySplit: 1 };
-      ws['!views'] = [{ state: 'frozen', ySplit: 1 }];
-      // Reasonable column widths
-      ws['!cols'] = headerRow.map(h => ({ wch: Math.min(Math.max(String(h).length + 2, 12), 28) }));
-      XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0, 31));
-      return ws;
-    }
-
-    // ---- Sheet 1: Summary KPIs ----
-    const tierCounts = { HIGH: 0, MID: 0, LOW: 0 };
-    tiered.forEach(s => tierCounts[s.tier]++);
-    const summaryRows = [
-      ['Metric', 'Value'],
-      ['Source file',         originalName],
-      ['Generated at',        new Date().toISOString()],
-      ['Date range',          dateRange],
-      ['Rows analysed',       tiered.reduce((acc,s)=>acc+s.transactions, 0)],
-      ['Unique SKUs',         tiered.length],
-      ['Total revenue (Rs.)', Math.round(agg.totalRev)],
-      ['Total units',         agg.totalQty],
-      ['HIGH performers',     tierCounts.HIGH],
-      ['MID performers',      tierCounts.MID],
-      ['LOW performers',      tierCounts.LOW],
-    ];
-    writeSheet(summaryRows, 'Summary');
-
-    // ---- Sheet 2: SKUs (with tier coloured) ----
-    const skuHeader = ['SKU', 'Category', 'Units', 'Revenue', 'Transactions', 'Tier'];
-    const skuRows = [skuHeader, ...tiered.map(s => [
-      s.sku, s.category || '', s.qty, Math.round(s.revenue), s.transactions, s.tier
-    ])];
-    writeSheet(skuRows, 'SKUs', { tierCol: 5, rowTierCol: 5, inrCols: [3], intCols: [2, 4] });
-
-    // ---- Sheet 3: Pivot_HighMidLow ----
-    const tierAgg = { HIGH: { skus: 0, revenue: 0 }, MID: { skus: 0, revenue: 0 }, LOW: { skus: 0, revenue: 0 } };
-    tiered.forEach(s => { tierAgg[s.tier].skus++; tierAgg[s.tier].revenue += s.revenue; });
-    const totalRev = agg.totalRev || 1;
-    const pivotTier = [
-      ['Tier', '# SKUs', 'Revenue (Rs.)', 'Share of revenue'],
-      ['HIGH', tierAgg.HIGH.skus, Math.round(tierAgg.HIGH.revenue), tierAgg.HIGH.revenue / totalRev],
-      ['MID',  tierAgg.MID.skus,  Math.round(tierAgg.MID.revenue),  tierAgg.MID.revenue  / totalRev],
-      ['LOW',  tierAgg.LOW.skus,  Math.round(tierAgg.LOW.revenue),  tierAgg.LOW.revenue  / totalRev],
-      ['TOTAL', tiered.length, Math.round(totalRev), 1],
-    ];
-    const wsTier = writeSheet(pivotTier, 'Pivot_HighMidLow', { tierCol: 0, rowTierCol: 0, intCols: [1], inrCols: [2] });
-    // make share-of-revenue column percentage formatted
-    for (let r = 1; r <= 4; r++) {
-      const cell = wsTier[XLSX.utils.encode_cell({ r, c: 3 })];
-      if (cell) cell.z = PCT_FMT;
-    }
-
-    // ---- Sheet 4: Pivot_ByCategory (if category present) ----
-    if (Object.keys(agg.byCat).length) {
-      const cats = Object.entries(agg.byCat).sort((a,b)=>b[1].revenue-a[1].revenue);
-      const catRows = [['Category', 'Units', 'Revenue (Rs.)', 'Share of revenue']];
-      cats.forEach(([k,v]) => catRows.push([k, v.units, Math.round(v.revenue), v.revenue / totalRev]));
-      catRows.push(['TOTAL', cats.reduce((a,[,v])=>a+v.units,0), Math.round(totalRev), 1]);
-      const wsCat = writeSheet(catRows, 'Pivot_ByCategory', { intCols: [1], inrCols: [2] });
-      for (let r = 1; r <= cats.length + 1; r++) {
-        const cell = wsCat[XLSX.utils.encode_cell({ r, c: 3 })];
-        if (cell) cell.z = PCT_FMT;
-      }
-    }
-
-    // ---- Sheet 5: Reconciliation (if dropped) ----
-    if (recon) {
-      const rcHeader = ['SKU', 'Opening', 'Sold', 'Recorded Closing', 'Shrinkage'];
-      const rcRows = [rcHeader, ...recon.top5.map(r => [r.sku, r.open, r.sold, r.close, r.discrep])];
-      // pad with summary
-      rcRows.unshift(['Reconciliation summary', null, null, null, null]);
-      rcRows.unshift([`Rows compared: ${recon.rowsCompared}  |  With discrepancy: ${recon.rowsWithDiscrepancy}  |  Total shrink units: ${recon.totalShrink}`, null, null, null, null]);
-      writeSheet(rcRows.slice(2), 'Reconciliation', { intCols: [1, 2, 3, 4] });
-    }
-
-    // ---- Trigger download ----
-    const fname = (originalName || 'sales').replace(/\.[^.]+$/, '') + '_analysis.xlsx';
-    XLSX.writeFile(wb, fname, { bookType: 'xlsx', cellStyles: true });
+    const TIER_FILL = {HIGH:{patternType:'solid',fgColor:{rgb:'D1FAE5'}}, MID:{patternType:'solid',fgColor:{rgb:'FEF3C7'}}, LOW:{patternType:'solid',fgColor:{rgb:'FEE2E2'}}};
+    const HEADER_STYLE = {font:{bold:true,color:{rgb:'FFFFFF'}}, fill:{patternType:'solid',fgColor:{rgb:'1F2937'}}, alignment:{horizontal:'center'}, border:{top:{style:'thin',color:{rgb:'334155'}},bottom:{style:'thin',color:{rgb:'334155'}},left:{style:'thin',color:{rgb:'334155'}},right:{style:'thin',color:{rgb:'334155'}}}};
+    const TIER_FONT = {HIGH:{bold:true,color:{rgb:'065F46'}}, MID:{color:{rgb:'92400E'}}, LOW:{color:{rgb:'991B1B'}}};
+    const INR_FMT = '"Rs. "#,##,##0', PCT_FMT = '0.0%', INT_FMT = '#,##0';
+    function writeSheet(rowsArr, sheetName, opts){opts=opts||{};const ws=XLSX.utils.aoa_to_sheet(rowsArr);const headerRow=rowsArr[0];for(let c=0;c<headerRow.length;c++){const cell=ws[XLSX.utils.encode_cell({r:0,c})];if(cell)cell.s=HEADER_STYLE;}for(let r=1;r<rowsArr.length;r++){for(let c=0;c<headerRow.length;c++){const cell=ws[XLSX.utils.encode_cell({r,c})];if(!cell)continue;if(opts.tierCol===c&&TIER_FILL[cell.v]){cell.s={...cell.s,fill:TIER_FILL[cell.v],font:TIER_FONT[cell.v],alignment:{horizontal:'center'}};}if(opts.inrCols&&opts.inrCols.indexOf(c)>=0&&typeof cell.v==='number')cell.z=INR_FMT;if(opts.intCols&&opts.intCols.indexOf(c)>=0&&typeof cell.v==='number')cell.z=INT_FMT;if(opts.rowTierCol!==undefined){const tv=rowsArr[r][opts.rowTierCol];if(TIER_FILL[tv]&&opts.tierCol!==c)cell.s={...cell.s,fill:{patternType:'solid',fgColor:{rgb:tv==='HIGH'?'ECFDF5':tv==='MID'?'FFFBEB':'FEF2F2'}}};}}}ws['!autofilter']={ref:ws['!ref']};ws['!views']=[{state:'frozen',ySplit:1}];ws['!cols']=headerRow.map(h=>({wch:Math.min(Math.max(String(h).length+2,12),28)}));XLSX.utils.book_append_sheet(wb,ws,sheetName.slice(0,31));return ws;}
+    const tierCounts = {HIGH:0,MID:0,LOW:0}; tiered.forEach(s=>tierCounts[s.tier]++);
+    writeSheet([['Metric','Value'],['Source file',originalName],['Generated at',new Date().toISOString()],['Date range',dateRange],['Rows analysed',tiered.reduce((a,s)=>a+s.transactions,0)],['Unique SKUs',tiered.length],['Total revenue (Rs.)',Math.round(agg.totalRev)],['Total units',agg.totalQty],['HIGH performers',tierCounts.HIGH],['MID performers',tierCounts.MID],['LOW performers',tierCounts.LOW]],'Summary');
+    writeSheet([['SKU','Category','Units','Revenue','Transactions','Tier'],...tiered.map(s=>[s.sku,s.category||'',s.qty,Math.round(s.revenue),s.transactions,s.tier])],'SKUs',{tierCol:5,rowTierCol:5,inrCols:[3],intCols:[2,4]});
+    const tierAgg={HIGH:{skus:0,revenue:0},MID:{skus:0,revenue:0},LOW:{skus:0,revenue:0}};
+    tiered.forEach(s=>{tierAgg[s.tier].skus++;tierAgg[s.tier].revenue+=s.revenue;});
+    const totalRev=agg.totalRev||1;
+    const wsTier=writeSheet([['Tier','# SKUs','Revenue (Rs.)','Share of revenue'],['HIGH',tierAgg.HIGH.skus,Math.round(tierAgg.HIGH.revenue),tierAgg.HIGH.revenue/totalRev],['MID',tierAgg.MID.skus,Math.round(tierAgg.MID.revenue),tierAgg.MID.revenue/totalRev],['LOW',tierAgg.LOW.skus,Math.round(tierAgg.LOW.revenue),tierAgg.LOW.revenue/totalRev],['TOTAL',tiered.length,Math.round(totalRev),1]],'Pivot_HighMidLow',{tierCol:0,rowTierCol:0,intCols:[1],inrCols:[2]});
+    for(let r=1;r<=4;r++){const cell=wsTier[XLSX.utils.encode_cell({r,c:3})];if(cell)cell.z=PCT_FMT;}
+    if(Object.keys(agg.byCat).length){const cats=Object.entries(agg.byCat).sort((a,b)=>b[1].revenue-a[1].revenue);const catRows=[['Category','Units','Revenue (Rs.)','Share of revenue']];cats.forEach(([k,v])=>catRows.push([k,v.units,Math.round(v.revenue),v.revenue/totalRev]));catRows.push(['TOTAL',cats.reduce((a,[,v])=>a+v.units,0),Math.round(totalRev),1]);const wsCat=writeSheet(catRows,'Pivot_ByCategory',{intCols:[1],inrCols:[2]});for(let r=1;r<=cats.length+1;r++){const cell=wsCat[XLSX.utils.encode_cell({r,c:3})];if(cell)cell.z=PCT_FMT;}}
+    if(recon){const rcRows=[['SKU','Opening','Sold','Recorded Closing','Shrinkage'],...recon.top5.map(r=>[r.sku,r.open,r.sold,r.close,r.discrep])];writeSheet(rcRows,'Reconciliation',{intCols:[1,2,3,4]});}
+    XLSX.writeFile(wb,(originalName||'sales').replace(/\.[^.]+$/,'')+'_analysis.xlsx',{bookType:'xlsx',cellStyles:true});
   }
-  // ============================================================
 
   btn.addEventListener('click', async () => {
-    out.innerHTML = '<p style="color:var(--mu);font-family:var(--mono);font-size:12px;margin-top:18px">Reading files...</p>';
+    out.innerHTML = '<p style="color:var(--text-muted);font-family:\'DM Mono\',monospace;font-size:12px;margin-top:18px">Reading files...</p>';
     btn.disabled = true;
     try {
       let salesFile, openFile, closeFile;
@@ -819,12 +563,12 @@ renderTable('ageing-table', DATA.ageing_top, [
         else if (role === 'closing' && !closeFile) closeFile = f;
         else if (!salesFile) salesFile = f;
       }
-      if (!salesFile) { out.innerHTML = '<p style="color:#ff4060">No sales file detected.</p>'; btn.disabled=false; return; }
+      if (!salesFile) { out.innerHTML = '<p style="color:var(--red);font-family:\'DM Mono\',monospace;font-size:12px;margin-top:14px">No sales file detected.</p>'; btn.disabled=false; return; }
 
       const salesRows = await readWorkbook(salesFile);
       const salesCols = resolveCols(salesRows);
       if (!salesCols.sku) {
-        out.innerHTML = '<p style="color:#ff4060;font-family:var(--mono);font-size:12px;margin-top:14px">Could not detect a SKU / item column. Tried: sku_id, sku, item, itemcode, code.</p>';
+        out.innerHTML = '<p style="color:var(--red);font-family:\'DM Mono\',monospace;font-size:12px;margin-top:14px">Could not detect a SKU / item column. Tried: sku_id, sku, item, itemcode, code.</p>';
         btn.disabled = false; return;
       }
       const agg = aggregate(salesRows, salesCols);
@@ -832,17 +576,14 @@ renderTable('ageing-table', DATA.ageing_top, [
 
       let recon = null;
       if (openFile && closeFile) {
-        const openingRows = await readWorkbook(openFile);
-        const closingRows = await readWorkbook(closeFile);
-        recon = reconcile(agg, openingRows, closingRows,
-                            resolveCols(openingRows), resolveCols(closingRows));
+        const oRows = await readWorkbook(openFile);
+        const cRows = await readWorkbook(closeFile);
+        recon = reconcile(agg, oRows, cRows, resolveCols(oRows), resolveCols(cRows));
       }
 
-      // ---- render ----
-      const tierCounts = { HIGH: 0, MID: 0, LOW: 0 };
-      tiered.forEach(s => tierCounts[s.tier]++);
-      const dr = (agg.minDate && agg.maxDate)
-        ? `${agg.minDate.toISOString().slice(0,10)} - ${agg.maxDate.toISOString().slice(0,10)}` : '-';
+      const tierCounts = {HIGH:0,MID:0,LOW:0};
+      tiered.forEach(s=>tierCounts[s.tier]++);
+      const dr = (agg.minDate && agg.maxDate) ? `${agg.minDate.toISOString().slice(0,10)} - ${agg.maxDate.toISOString().slice(0,10)}` : '-';
 
       let html = '<div class="upload-mini-grid">' +
         `<div class="umk"><div class="k">Rows analysed</div><div class="v">${fmt(salesRows.length)}</div></div>` +
@@ -852,94 +593,105 @@ renderTable('ageing-table', DATA.ageing_top, [
         '</div>';
 
       html += '<div class="g2" style="margin-bottom:18px">';
-      html += '<div class="card" style="padding:18px 20px"><div class="chtit"><span>High / Mid / Low performer counts</span></div><div id="up-tiers" style="height:240px"></div></div>';
-      html += `<div class="card" style="padding:18px 20px"><div class="chtit"><span>Date range &amp; columns detected</span></div>
-        <div style="font-family:var(--mono);font-size:11.5px;color:var(--mu2);line-height:2">
-          <div>Date range: <strong style="color:var(--tx)">${dr}</strong></div>
-          <div>SKU column: <strong style="color:var(--tx)">${salesCols.sku || '-'}</strong></div>
-          <div>Qty column: <strong style="color:var(--tx)">${salesCols.qty || '-'}</strong></div>
-          <div>Revenue column: <strong style="color:var(--tx)">${salesCols.revenue || (salesCols.price ? salesCols.price + ' x qty' : '-')}</strong></div>
-          <div>Category column: <strong style="color:var(--tx)">${salesCols.category || '(not found)'}</strong></div>
+      html += '<div class="chart-card"><div class="chtit"><span>High / Mid / Low performer counts</span></div><div id="up-tiers" style="height:240px"></div></div>';
+      html += `<div class="chart-card"><div class="chtit"><span>Date range &amp; columns detected</span></div>
+        <div style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-mid);line-height:2">
+          <div>Date range: <strong style="color:var(--text)">${dr}</strong></div>
+          <div>SKU column: <strong style="color:var(--text)">${salesCols.sku || '-'}</strong></div>
+          <div>Qty column: <strong style="color:var(--text)">${salesCols.qty || '-'}</strong></div>
+          <div>Revenue column: <strong style="color:var(--text)">${salesCols.revenue || (salesCols.price ? salesCols.price + ' x qty' : '-')}</strong></div>
+          <div>Category column: <strong style="color:var(--text)">${salesCols.category || '(not found)'}</strong></div>
         </div>
       </div>`;
       html += '</div>';
 
-      html += '<div class="card" style="padding:18px 20px;margin-bottom:18px"><div class="chtit"><span>SKUs by tier (top 30 of ' + tiered.length + ')</span></div><div id="up-skus"></div></div>';
+      html += '<div class="chart-card" style="margin-bottom:18px"><div class="chtit"><span>SKUs by tier (top 30 of ' + tiered.length + ')</span></div><div id="up-skus"></div></div>';
 
       if (Object.keys(agg.byCat).length) {
-        html += '<div class="card" style="padding:18px 20px;margin-bottom:18px"><div class="chtit"><span>Revenue by category</span></div><div id="up-cat" style="height:340px"></div></div>';
+        html += '<div class="chart-card" style="margin-bottom:18px"><div class="chtit"><span>Revenue by category</span></div><div id="up-cat" style="height:340px"></div></div>';
       }
 
       if (recon) {
         const recRows = recon.top5.map(r =>
           `<tr><td>${r.sku}</td><td class="num">${r.open}</td><td class="num">${r.sold}</td><td class="num">${r.close}</td><td class="num neg">${r.discrep}</td></tr>`).join('');
-        html += `<div class="card" style="padding:18px 20px"><div class="chtit"><span>Reconciliation (Opening - Sales vs Recorded Closing)</span></div>
-          <div style="font-family:var(--mono);font-size:11.5px;color:var(--mu2);margin-bottom:10px">
+        html += `<div class="chart-card"><div class="chtit"><span>Reconciliation (Opening - Sales vs Recorded Closing)</span></div>
+          <div style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-mid);margin-bottom:10px">
             ${fmt(recon.rowsCompared)} SKUs compared &middot;
             ${fmt(recon.rowsWithDiscrepancy)} with discrepancy &middot;
-            <strong class="neg">${fmt(recon.totalShrink)}</strong> shrink units total.
+            <strong class="neg" style="color:var(--red)">${fmt(recon.totalShrink)}</strong> shrink units total.
           </div>
-          ${recon.top5.length ? '<div style="overflow:auto"><table class="tbl"><thead><tr><th>SKU</th><th class="num">Open</th><th class="num">Sold</th><th class="num">Close</th><th class="num">Shrink</th></tr></thead><tbody>'+recRows+'</tbody></table></div>' : '<div style="color:var(--mu);font-family:var(--mono);font-size:11px">no shrinkage detected</div>'}
+          ${recon.top5.length ? '<div class="tbl-wrap" style="border:none;box-shadow:none"><table class="tbl"><thead><tr><th>SKU</th><th class="num">Open</th><th class="num">Sold</th><th class="num">Close</th><th class="num">Shrink</th></tr></thead><tbody>'+recRows+'</tbody></table></div>' : '<div style="color:var(--text-muted);font-family:\'DM Mono\',monospace;font-size:11px">no shrinkage detected</div>'}
         </div>`;
       }
-
-      // Add the "Download formatted Excel" button
       html += '<div style="margin-top:18px;display:flex;justify-content:center"><button class="btn" id="btn-download">&darr; Download formatted Excel (pivots + tier colours)</button></div>';
       out.innerHTML = html;
 
-      // Wire the download button
       document.getElementById('btn-download').addEventListener('click', () => {
-        try {
-          buildAndDownloadExcel(tiered, agg, recon, salesCols, dr, salesFile.name);
-        } catch (e) {
-          alert('Excel export failed: ' + (e.message || e));
-        }
+        try { buildAndDownloadExcel(tiered, agg, recon, salesCols, dr, salesFile.name); }
+        catch (e) { alert('Excel export failed: ' + (e.message || e)); }
       });
 
-      // tier bar chart
-      {
-        const t = plotTheme();
-        Plotly.newPlot('up-tiers', [{
-          x: ['HIGH','MID','LOW'],
-          y: [tierCounts.HIGH, tierCounts.MID, tierCounts.LOW],
-          type: 'bar', text: [tierCounts.HIGH, tierCounts.MID, tierCounts.LOW], textposition: 'outside',
-          marker: { color: [readCSSVar('--gr'), readCSSVar('--ye'), readCSSVar('--rd')] },
-        }], {
-          paper_bgcolor:t.paper_bgcolor, plot_bgcolor:t.plot_bgcolor, font:t.font,
-          margin:{t:20, r:30, l:50, b:30}, xaxis:{gridcolor:t.gridcolor},
-          yaxis:{title:'# SKUs', gridcolor:t.gridcolor},
-        }, {displayModeBar:false, responsive:true});
-      }
+      const t = plotTheme();
+      Plotly.newPlot('up-tiers', [{
+        x: ['HIGH','MID','LOW'], y:[tierCounts.HIGH,tierCounts.MID,tierCounts.LOW],
+        type:'bar', text:[tierCounts.HIGH,tierCounts.MID,tierCounts.LOW], textposition:'outside', textfont:{color:readVar('--text-mid')},
+        marker:{color:[readVar('--green'),readVar('--amber'),readVar('--red')]}
+      }], {paper_bgcolor:t.paper_bgcolor, plot_bgcolor:t.plot_bgcolor, font:t.font,
+        margin:{t:20,r:30,l:50,b:30}, xaxis:{gridcolor:t.gridcolor}, yaxis:{title:'# SKUs',gridcolor:t.gridcolor}
+      }, {displayModeBar:false, responsive:true});
 
-      // skus table — top 30
       const top30 = tiered.slice(0, 30);
-      document.getElementById('up-skus').innerHTML = '<div style="overflow:auto"><table class="tbl"><thead><tr><th>SKU</th><th>Category</th><th class="num">Units</th><th class="num">Revenue</th><th>Tier</th></tr></thead><tbody>' +
+      document.getElementById('up-skus').innerHTML = '<div class="tbl-wrap" style="border:none;box-shadow:none"><table class="tbl"><thead><tr><th>SKU</th><th>Category</th><th class="num">Units</th><th class="num">Revenue</th><th>Tier</th></tr></thead><tbody>' +
         top30.map(s => `<tr>
-          <td>${s.sku}</td>
-          <td>${s.category || ''}</td>
+          <td>${s.sku}</td><td>${s.category || ''}</td>
           <td class="num">${fmt(s.qty)}</td>
           <td class="num">${fmtINR(s.revenue)}</td>
           <td><span class="pill ${s.tier}">${s.tier}</span></td>
         </tr>`).join('') + '</tbody></table></div>';
 
-      // category chart if present
       if (Object.keys(agg.byCat).length) {
         const cats = Object.entries(agg.byCat).sort((a,b)=>b[1].revenue-a[1].revenue).slice(0,12);
-        const t = plotTheme();
+        const t2 = plotTheme();
         Plotly.newPlot('up-cat', [{
-          labels: cats.map(c => c[0]),
-          values: cats.map(c => c[1].revenue),
-          type:'pie', hole:0.55, textinfo:'label+percent',
-          marker:{colors: PALETTE}
-        }], { paper_bgcolor:t.paper_bgcolor, plot_bgcolor:t.plot_bgcolor, font:t.font, margin:{t:10, b:10}, showlegend:false}, {displayModeBar:false, responsive:true});
+          labels: cats.map(c => c[0]), values: cats.map(c => c[1].revenue),
+          type:'pie', hole:0.55, textinfo:'label+percent', marker:{colors: palette()}
+        }], {paper_bgcolor:t2.paper_bgcolor, plot_bgcolor:t2.plot_bgcolor, font:t2.font, margin:{t:10,b:10}, showlegend:false}, {displayModeBar:false, responsive:true});
       }
     } catch (err) {
-      out.innerHTML = '<p style="color:#ff4060;font-family:var(--mono);font-size:12px;margin-top:14px">Error: ' + (err && err.message ? err.message : err) + '</p>';
+      out.innerHTML = '<p style="color:var(--red);font-family:\'DM Mono\',monospace;font-size:12px;margin-top:14px">Error: ' + (err && err.message ? err.message : err) + '</p>';
     } finally {
       btn.disabled = false;
     }
   });
 })();
+
+// Theme toggle
+const docEl = document.documentElement;
+const togBtn = document.getElementById('themeToggle');
+const iSun = document.getElementById('iconSun');
+const iMoon = document.getElementById('iconMoon');
+function setIcons(t){if(t==='dark'){iSun.style.display='block';iMoon.style.display='none';}else{iSun.style.display='none';iMoon.style.display='block';}}
+function applyTheme(t){
+  docEl.setAttribute('data-theme', t);
+  setIcons(t);
+  buildYearlyChart(); buildCategoryChart(); buildTiersChart();
+  // re-render any drag-drop result charts if present
+  const upT = document.getElementById('up-tiers');
+  if (upT && upT.data) {
+    const tc = upT.data[0];
+    Plotly.relayout('up-tiers', plotTheme());
+  }
+  const upC = document.getElementById('up-cat');
+  if (upC && upC.data) Plotly.relayout('up-cat', plotTheme());
+}
+let initT;
+try { initT = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch(e){ initT = 'light'; }
+docEl.setAttribute('data-theme', initT); setIcons(initT);
+togBtn.addEventListener('click', () => {
+  const next = (docEl.getAttribute('data-theme') === 'dark') ? 'light' : 'dark';
+  applyTheme(next);
+  try { localStorage.setItem('theme', next); } catch(e){}
+});
 </script>
 </body>
 </html>

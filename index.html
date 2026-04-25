@@ -1,175 +1,392 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Sathvik Lakumarapu V · Research Dashboards</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600;700&family=Bricolage+Grotesque:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
-<style>
-:root{
-  --bg:#08091a;--card:#0e1228;--card2:#111630;--bdr:rgba(255,255,255,.1);
-  --ce:#3df5c0;--pe:#f5623d;--gr:#4afe7a;--rd:#ff4060;--go:#f5c842;
-  --tx:#f0f0f8;--mu:rgba(255,255,255,.55);--mu2:rgba(255,255,255,.78);
-  --mono:'IBM Plex Mono',monospace;--tax:#c89fff
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Bricolage Grotesque',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:15px}
-.page{max-width:1280px;margin:0 auto;padding:0 28px 80px}
-header{padding:44px 0 28px;border-bottom:1px solid var(--bdr)}
-.h-title{font-size:clamp(26px,3.2vw,40px);font-weight:800;letter-spacing:-.6px}
-.h-title .ce{color:var(--ce)}.h-title .pe{color:var(--pe)}.h-title .tx{color:var(--tax)}
-.h-meta{margin-top:8px;font-family:var(--mono);font-size:12px;color:var(--mu);line-height:1.85}
-.h-right{margin-top:14px;display:flex;gap:7px;flex-wrap:wrap}
-.hbadge{font-family:var(--mono);font-size:11px;padding:7px 14px;border:1px solid var(--bdr);border-radius:7px;color:var(--mu2);background:rgba(255,255,255,.04);display:flex;align-items:center;gap:7px}
-.pulse{width:7px;height:7px;border-radius:50%;background:var(--gr);box-shadow:0 0 8px var(--gr);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
-.sec{margin-top:40px}
-.shdr{display:flex;align-items:center;gap:12px;margin-bottom:16px;font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mu2)}
-.shdr::after{content:'';flex:1;height:1px;background:var(--bdr)}
-.snum{color:var(--ce);opacity:.7}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-@media(max-width:900px){.grid{grid-template-columns:1fr}}
-.tile{position:relative;display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:26px 26px 22px;overflow:hidden;transition:.2s border-color,.2s transform}
-.tile:hover{border-color:rgba(255,255,255,.22);transform:translateY(-2px)}
-.tile.ab{border-top:3px solid var(--ce)}
-.tile.fo{border-top:3px solid var(--pe)}
-.tile.sk{border-top:3px solid var(--tax)}
-.t-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:14px;color:var(--mu2)}
-.tdot{width:6px;height:6px;border-radius:50%}
-.tile.ab .tdot{background:var(--ce);box-shadow:0 0 8px var(--ce)}
-.tile.fo .tdot{background:var(--pe);box-shadow:0 0 8px var(--pe)}
-.tile.sk .tdot{background:var(--tax);box-shadow:0 0 8px var(--tax)}
-.t-title{font-size:19px;font-weight:700;letter-spacing:-.3px;line-height:1.25;margin-bottom:8px}
-.t-desc{font-family:var(--mono);font-size:11.5px;color:var(--mu);line-height:1.7;margin-bottom:20px;min-height:60px}
-.t-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
-.t-stat .v{font-size:17px;font-weight:700;letter-spacing:-.3px}
-.t-stat .k{font-family:var(--mono);font-size:9.5px;color:var(--mu);margin-top:2px;text-transform:uppercase;letter-spacing:.7px}
-.tile.ab .t-stat.a .v{color:var(--ce)}
-.tile.fo .t-stat.a .v{color:var(--pe)}
-.tile.sk .t-stat.a .v{color:var(--tax)}
-.t-cta{font-family:var(--mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;display:flex;align-items:center;gap:8px;padding-top:14px;border-top:1px solid var(--bdr)}
-.tile.ab .t-cta{color:var(--ce)}
-.tile.fo .t-cta{color:var(--pe)}
-.tile.sk .t-cta{color:var(--tax)}
-.t-cta.dim{color:var(--mu);pointer-events:none}
-.arrow{transition:.2s transform}
-.tile:hover .arrow{transform:translateX(4px)}
-.tile.disabled{opacity:.7;cursor:default}
-.tile.disabled:hover{transform:none;border-color:var(--bdr)}
-.plan-sec{margin-top:30px}
-.plan-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.plan-card{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:16px 18px;display:flex;align-items:center;gap:14px;opacity:.85}
-.plan-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.plan-dot.c{background:var(--go);box-shadow:0 0 7px rgba(245,200,66,.6)}
-.plan-dot.x{background:var(--ce);box-shadow:0 0 7px rgba(61,245,192,.6)}
-.plan-body{flex:1;min-width:0}
-.plan-name{font-size:13.5px;font-weight:700;color:var(--tx);letter-spacing:-.1px}
-.plan-desc{font-family:var(--mono);font-size:10.5px;color:var(--mu);margin-top:3px;line-height:1.6}
-.plan-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--mu2);padding:4px 10px;border:1px solid var(--bdr);border-radius:5px;flex-shrink:0}
-@media(max-width:700px){.plan-wrap{grid-template-columns:1fr}}
-.about{margin-top:44px;background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:22px 26px;font-family:var(--mono);font-size:12px;color:var(--mu2);line-height:1.85}
-.about strong{color:var(--tx)}
-.disc{margin-top:26px;padding:16px 20px;background:rgba(255,64,96,.05);border:1px solid rgba(255,64,96,.2);border-radius:10px;font-family:var(--mono);font-size:12px;color:var(--mu2);line-height:1.9}
-.disc strong{color:var(--rd)}
-.footer{margin-top:36px;font-family:var(--mono);font-size:11px;color:var(--mu);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.footer a{color:var(--mu2);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.15)}
-.footer a:hover{color:var(--tx)}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sathvik Lakumarapu V · Research Dashboards</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>
+    // Apply persisted theme before paint to avoid FOUC
+    (function(){try{var s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);}else if(window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();
+  </script>
+  <style>
+    /* ── CSS variables ── */
+    :root {
+      --bg:          oklch(0.985 0.004 80);
+      --bg-subtle:   oklch(0.960 0.006 80);
+      --bg-card:     oklch(1.000 0.000 0);
+      --border:      oklch(0.880 0.005 80);
+      --border-mid:  oklch(0.840 0.005 80);
+      --text:        oklch(0.130 0.012 260);
+      --text-mid:    oklch(0.380 0.010 260);
+      --text-muted:  oklch(0.560 0.008 260);
+      --accent:      oklch(0.520 0.185 248);
+      --accent-bg:   oklch(0.960 0.025 248);
+      --accent-text: oklch(0.380 0.185 248);
+      --green:       oklch(0.520 0.140 155);
+      --green-bg:    oklch(0.960 0.030 155);
+      --amber:       oklch(0.600 0.140 65);
+      --amber-bg:    oklch(0.970 0.030 65);
+      --shadow-sm:   0 1px 3px oklch(0 0 0 / 0.06), 0 1px 2px oklch(0 0 0 / 0.04);
+      --shadow-md:   0 4px 12px oklch(0 0 0 / 0.07), 0 2px 4px oklch(0 0 0 / 0.04);
+      --shadow-lg:   0 8px 24px oklch(0 0 0 / 0.09), 0 2px 6px oklch(0 0 0 / 0.05);
+      --radius:      10px;
+      --radius-sm:   6px;
+      --transition:  200ms ease;
+    }
+
+    [data-theme="dark"] {
+      --bg:          oklch(0.105 0.012 260);
+      --bg-subtle:   oklch(0.140 0.014 260);
+      --bg-card:     oklch(0.155 0.014 260);
+      --border:      oklch(0.240 0.016 260);
+      --border-mid:  oklch(0.290 0.016 260);
+      --text:        oklch(0.935 0.005 80);
+      --text-mid:    oklch(0.720 0.006 260);
+      --text-muted:  oklch(0.540 0.008 260);
+      --accent:      oklch(0.620 0.185 248);
+      --accent-bg:   oklch(0.200 0.060 248);
+      --accent-text: oklch(0.720 0.185 248);
+      --green:       oklch(0.640 0.140 155);
+      --green-bg:    oklch(0.180 0.045 155);
+      --amber:       oklch(0.720 0.140 65);
+      --amber-bg:    oklch(0.200 0.040 65);
+      --shadow-sm:   0 1px 3px oklch(0 0 0 / 0.30);
+      --shadow-md:   0 4px 12px oklch(0 0 0 / 0.35);
+      --shadow-lg:   0 8px 24px oklch(0 0 0 / 0.40);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg); color: var(--text);
+      line-height: 1.6; -webkit-font-smoothing: antialiased;
+      transition: background var(--transition), color var(--transition);
+      min-height: 100vh;
+    }
+
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: color-mix(in oklch, var(--bg) 85%, transparent);
+      backdrop-filter: blur(12px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 56px;
+      display: flex; align-items: center;
+    }
+    .nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 32px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
+    .nav-brand { font-size: 14px; font-weight: 500; color: var(--text); text-decoration: none; letter-spacing: -0.01em; }
+    .nav-brand span { color: var(--text-muted); font-weight: 400; }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-link { font-size: 13px; color: var(--text-muted); text-decoration: none; transition: color var(--transition); }
+    .nav-link:hover { color: var(--text); }
+
+    .theme-toggle {
+      width: 36px; height: 36px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--bg-card); color: var(--text-mid);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background var(--transition), border-color var(--transition), color var(--transition), box-shadow var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+    .theme-toggle:hover { background: var(--bg-subtle); color: var(--text); box-shadow: var(--shadow-md); }
+    .theme-toggle svg { width: 16px; height: 16px; }
+
+    .main { max-width: 1100px; margin: 0 auto; padding: 0 32px; padding-top: 56px; }
+
+    .hero { padding: 72px 0 56px; border-bottom: 1px solid var(--border); }
+    .hero-eyebrow { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 99px; border: 1px solid;
+    }
+    .badge-warn { background: var(--amber-bg); color: var(--amber); border-color: color-mix(in oklch, var(--amber) 35%, transparent); }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .hero-title { font-size: clamp(28px, 4vw, 40px); font-weight: 600; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 14px; }
+    .hero-sub { font-size: 15px; color: var(--text-muted); max-width: 540px; line-height: 1.7; font-weight: 300; }
+
+    .section { padding: 56px 0 0; }
+    .section-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 28px; }
+    .section-label {
+      font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted);
+      padding: 3px 8px; border: 1px solid var(--border-mid); border-radius: 4px;
+    }
+    .section-title { font-size: 18px; font-weight: 500; letter-spacing: -0.015em; }
+
+    .dashboard-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+      gap: 20px; margin-bottom: 56px;
+    }
+
+    .dash-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow-sm);
+      overflow: hidden; display: flex; flex-direction: column;
+      transition: box-shadow var(--transition), border-color var(--transition), transform var(--transition);
+      text-decoration: none; color: inherit;
+    }
+    .dash-card:hover { box-shadow: var(--shadow-lg); border-color: var(--border-mid); transform: translateY(-2px); }
+
+    .dash-card-top { padding: 24px 24px 0; }
+    .dash-card-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .dash-card-tag {
+      font-family: 'DM Mono', monospace; font-size: 10.5px; font-weight: 500;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      color: var(--accent-text); background: var(--accent-bg);
+      border: 1px solid color-mix(in oklch, var(--accent) 30%, transparent);
+      padding: 3px 9px; border-radius: 4px;
+    }
+    .dash-card-index { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
+    .dash-card-title { font-size: 17px; font-weight: 600; letter-spacing: -0.018em; line-height: 1.3; margin-bottom: 8px; }
+    .dash-card-desc { font-size: 13.5px; color: var(--text-mid); line-height: 1.70; font-weight: 400; }
+
+    .kpi-strip {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--border); margin-top: 20px;
+    }
+    .kpi-cell { padding: 16px 20px; border-right: 1px solid var(--border); }
+    .kpi-cell:last-child { border-right: none; }
+    .kpi-value { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 500; letter-spacing: -0.01em; color: var(--text); margin-bottom: 3px; line-height: 1.2; }
+    .kpi-value.positive { color: var(--green); }
+    .kpi-value.negative { color: oklch(0.55 0.20 20); }
+    .kpi-label { font-size: 10.5px; color: var(--text-muted); line-height: 1.3; font-weight: 400; }
+
+    .dash-card-footer {
+      padding: 14px 24px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--bg-subtle);
+    }
+    .dash-card-footer-note { font-size: 11.5px; color: var(--text-muted); }
+    .btn-open {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 500; color: var(--accent);
+      text-decoration: none; padding: 6px 12px; border-radius: var(--radius-sm);
+      border: 1px solid color-mix(in oklch, var(--accent) 40%, transparent);
+      background: var(--accent-bg);
+      transition: background var(--transition), box-shadow var(--transition);
+      letter-spacing: -0.01em;
+    }
+    .btn-open:hover { background: color-mix(in oklch, var(--accent) 15%, transparent); box-shadow: var(--shadow-sm); }
+    .btn-open svg { width: 12px; height: 12px; }
+
+    .planned-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 56px; }
+    .planned-card {
+      background: var(--amber-bg);
+      border: 1px dashed color-mix(in oklch, var(--amber) 50%, transparent);
+      border-radius: var(--radius); padding: 24px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .planned-status { display: inline-flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; font-size: 10.5px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--amber); }
+    .planned-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); opacity: 0.85; }
+    .planned-title { font-size: 15px; font-weight: 600; letter-spacing: -0.015em; color: var(--text); }
+    .planned-desc { font-size: 13px; color: var(--text-mid); line-height: 1.65; font-weight: 400; }
+
+    .footer { border-top: 1px solid var(--border); padding: 40px 0 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+    .footer-block-title { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+    .footer-block-text { font-size: 13px; color: var(--text-muted); line-height: 1.7; font-weight: 300; }
+    .footer-bottom { border-top: 1px solid var(--border); padding: 20px 0; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .footer-bottom-text { font-size: 12px; color: var(--text-muted); }
+    .footer-link { font-size: 12px; color: var(--accent); text-decoration: none; }
+    .footer-link:hover { text-decoration: underline; }
+
+    .divider { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding-top: 40px; border-top: 1px solid var(--border); }
+
+    @media (max-width: 700px) {
+      .main { padding: 0 20px; padding-top: 56px; }
+      .nav-inner { padding: 0 20px; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+      .kpi-cell:nth-child(2) { border-right: none; }
+      .footer { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-<div class="page">
-<header>
-  <div class="h-title">Research <span class="ce">Dashboards</span> &mdash; Sathvik Lakumarapu V</div>
-  <div class="h-meta">Public index &middot; quantitative research, backtests, and analytics &middot; results linked from the GitHub line on my resume &middot; every dashboard below is preliminary and subject to further testing.</div>
-  <div class="h-right">
-    <div class="hbadge"><div class="pulse"></div>PRELIMINARY &middot; RESEARCH ONLY</div>
-  </div>
-</header>
 
-<div class="sec">
-  <div class="shdr"><span class="snum">01</span>Dashboards</div>
-  <div class="grid">
-
-    <a class="tile ab" href="alfa_beta.html">
-      <div class="t-tag"><div class="tdot"></div>Multi-asset systematic &middot; FX + indices</div>
-      <div class="t-title">Multi-Asset Trading Dashboard &amp; Strategy Framework</div>
-      <div class="t-desc">Two 10-year walk-forward books on the same 22-cell universe, combining momentum signals with diversified portfolio construction. Performance tracking and cross-asset analysis across FX and global equity indices.</div>
-      <div class="t-stats">
-        <div class="t-stat a"><div class="v">206.3%</div><div class="k">Headline CAGR (10y WF)</div></div>
-        <div class="t-stat a"><div class="v">2.42</div><div class="k">Peak Sharpe</div></div>
-        <div class="t-stat"><div class="v">11 / 11</div><div class="k">Positive years</div></div>
-        <div class="t-stat"><div class="v">&minus;19.7%</div><div class="k">Max drawdown</div></div>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="nav-brand" href="#">Sathvik Lakumarapu V <span>· Research</span></a>
+      <div class="nav-right">
+        <a class="nav-link" href="https://github.com/sathvik-lv/publishing" target="_blank" rel="noopener">GitHub</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
       </div>
-      <div class="t-cta">Open dashboard <span class="arrow">&rarr;</span></div>
-    </a>
-
-    <a class="tile fo" href="fno.html">
-      <div class="t-tag"><div class="tdot"></div>Indian index options &middot; calendar structure</div>
-      <div class="t-title">Indian F&amp;O &mdash; Mixed Calendar v1</div>
-      <div class="t-desc">Index calendar spread research on NSE indices, 2020&ndash;2025. Includes a three-way tax-mode selector: Corporate 115BAA, Personal income, and Zero tax. Data limited and not yet fully backtested.</div>
-      <div class="t-stats">
-        <div class="t-stat a"><div class="v">61.4%</div><div class="k">Win rate (6y)</div></div>
-        <div class="t-stat a"><div class="v">2.28x</div><div class="k">Payoff ratio</div></div>
-        <div class="t-stat"><div class="v">376</div><div class="k">Total trades</div></div>
-        <div class="t-stat"><div class="v">3 views</div><div class="k">Tax scenarios</div></div>
-      </div>
-      <div class="t-cta">Open dashboard <span class="arrow">&rarr;</span></div>
-    </a>
-
-    <a class="tile sk" href="sku.html">
-      <div class="t-tag"><div class="tdot"></div>Retail analytics &middot; SKU-level</div>
-      <div class="t-title">Jewellery SKU Analytics</div>
-      <div class="t-desc">154 SKUs across 15 categories from 9 jewellery research notes; 10-year synthetic sales + opening/closing inventory book; reconciliation engine flagging shrinkage as repair/lost/unknown; PBT-aware reallocation recommendations and ML classifier for free-text product tagging.</div>
-      <div class="t-stats">
-        <div class="t-stat a"><div class="v">18.3%</div><div class="k">PBT margin (latest yr)</div></div>
-        <div class="t-stat a"><div class="v">154</div><div class="k">SKUs / 15 categories</div></div>
-        <div class="t-stat"><div class="v">100%</div><div class="k">Shrinkage detection</div></div>
-        <div class="t-stat"><div class="v">38 / 38</div><div class="k">Verification checks</div></div>
-      </div>
-      <div class="t-cta">Open dashboard <span class="arrow">&rarr;</span></div>
-    </a>
-
-  </div>
-</div>
-
-<div class="sec plan-sec">
-  <div class="shdr"><span class="snum">02</span>Planned Extensions</div>
-  <div class="plan-wrap">
-    <div class="plan-card">
-      <div class="plan-dot c"></div>
-      <div class="plan-body">
-        <div class="plan-name">Crypto &mdash; Multi-Asset Extension</div>
-        <div class="plan-desc">Extending the systematic framework to major crypto pairs for 24/7 diversification. Research in progress.</div>
-      </div>
-      <div class="plan-tag">Planned</div>
     </div>
-    <div class="plan-card">
-      <div class="plan-dot x"></div>
-      <div class="plan-body">
-        <div class="plan-name">XAU / INR &mdash; Gold Priced in Rupees</div>
-        <div class="plan-desc">Adding gold (XAU) denominated in INR to the multi-asset book for currency-hedged precious-metal exposure. Data sourcing stage.</div>
+  </nav>
+
+  <main class="main">
+
+    <section class="hero">
+      <div class="hero-eyebrow">
+        <span class="badge badge-warn">
+          <span class="badge-dot"></span>
+          Preliminary &middot; Research Only
+        </span>
       </div>
-      <div class="plan-tag">Planned</div>
+      <h1 class="hero-title">Research Dashboards</h1>
+      <p class="hero-sub">Public index &mdash; quantitative research, backtests, and analytics. Results linked from the GitHub line on my resume. Every dashboard below is preliminary and subject to further testing.</p>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <span class="section-label">01</span>
+        <span class="section-title">Dashboards</span>
+      </div>
+
+      <div class="dashboard-grid">
+
+        <a class="dash-card" href="alfa_beta.html">
+          <div class="dash-card-top">
+            <div class="dash-card-meta">
+              <span class="dash-card-tag">Multi-asset systematic &middot; FX + indices</span>
+              <span class="dash-card-index">01</span>
+            </div>
+            <div class="dash-card-title">Multi-Asset Trading Dashboard &amp; Strategy Framework</div>
+            <div class="dash-card-desc" style="margin-top:8px; margin-bottom: 20px;">Two 10-year walk-forward books on the same 22-cell universe, combining momentum signals with diversified portfolio construction. Performance tracking and cross-asset analysis across FX and global equity indices.</div>
+          </div>
+          <div class="kpi-strip">
+            <div class="kpi-cell"><div class="kpi-value positive">206.3%</div><div class="kpi-label">Headline CAGR (10y WF)</div></div>
+            <div class="kpi-cell"><div class="kpi-value">2.42</div><div class="kpi-label">Peak Sharpe</div></div>
+            <div class="kpi-cell"><div class="kpi-value positive">11 / 11</div><div class="kpi-label">Positive years</div></div>
+            <div class="kpi-cell"><div class="kpi-value negative">&minus;19.7%</div><div class="kpi-label">Max drawdown</div></div>
+          </div>
+          <div class="dash-card-footer">
+            <span class="dash-card-footer-note">10-year walk-forward &middot; 22 instruments</span>
+            <span class="btn-open">
+              Open dashboard
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+              </svg>
+            </span>
+          </div>
+        </a>
+
+        <a class="dash-card" href="fno.html">
+          <div class="dash-card-top">
+            <div class="dash-card-meta">
+              <span class="dash-card-tag">Index derivatives &middot; calendar structure</span>
+              <span class="dash-card-index">02</span>
+            </div>
+            <div class="dash-card-title">Systematic Options Calendar Spread Strategy <span style="color:var(--text-muted);font-weight:500;">(Index Derivatives)</span></div>
+            <div class="dash-card-desc" style="margin-top:8px; margin-bottom: 20px;">Index calendar spread research on NSE indices, 2020&ndash;2025. Includes a three-way tax-mode selector: Corporate 115BAA, Personal income, and Zero tax. Data limited and not yet fully backtested.</div>
+          </div>
+          <div class="kpi-strip">
+            <div class="kpi-cell"><div class="kpi-value positive">61.4%</div><div class="kpi-label">Win rate (6y)</div></div>
+            <div class="kpi-cell"><div class="kpi-value">2.28&times;</div><div class="kpi-label">Payoff ratio</div></div>
+            <div class="kpi-cell"><div class="kpi-value">376</div><div class="kpi-label">Total trades</div></div>
+            <div class="kpi-cell"><div class="kpi-value">3</div><div class="kpi-label">Tax scenarios</div></div>
+          </div>
+          <div class="dash-card-footer">
+            <span class="dash-card-footer-note">NSE indices &middot; 2020&ndash;2025</span>
+            <span class="btn-open">
+              Open dashboard
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+              </svg>
+            </span>
+          </div>
+        </a>
+
+        <a class="dash-card" href="sku.html">
+          <div class="dash-card-top">
+            <div class="dash-card-meta">
+              <span class="dash-card-tag">Retail analytics &middot; SKU-level</span>
+              <span class="dash-card-index">03</span>
+            </div>
+            <div class="dash-card-title">Sales Analytics Automation <span style="color:var(--text-muted);font-weight:500;">(SKU-Level)</span></div>
+            <div class="dash-card-desc" style="margin-top:8px; margin-bottom: 20px;">154 SKUs across 15 categories from 9 research notes; 10-year synthetic sales + opening/closing inventory book; reconciliation engine flagging shrinkage as repair/lost/unknown; PBT-aware reallocation recommendations and ML classifier for free-text product tagging.</div>
+          </div>
+          <div class="kpi-strip">
+            <div class="kpi-cell"><div class="kpi-value positive">18.3%</div><div class="kpi-label">PBT margin (latest yr)</div></div>
+            <div class="kpi-cell"><div class="kpi-value">154</div><div class="kpi-label">SKUs / 15 categories</div></div>
+            <div class="kpi-cell"><div class="kpi-value positive">100%</div><div class="kpi-label">Shrinkage detection</div></div>
+            <div class="kpi-cell"><div class="kpi-value positive">38 / 38</div><div class="kpi-label">Verification checks</div></div>
+          </div>
+          <div class="dash-card-footer">
+            <span class="dash-card-footer-note">154 SKUs &middot; 9 research notes</span>
+            <span class="btn-open">
+              Open dashboard
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+              </svg>
+            </span>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <div class="divider">
+      <span class="section-label">02</span>
+      <span class="section-title">Planned Extensions</span>
     </div>
-  </div>
-</div>
 
-<div class="about">
-  <strong>About.</strong> This is the public results hub for research work I do across quant trading (FX, indices, Indian F&amp;O) and retail analytics (SKU). Underlying strategy source and proprietary data stay in private repos &mdash; this site only surfaces rendered dashboards. Nothing here is investment advice. Every number on every dashboard is reproducible from the backtest engine that produced it; I publish only the artifacts, not the recipe.
-</div>
+    <div class="planned-grid">
+      <div class="planned-card">
+        <div class="planned-status"><span class="planned-dot"></span>Planned</div>
+        <div class="planned-title">Crypto &mdash; Multi-Asset Extension</div>
+        <div class="planned-desc">Extending the systematic framework to major crypto pairs for 24/7 diversification. Research in progress.</div>
+      </div>
+      <div class="planned-card">
+        <div class="planned-status"><span class="planned-dot"></span>Data sourcing</div>
+        <div class="planned-title">XAU / INR &mdash; Gold Priced in Rupees</div>
+        <div class="planned-desc">Adding gold (XAU) denominated in INR to the multi-asset book for currency-hedged precious-metal exposure. Data sourcing stage.</div>
+      </div>
+    </div>
 
-<div class="disc">
-  <strong>&#9888; Disclaimer.</strong> All dashboards display preliminary research. No live orders have been placed. Backtest results are compound-math artifacts on historical data and are not realistic deployment targets. Sharpe, Calmar, CAGR, and max drawdown are the load-bearing metrics &mdash; not the absolute terminal dollar figures. Past performance does not predict future results.
-</div>
+    <footer>
+      <div class="footer">
+        <div>
+          <div class="footer-block-title">About</div>
+          <div class="footer-block-text">Public results hub for research work across quant trading (FX, indices, index derivatives) and retail analytics (SKU-level). Underlying strategy source and proprietary data stay in private repos &mdash; this site only surfaces rendered dashboards. Nothing here is investment advice.</div>
+        </div>
+        <div>
+          <div class="footer-block-title">Disclaimer</div>
+          <div class="footer-block-text">All dashboards display preliminary research. No live orders have been placed. Backtest results are compound-math artifacts on historical data and are not realistic deployment targets. Sharpe, Calmar, CAGR, and max drawdown are the load-bearing metrics. Past performance does not predict future results.</div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-bottom-text">&copy; 2026 Sathvik Lakumarapu V &middot; All Rights Reserved &middot; No copying, redistribution, or AI/ML training without written consent</span>
+        <a class="footer-link" href="https://github.com/sathvik-lv/publishing" target="_blank" rel="noopener">github.com/sathvik-lv/publishing</a>
+      </div>
+    </footer>
 
-<div class="footer">
-  <div>github.com/sathvik-lv/publishing</div>
-  <div>Last updated: 2026-04-25</div>
-</div>
-<div class="footer" style="margin-top:8px;opacity:.7">
-  <div>&copy; 2026 Sathvik Lakumarapu V &middot; All Rights Reserved</div>
-  <div>No copying, redistribution, or AI/ML training without written consent</div>
-</div>
-</div>
+  </main>
+
+  <script>
+    const html = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+    const iconSun = document.getElementById('iconSun');
+    const iconMoon = document.getElementById('iconMoon');
+
+    function applyTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      if (theme === 'dark') { iconSun.style.display = 'block'; iconMoon.style.display = 'none'; }
+      else { iconSun.style.display = 'none'; iconMoon.style.display = 'block'; }
+    }
+    function getSavedTheme(){ try { return localStorage.getItem('theme'); } catch { return null; } }
+    function saveTheme(t){ try { localStorage.setItem('theme', t); } catch {} }
+
+    const saved = getSavedTheme();
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(saved || (prefersDark ? 'dark' : 'light'));
+
+    toggle.addEventListener('click', () => {
+      const next = (html.getAttribute('data-theme') === 'dark') ? 'light' : 'dark';
+      applyTheme(next); saveTheme(next);
+    });
+  </script>
 </body>
 </html>

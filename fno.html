@@ -1,288 +1,357 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Indian F&amp;O &mdash; Mixed Calendar v1 · 3 Tax Views</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600;700&family=Bricolage+Grotesque:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<title>Systematic Options Calendar Spread Strategy &mdash; 3 Tax Views</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+(function(){try{var s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);}else if(window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();
+</script>
 <style>
-:root{
-  --bg:#08091a;--card:#0e1228;--card2:#111630;--bdr:rgba(255,255,255,.1);
-  --ce:#3df5c0;--pe:#f5623d;--gr:#4afe7a;--rd:#ff4060;--go:#f5c842;
-  --tx:#f0f0f8;--mu:rgba(255,255,255,.55);--mu2:rgba(255,255,255,.78);
-  --mono:'IBM Plex Mono',monospace;--tax:#c89fff;
-  --zero:#4afe7a;--corp:#c89fff;--pers:#f5c842
+:root {
+  --bg: oklch(0.985 0.004 80); --bg-subtle: oklch(0.960 0.006 80); --bg-card: oklch(1 0 0);
+  --border: oklch(0.880 0.005 80); --border-mid: oklch(0.840 0.005 80);
+  --text: oklch(0.130 0.012 260); --text-mid: oklch(0.380 0.010 260); --text-muted: oklch(0.560 0.008 260);
+  --accent: oklch(0.520 0.185 248); --accent-bg: oklch(0.960 0.025 248); --accent-text: oklch(0.380 0.185 248);
+  --green: oklch(0.520 0.140 155); --green-bg: oklch(0.960 0.030 155);
+  --amber: oklch(0.600 0.140 65); --amber-bg: oklch(0.970 0.030 65);
+  --red: oklch(0.560 0.200 25); --red-bg: oklch(0.965 0.030 25);
+  --violet: oklch(0.520 0.180 290); --violet-bg: oklch(0.960 0.030 290);
+  --shadow-sm: 0 1px 3px oklch(0 0 0 /.06), 0 1px 2px oklch(0 0 0 /.04);
+  --shadow-md: 0 4px 12px oklch(0 0 0 /.07), 0 2px 4px oklch(0 0 0 /.04);
+  --shadow-lg: 0 8px 24px oklch(0 0 0 /.09), 0 2px 6px oklch(0 0 0 /.05);
+  --radius: 10px; --radius-sm: 6px; --transition: 200ms ease;
+  --zero: var(--green); --zero-bg: var(--green-bg);
+  --corp: var(--accent); --corp-bg: var(--accent-bg);
+  --pers: var(--amber); --pers-bg: var(--amber-bg);
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Bricolage Grotesque',sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden;font-size:15px}
-a{color:var(--mu2);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.15)}
-a:hover{color:var(--tx)}
-.page{max-width:1680px;margin:0 auto;padding:0 28px 80px}
-header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:40px 0 28px;border-bottom:1px solid var(--bdr)}
-.back{font-family:var(--mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mu);display:inline-block;margin-bottom:10px;border:none}
-.back:hover{color:var(--pe)}
-.h-title{font-size:clamp(22px,2.6vw,34px);font-weight:800;letter-spacing:-.5px}
-.h-title .p{color:var(--pe)}.h-title .tx{color:var(--tax)}
-.h-meta{margin-top:8px;font-family:var(--mono);font-size:12px;color:var(--mu);line-height:1.9;max-width:920px}
-.h-right{display:flex;gap:7px;align-items:flex-start;flex-wrap:wrap}
-.hbadge{font-family:var(--mono);font-size:11px;padding:7px 14px;border:1px solid var(--bdr);border-radius:7px;color:var(--mu2);background:rgba(255,255,255,.04);display:flex;align-items:center;gap:7px}
-.pulse{width:7px;height:7px;border-radius:50%;background:var(--gr);box-shadow:0 0 8px var(--gr);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
-.sec{margin-top:40px}
-.shdr{display:flex;align-items:center;gap:12px;margin-bottom:16px;font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mu2)}
-.shdr::after{content:'';flex:1;height:1px;background:var(--bdr)}
-.snum{color:var(--pe);opacity:.7}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-.card{background:var(--card);border:1px solid var(--bdr);border-radius:13px;padding:22px 24px}
-/* TAX SELECTOR */
+[data-theme="dark"] {
+  --bg: oklch(0.105 0.012 260); --bg-subtle: oklch(0.140 0.014 260); --bg-card: oklch(0.155 0.014 260);
+  --border: oklch(0.240 0.016 260); --border-mid: oklch(0.290 0.016 260);
+  --text: oklch(0.935 0.005 80); --text-mid: oklch(0.720 0.006 260); --text-muted: oklch(0.540 0.008 260);
+  --accent: oklch(0.620 0.185 248); --accent-bg: oklch(0.200 0.060 248); --accent-text: oklch(0.720 0.185 248);
+  --green: oklch(0.640 0.140 155); --green-bg: oklch(0.180 0.045 155);
+  --amber: oklch(0.720 0.140 65); --amber-bg: oklch(0.200 0.040 65);
+  --red: oklch(0.660 0.200 25); --red-bg: oklch(0.220 0.060 25);
+  --violet: oklch(0.700 0.180 290); --violet-bg: oklch(0.200 0.050 290);
+  --shadow-sm: 0 1px 3px oklch(0 0 0 /.30); --shadow-md: 0 4px 12px oklch(0 0 0 /.35); --shadow-lg: 0 8px 24px oklch(0 0 0 /.40);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;transition:background var(--transition),color var(--transition);min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:color-mix(in oklch,var(--bg) 85%,transparent);backdrop-filter:blur(12px) saturate(160%);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center}
+.nav-inner{max-width:1280px;margin:0 auto;padding:0 32px;width:100%;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-size:14px;font-weight:500;color:var(--text);text-decoration:none;letter-spacing:-.01em}
+.nav-brand span{color:var(--text-muted);font-weight:400}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav-link{font-size:13px;color:var(--text-muted);text-decoration:none;transition:color var(--transition)}
+.nav-link:hover{color:var(--text)}
+.theme-toggle{width:36px;height:36px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);color:var(--text-mid);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background var(--transition),border-color var(--transition),color var(--transition),box-shadow var(--transition);box-shadow:var(--shadow-sm)}
+.theme-toggle:hover{background:var(--bg-subtle);color:var(--text);box-shadow:var(--shadow-md)}
+.theme-toggle svg{width:16px;height:16px}
+
+.main{max-width:1280px;margin:0 auto;padding:0 32px;padding-top:56px}
+
+.hero-sec{padding:56px 0 40px;border-bottom:1px solid var(--border)}
+.hero-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;padding:4px 10px;border-radius:99px;border:1px solid}
+.badge-warn{background:var(--amber-bg);color:var(--amber);border-color:color-mix(in oklch,var(--amber) 35%,transparent)}
+.badge-accent{background:var(--accent-bg);color:var(--accent);border-color:color-mix(in oklch,var(--accent) 35%,transparent)}
+.badge-red{background:var(--red-bg);color:var(--red);border-color:color-mix(in oklch,var(--red) 35%,transparent)}
+.badge-violet{background:var(--violet-bg);color:var(--violet);border-color:color-mix(in oklch,var(--violet) 35%,transparent)}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;animation:pulse 2.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.hero-title{font-size:clamp(28px,4vw,40px);font-weight:600;letter-spacing:-.025em;line-height:1.2;margin-bottom:14px}
+.hero-sub{font-size:15px;color:var(--text-muted);max-width:760px;line-height:1.7;font-weight:300}
+.back{display:inline-block;margin-bottom:18px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);text-decoration:none}
+.back:hover{color:var(--text)}
+
+.section{padding:48px 0 0}
+.section-header{display:flex;align-items:baseline;gap:12px;margin-bottom:24px}
+.section-label{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);padding:3px 8px;border:1px solid var(--border-mid);border-radius:4px}
+.section-title{font-size:18px;font-weight:500;letter-spacing:-.015em}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:24px 26px}
+
+/* Tax selector */
 .tax-sel-wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px}
-.tax-sel-label{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mu)}
-.tax-sel{display:flex;gap:0;background:rgba(255,255,255,.04);border:1px solid var(--bdr);border-radius:9px;padding:4px}
-.tax-opt{font-family:var(--mono);font-size:11.5px;padding:9px 18px;border-radius:6px;border:none;cursor:pointer;background:transparent;color:var(--mu2);transition:.2s;letter-spacing:.5px}
-.tax-opt.a-zero{background:rgba(74,254,122,.15);color:var(--zero)}
-.tax-opt.a-corp{background:rgba(200,159,255,.15);color:var(--corp)}
-.tax-opt.a-pers{background:rgba(245,200,66,.15);color:var(--pers)}
-.tax-opt:hover:not(.active){color:var(--tx)}
-/* HERO */
-.hero{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--bdr);border-radius:15px;padding:26px 28px;transition:.25s border-color}
-.hero.mode-zero{border-top:3px solid var(--zero)}
-.hero.mode-corp{border-top:3px solid var(--corp)}
-.hero.mode-pers{border-top:3px solid var(--pers)}
-.h-tag{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.tdot{width:6px;height:6px;border-radius:50%}
-.hero.mode-zero .h-tag{color:var(--zero)}
-.hero.mode-zero .h-tag .tdot{background:var(--zero);box-shadow:0 0 8px var(--zero)}
-.hero.mode-corp .h-tag{color:var(--corp)}
-.hero.mode-corp .h-tag .tdot{background:var(--corp);box-shadow:0 0 8px var(--corp)}
-.hero.mode-pers .h-tag{color:var(--pers)}
-.hero.mode-pers .h-tag .tdot{background:var(--pers);box-shadow:0 0 8px var(--pers)}
-.h-main{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
-.h-ret{font-size:clamp(36px,4.2vw,66px);font-weight:800;line-height:1;letter-spacing:-1.5px}
-.hero.mode-zero .h-ret{color:var(--zero)}
-.hero.mode-corp .h-ret{color:var(--corp)}
-.hero.mode-pers .h-ret{color:var(--pers)}
-.h-ret sup{font-size:.32em;vertical-align:super}
-.h-sub .lbl{font-family:var(--mono);font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:1px}
-.h-sub .val{font-size:16px;font-weight:700;margin-top:3px}
-.hdiv{height:1px;background:var(--bdr);margin:18px 0}
-.hst{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.hst-v{font-size:17px;font-weight:700;letter-spacing:-.3px}
-.hst-k{font-family:var(--mono);font-size:10px;color:var(--mu);margin-top:3px;text-transform:uppercase;letter-spacing:.7px}
-.pos{color:var(--gr)}.neg{color:var(--rd)}.gold{color:var(--go)}
-.tax-note{margin-top:15px;padding:12px 16px;border-radius:9px;font-family:var(--mono);font-size:11px;line-height:1.9}
-.hero.mode-zero .tax-note{background:rgba(74,254,122,.06);border:1px solid rgba(74,254,122,.2);color:rgba(74,254,122,.8)}
-.hero.mode-corp .tax-note{background:rgba(200,159,255,.06);border:1px solid rgba(200,159,255,.2);color:rgba(200,159,255,.8)}
-.hero.mode-pers .tax-note{background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.2);color:rgba(245,200,66,.8)}
+.tax-sel-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
+.tax-sel{display:flex;gap:0;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px;box-shadow:var(--shadow-sm);flex-wrap:wrap}
+.tax-opt{font-family:'DM Mono',monospace;font-size:11.5px;padding:9px 18px;border-radius:4px;border:none;cursor:pointer;background:transparent;color:var(--text-mid);transition:.18s background,.18s color;letter-spacing:.04em;font-weight:500}
+.tax-opt:hover:not(.active){background:var(--bg-subtle);color:var(--text)}
+.tax-opt.a-zero{background:var(--zero-bg);color:var(--zero)}
+.tax-opt.a-corp{background:var(--corp-bg);color:var(--corp)}
+.tax-opt.a-pers{background:var(--pers-bg);color:var(--pers)}
+
+/* Hero card with tax-color top border */
+.hero-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:24px 26px;border-top:3px solid var(--zero);transition:.25s border-top-color}
+.hero-card.mode-zero{border-top-color:var(--zero)}
+.hero-card.mode-corp{border-top-color:var(--corp)}
+.hero-card.mode-pers{border-top-color:var(--pers)}
+.h-tag{font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.h-tag .tdot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.hero-card.mode-zero .h-tag{color:var(--zero)}
+.hero-card.mode-corp .h-tag{color:var(--corp)}
+.hero-card.mode-pers .h-tag{color:var(--pers)}
+.h-main{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:8px}
+.h-ret{font-family:'DM Mono',monospace;font-size:clamp(36px,4.2vw,56px);font-weight:500;line-height:1;letter-spacing:-.02em}
+.hero-card.mode-zero .h-ret{color:var(--zero)}
+.hero-card.mode-corp .h-ret{color:var(--corp)}
+.hero-card.mode-pers .h-ret{color:var(--pers)}
+.h-ret sup{font-size:.4em;vertical-align:super;font-weight:400}
+.h-sub .lbl{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em}
+.h-sub .val{font-size:15px;font-weight:500;color:var(--text-mid);margin-top:2px}
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);margin-top:16px}
+.kpi-cell{padding:14px 16px;border-right:1px solid var(--border)}
+.kpi-cell:nth-child(4n){border-right:none}
+.kpi-value{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;letter-spacing:-.01em;color:var(--text);line-height:1.2;margin-bottom:3px}
+.kpi-value.pos{color:var(--green)}
+.kpi-value.neg{color:var(--red)}
+.kpi-value.amber{color:var(--amber)}
+.kpi-label{font-size:10.5px;color:var(--text-muted);font-weight:400;line-height:1.3}
+.tax-note{margin-top:16px;padding:12px 16px;border-radius:var(--radius-sm);font-family:'DM Mono',monospace;font-size:11.5px;line-height:1.85}
+.hero-card.mode-zero .tax-note{background:var(--zero-bg);color:var(--zero);border:1px solid color-mix(in oklch,var(--zero) 25%,transparent)}
+.hero-card.mode-corp .tax-note{background:var(--corp-bg);color:var(--corp);border:1px solid color-mix(in oklch,var(--corp) 25%,transparent)}
+.hero-card.mode-pers .tax-note{background:var(--pers-bg);color:var(--pers);border:1px solid color-mix(in oklch,var(--pers) 25%,transparent)}
+
+.method{font-size:14px;color:var(--text-mid);line-height:1.8}
+.method strong{color:var(--text);font-weight:600}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;border:1px solid color-mix(in oklch,var(--text-muted) 30%,transparent);color:var(--text-muted);background:var(--bg-subtle)}
+
 /* Tables */
-.tbl{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px}
-.tbl th{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mu);padding:11px 14px;text-align:left;border-bottom:1px solid var(--bdr);background:rgba(255,255,255,.02)}
-.tbl td{padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--mu2)}
-.tbl tr:hover td{background:rgba(255,255,255,.02)}
-.tbl td.num{text-align:right}
-.tbl td.ppos{color:var(--gr)}
-.tbl td.pneg{color:var(--rd)}
-.tbl td.ttax{color:var(--corp)}
-.tbl td.tmode{font-weight:700}
-.chtit{font-family:var(--mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mu2);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
-.chnote{font-family:var(--mono);font-size:10px;color:var(--mu);margin-top:10px}
-.pill{display:inline-block;padding:3px 10px;border-radius:5px;font-family:var(--mono);font-size:10px;letter-spacing:.5px}
-.pill.m{background:rgba(255,255,255,.08);color:var(--mu2)}
-.method{font-family:var(--mono);font-size:12px;color:var(--mu2);line-height:1.95}
-.method strong{color:var(--tx)}
+.tbl-wrap{overflow:auto;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-card);box-shadow:var(--shadow-sm)}
+.tbl{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:12.5px}
+.tbl th{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);padding:12px 16px;text-align:left;border-bottom:1px solid var(--border);background:var(--bg-subtle);font-weight:500}
+.tbl td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--text-mid)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--bg-subtle)}
+.tbl td.num,.tbl th.num{text-align:right;font-variant-numeric:tabular-nums}
+.tbl td.pos{color:var(--green);font-weight:500}
+.tbl td.neg{color:var(--red);font-weight:500}
+.tbl td.tax-c{color:var(--corp);font-weight:500}
+.tbl td.tmode{font-weight:600;color:var(--text)}
+
+/* Tax comparison cards */
+.tcard{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:20px 22px;border-top:2px solid var(--zero)}
+.tcard.corp{border-top-color:var(--corp)}
+.tcard.pers{border-top-color:var(--pers)}
+.tcard .head{font-family:'DM Mono',monospace;font-size:11.5px;letter-spacing:.04em;color:var(--text-muted);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.tcard.zero .head .lhs{color:var(--zero)}
+.tcard.corp .head .lhs{color:var(--corp)}
+.tcard.pers .head .lhs{color:var(--pers)}
+.tcard .big{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;letter-spacing:-.018em}
+.tcard.zero .big{color:var(--zero)}
+.tcard.corp .big{color:var(--corp)}
+.tcard.pers .big{color:var(--pers)}
+.tcard .meta{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:5px}
+.tcard .desc{margin-top:14px;font-family:'DM Mono',monospace;font-size:11.5px;line-height:1.85;color:var(--text-mid)}
+
+.chart-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:20px 22px}
+.chtit{font-family:'DM Mono',monospace;font-size:11.5px;letter-spacing:.04em;color:var(--text-muted);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.chnote{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text-muted);margin-top:14px;line-height:1.7}
+
 .ibar-wrap{margin-top:6px}
-.irow{display:flex;align-items:center;gap:10px;margin-bottom:11px;font-family:var(--mono);font-size:11.5px}
-.iname{width:150px;flex-shrink:0;color:var(--tx)}
-.itrack{flex:1;height:7px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.irow{display:flex;align-items:center;gap:12px;margin-bottom:11px;font-family:'DM Mono',monospace;font-size:11.5px}
+.iname{width:150px;flex-shrink:0;color:var(--text);font-weight:500}
+.itrack{flex:1;height:7px;background:var(--bg-subtle);border-radius:3px;overflow:hidden;border:1px solid var(--border)}
 .ifill{height:100%;border-radius:3px}
-.ipnl{width:105px;text-align:right;flex-shrink:0;font-weight:700}
-.iwr{width:46px;text-align:right;flex-shrink:0;color:var(--mu)}
-.disc{margin-top:44px;padding:20px 22px;background:rgba(255,64,96,.05);border:1px solid rgba(255,64,96,.2);border-radius:10px;font-family:var(--mono);font-size:12px;color:var(--mu2);line-height:2}
-.disc h4{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--rd);margin-bottom:10px;text-transform:uppercase}
-.disc ol{margin-left:20px}
-.disc li{margin-bottom:6px}
-.footer{margin-top:26px;font-family:var(--mono);font-size:11px;color:var(--mu);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-@media(max-width:900px){.g2,.g3{grid-template-columns:1fr}.hst{grid-template-columns:repeat(2,1fr)}}
+.ipnl{width:105px;text-align:right;flex-shrink:0;font-weight:600}
+.iwr{width:46px;text-align:right;flex-shrink:0;color:var(--text-muted)}
+
+.disc{margin-top:48px;padding:24px 26px;background:var(--red-bg);border:1px solid color-mix(in oklch,var(--red) 30%,transparent);border-radius:var(--radius)}
+.disc h4{font-family:'DM Mono',monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:14px;font-weight:600}
+.disc ol{margin-left:20px;font-size:13.5px;color:var(--text-mid);line-height:1.85}
+.disc li{margin-bottom:8px}
+.disc strong{color:var(--text);font-weight:600}
+
+.footer{border-top:1px solid var(--border);margin-top:48px;padding:32px 0 18px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--text-muted)}
+.footer-bottom{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;padding:16px 0 40px;font-size:11.5px;color:var(--text-muted);opacity:.85}
+
+@media(max-width:900px){.g2,.g3{grid-template-columns:1fr}.kpi-strip{grid-template-columns:repeat(2,1fr)}.kpi-cell:nth-child(2){border-right:none}.kpi-cell:nth-child(3),.kpi-cell:nth-child(4){border-top:1px solid var(--border)}.iname{width:120px}.ipnl{width:80px}}
+@media(max-width:700px){.main{padding:0 20px;padding-top:56px}.nav-inner{padding:0 20px}}
 </style>
 </head>
 <body>
-<div class="page">
-<header>
-  <div>
-    <a class="back" href="index.html">&larr; back to index</a>
-    <div class="h-title">Indian <span class="p">F&amp;O</span> &mdash; Mixed Calendar v1 <span class="tx">&middot; 3 Tax Views</span></div>
-    <div class="h-meta">NSE index options &middot; calendar spread structure (sell near-expiry, buy same-strike far-expiry) &middot; 2020-01-01 &rarr; 2025-12-31 &middot; starting equity &#8377;1 Cr &middot; 376 trades &middot; backtest only &middot; data limited, not yet fully backtested out-of-sample.</div>
-  </div>
-  <div class="h-right">
-    <div class="hbadge"><div class="pulse"></div>BACKTEST ONLY</div>
-    <div class="hbadge" style="border-color:rgba(245,98,61,.3);color:var(--pe)">RESUME &middot; PROJECT 1</div>
-    <div class="hbadge" style="border-color:rgba(245,98,61,.3);color:var(--pe)">DATA LIMITED</div>
-    <div class="hbadge" style="border-color:rgba(200,159,255,.3);color:var(--tax)">TAX TOGGLE &middot; 3 MODES</div>
-  </div>
-</header>
 
-<!-- 01 TAX SELECTOR + HERO -->
-<div class="sec">
-  <div class="shdr"><span class="snum">01</span>Tax Mode &mdash; Select a View</div>
-  <div class="tax-sel-wrap">
-    <div class="tax-sel-label">Select tax regime:</div>
-    <div class="tax-sel" id="taxSel">
-      <button class="tax-opt a-zero active" data-mode="zero">ZERO TAX (0%)</button>
-      <button class="tax-opt" data-mode="corp">CORPORATE &middot; 115BAA (25.17%)</button>
-      <button class="tax-opt" data-mode="pers">PERSONAL INCOME (31.2%)</button>
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">Sathvik Lakumarapu V <span>· Research</span></a>
+    <div class="nav-right">
+      <a class="nav-link" href="index.html">Index</a>
+      <a class="nav-link" href="https://github.com/sathvik-lv/publishing" target="_blank" rel="noopener">GitHub</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
     </div>
   </div>
-  <div class="hero mode-zero" id="hero">
-    <div class="h-tag" id="hTag"><div class="tdot"></div><span id="hTagTxt">Zero-Tax View &middot; Pre-Tax / Gross</span></div>
-    <div class="h-main">
-      <div class="h-ret" id="hRet">3,230<sup>%</sup></div>
-      <div class="h-sub"><div class="lbl" id="hLbl">Post-Tax Total Return</div><div class="val" id="hSub">&#8377;1 Cr &rarr; &#8377;33.3 Cr</div></div>
+</nav>
+
+<main class="main">
+
+  <section class="hero-sec">
+    <a class="back" href="index.html">&larr; Back to index</a>
+    <div class="hero-eyebrow">
+      <span class="badge badge-warn"><span class="badge-dot"></span>Backtest only</span>
+      <span class="badge badge-accent">Resume &middot; Project 1</span>
+      <span class="badge badge-red">Data limited</span>
+      <span class="badge badge-violet">Tax toggle &middot; 3 modes</span>
     </div>
-    <div class="hdiv"></div>
-    <div class="hst">
-      <div><div class="hst-v gold" id="kFinal">&#8377;33.3 Cr</div><div class="hst-k">Final Equity</div></div>
-      <div><div class="hst-v" id="kTax">&#8377;0</div><div class="hst-k">Total Tax Paid</div></div>
-      <div><div class="hst-v" id="kRate">0.00%</div><div class="hst-k">Effective Rate</div></div>
-      <div><div class="hst-v" id="kDrag">&mdash;</div><div class="hst-k">Tax Drag vs Zero</div></div>
-      <div><div class="hst-v pos">61.4%</div><div class="hst-k">Win Rate</div></div>
-      <div><div class="hst-v">2.28x</div><div class="hst-k">Payoff Ratio</div></div>
-      <div><div class="hst-v">376</div><div class="hst-k">Total Trades</div></div>
-      <div><div class="hst-v">3.7</div><div class="hst-k">Avg Hold Days</div></div>
-    </div>
-    <div class="tax-note" id="hNote">No tax applied &mdash; gross pre-tax return. Reference line for all other views. Slippage is still deducted per trade (0.2% per leg, round-trip across 4 legs).</div>
-  </div>
-</div>
+    <h1 class="hero-title">Systematic Options Calendar Spread Strategy <span style="color:var(--text-muted);font-weight:500;">(Index Derivatives)</span></h1>
+    <p class="hero-sub">NSE index options &middot; calendar spread structure (sell near-expiry, buy same-strike far-expiry) &middot; 2020-01-01 &rarr; 2025-12-31 &middot; starting equity &#8377;1 Cr &middot; 376 trades &middot; backtest only &middot; data limited, not yet fully backtested out-of-sample.</p>
+  </section>
 
-<!-- 02 EQUITY CURVES -->
-<div class="sec">
-  <div class="shdr"><span class="snum">02</span>Equity Curves &mdash; All Three Tax Views</div>
-  <div class="card">
-    <div class="chtit"><span>&#8377;1 Cr start &middot; year-end compounding 2020 &rarr; 2025 &middot; same pre-tax P&amp;L, different tax layers</span></div>
-    <div style="height:300px"><canvas id="eqChart"></canvas></div>
-    <div class="chnote">All three curves use the same pre-tax annual P&amp;L series &mdash; only the tax layer changes at year-end. Slippage and cost model stay constant across all views.</div>
-  </div>
-</div>
-
-<!-- 03 YEAR BY YEAR -->
-<div class="sec">
-  <div class="shdr"><span class="snum">03</span>Year-by-Year P&amp;L &mdash; Current Tax View</div>
-  <div class="card" style="padding:0;overflow:auto">
-    <table class="tbl">
-      <thead><tr>
-        <th>Year</th>
-        <th class="num">Trades</th>
-        <th class="num">Win Rate</th>
-        <th class="num">Pre-Tax P&amp;L</th>
-        <th class="num">Tax</th>
-        <th class="num">Post-Tax P&amp;L</th>
-        <th class="num">Year-End Equity</th>
-      </tr></thead>
-      <tbody id="yrBody"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- 04 TAX COMPARISON -->
-<div class="sec">
-  <div class="shdr"><span class="snum">04</span>Tax View Comparison &mdash; Same Strategy, Three Regimes</div>
-  <div class="g3">
-    <div class="card" style="border-top:2px solid var(--zero)">
-      <div class="chtit" style="color:var(--zero)"><span>ZERO TAX</span><span class="pill m">0.00%</span></div>
-      <div style="font-size:24px;font-weight:700;color:var(--zero);letter-spacing:-.5px">&#8377;33.3 Cr</div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--mu);margin-top:4px">Return: +3,230%</div>
-      <div style="margin-top:14px;font-family:var(--mono);font-size:11px;line-height:1.9;color:var(--mu2)">
-        Pre-tax gross view. Reference baseline. Represents the uplifted return if the strategy were run in a tax-free vehicle &mdash; not a realistic deployment assumption in India.
+  <section class="section">
+    <div class="section-header"><span class="section-label">01</span><span class="section-title">Tax Mode &mdash; Select a View</span></div>
+    <div class="tax-sel-wrap">
+      <div class="tax-sel-label">Select tax regime:</div>
+      <div class="tax-sel" id="taxSel">
+        <button class="tax-opt a-zero" data-mode="zero">Zero Tax (0%)</button>
+        <button class="tax-opt" data-mode="corp">Corporate &middot; 115BAA (25.17%)</button>
+        <button class="tax-opt" data-mode="pers">Personal Income (31.2%)</button>
       </div>
     </div>
-    <div class="card" style="border-top:2px solid var(--corp)">
-      <div class="chtit" style="color:var(--corp)"><span>CORPORATE 115BAA</span><span class="pill m">25.17%</span></div>
-      <div style="font-size:24px;font-weight:700;color:var(--corp);letter-spacing:-.5px">&#8377;25.2 Cr</div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--mu);margin-top:4px">Return: +2,417% &middot; Tax: &#8377;8.14 Cr</div>
-      <div style="margin-top:14px;font-family:var(--mono);font-size:11px;line-height:1.9;color:var(--mu2)">
-        22% base + 10% surcharge + 4% cess &equiv; 25.17% effective. Applicable if the strategy is run from a domestic company electing Section 115BAA of the Income-Tax Act.
+    <div class="hero-card mode-zero" id="hero">
+      <div class="h-tag" id="hTag"><span class="tdot"></span><span id="hTagTxt">Zero-Tax View &middot; Pre-Tax / Gross</span></div>
+      <div class="h-main">
+        <div class="h-ret" id="hRet">3,230<sup>%</sup></div>
+        <div class="h-sub"><div class="lbl" id="hLbl">Post-Tax Total Return</div><div class="val" id="hSub">&#8377;1 Cr &rarr; &#8377;33.3 Cr</div></div>
       </div>
-    </div>
-    <div class="card" style="border-top:2px solid var(--pers)">
-      <div class="chtit" style="color:var(--pers)"><span>PERSONAL INCOME</span><span class="pill m">31.20%</span></div>
-      <div style="font-size:24px;font-weight:700;color:var(--pers);letter-spacing:-.5px">&#8377;23.2 Cr</div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--mu);margin-top:4px">Return: +2,222% &middot; Tax: &#8377;10.08 Cr</div>
-      <div style="margin-top:14px;font-family:var(--mono);font-size:11px;line-height:1.9;color:var(--mu2)">
-        30% slab + 4% cess on 30% &equiv; 31.2% effective. F&amp;O is treated as non-speculative business income under Sec 43(5); this reflects a 30%-bracket individual trader without surcharge.
+      <div class="kpi-strip">
+        <div class="kpi-cell"><div class="kpi-value amber" id="kFinal">&#8377;33.3 Cr</div><div class="kpi-label">Final equity</div></div>
+        <div class="kpi-cell"><div class="kpi-value" id="kTax">&#8377;0</div><div class="kpi-label">Total tax paid</div></div>
+        <div class="kpi-cell"><div class="kpi-value" id="kRate">0.00%</div><div class="kpi-label">Effective rate</div></div>
+        <div class="kpi-cell"><div class="kpi-value" id="kDrag">&mdash;</div><div class="kpi-label">Tax drag vs zero</div></div>
+        <div class="kpi-cell"><div class="kpi-value pos">61.4%</div><div class="kpi-label">Win rate</div></div>
+        <div class="kpi-cell"><div class="kpi-value">2.28&times;</div><div class="kpi-label">Payoff ratio</div></div>
+        <div class="kpi-cell"><div class="kpi-value">376</div><div class="kpi-label">Total trades</div></div>
+        <div class="kpi-cell"><div class="kpi-value">3.7</div><div class="kpi-label">Avg hold days</div></div>
       </div>
+      <div class="tax-note" id="hNote">No tax applied &mdash; gross pre-tax return. Reference line for all other views. Slippage is still deducted per trade (0.2% per leg, round-trip across 4 legs).</div>
     </div>
-  </div>
-</div>
+  </section>
 
-<!-- 05 CONSTRUCTION -->
-<div class="sec">
-  <div class="shdr"><span class="snum">05</span>Strategy Construction &mdash; High Level</div>
-  <div class="card">
-    <div class="method">
-      <strong>Structure.</strong> Calendar spread on NSE index options: sell the near-expiry (weekly) leg, buy the same-strike far-expiry (monthly) leg. Profit captured from the differential in theta decay between the two legs. Exits are rule-based across multiple conditions (time-based, order-flow reversal, trend decay, expiry roll-off).
-      <br><br>
-      <strong>Universe.</strong> Four NSE index families &mdash; NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY &mdash; with each side (CE / PE) either active or disabled per the book's locked allocation rules. Capital deployment is capped at 60% of book equity at any time.
-      <br><br>
-      <strong>Sizing.</strong> Per-side allocation is a fraction of book equity, derived from a defensive Kelly-style rule on the per-combo historical edge. VIX level rebalances the CE-vs-PE capital split weekly. <span class="pill m">Exact strike rules, allocation percentages, entry filters, and exit thresholds are held in the private research repo.</span>
+  <section class="section">
+    <div class="section-header"><span class="section-label">02</span><span class="section-title">Equity Curves &mdash; All Three Tax Views</span></div>
+    <div class="chart-card">
+      <div class="chtit"><span>&#8377;1 Cr start &middot; year-end compounding 2020 &rarr; 2025 &middot; same pre-tax P&amp;L, different tax layers</span></div>
+      <div style="height:300px"><canvas id="eqChart"></canvas></div>
+      <div class="chnote">All three curves use the same pre-tax annual P&amp;L series &mdash; only the tax layer changes at year-end. Slippage and cost model stay constant across all views.</div>
     </div>
-  </div>
-</div>
+  </section>
 
-<!-- 06 EXIT + INDEX BREAKDOWN -->
-<div class="sec">
-  <div class="shdr"><span class="snum">06</span>Exit &amp; Index Breakdown</div>
-  <div class="g2">
-    <div class="card">
-      <div class="chtit"><span>Exit distribution by trade count</span></div>
+  <section class="section">
+    <div class="section-header"><span class="section-label">03</span><span class="section-title">Year-by-Year P&amp;L &mdash; Current Tax View</span></div>
+    <div class="tbl-wrap">
       <table class="tbl">
-        <thead><tr><th>Exit bucket</th><th class="num">Count</th><th class="num">Win Rate</th><th class="num">P&amp;L (&#8377;Cr)</th></tr></thead>
-        <tbody>
-          <tr><td>Time-based exit</td><td class="num">182</td><td class="num">62.1%</td><td class="num ppos">17.57</td></tr>
-          <tr><td>Order-flow reversal</td><td class="num">112</td><td class="num">59.8%</td><td class="num ppos">6.13</td></tr>
-          <tr><td>Trend-decay signal</td><td class="num">32</td><td class="num">84.4%</td><td class="num ppos">2.08</td></tr>
-          <tr><td>Expiry roll-off</td><td class="num">48</td><td class="num">50.0%</td><td class="num ppos">1.24</td></tr>
-          <tr><td>Year-end close</td><td class="num">3</td><td class="num">66.7%</td><td class="num ppos">0.22</td></tr>
-        </tbody>
+        <thead><tr>
+          <th>Year</th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">Pre-tax P&amp;L</th><th class="num">Tax</th><th class="num">Post-tax P&amp;L</th><th class="num">Year-end equity</th>
+        </tr></thead>
+        <tbody id="yrBody"></tbody>
       </table>
     </div>
-    <div class="card">
-      <div class="chtit"><span>Per-index contribution &middot; pre-tax gross P&amp;L</span></div>
-      <div class="ibar-wrap" id="idxBars"></div>
-      <div class="chnote">Strike type (ATM vs ITM) and per-index capital allocation % held private.</div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">04</span><span class="section-title">Tax View Comparison &mdash; Same Strategy, Three Regimes</span></div>
+    <div class="g3">
+      <div class="tcard zero">
+        <div class="head"><span class="lhs">Zero Tax</span><span class="pill">0.00%</span></div>
+        <div class="big">&#8377;33.3 Cr</div>
+        <div class="meta">Return: +3,230%</div>
+        <div class="desc">Pre-tax gross view. Reference baseline. Represents the uplifted return if the strategy were run in a tax-free vehicle &mdash; not a realistic deployment assumption in India.</div>
+      </div>
+      <div class="tcard corp">
+        <div class="head"><span class="lhs">Corporate 115BAA</span><span class="pill">25.17%</span></div>
+        <div class="big">&#8377;25.2 Cr</div>
+        <div class="meta">Return: +2,417% &middot; Tax: &#8377;8.14 Cr</div>
+        <div class="desc">22% base + 10% surcharge + 4% cess &equiv; 25.17% effective. Applicable if the strategy is run from a domestic company electing Section 115BAA of the Income-Tax Act.</div>
+      </div>
+      <div class="tcard pers">
+        <div class="head"><span class="lhs">Personal Income</span><span class="pill">31.20%</span></div>
+        <div class="big">&#8377;23.2 Cr</div>
+        <div class="meta">Return: +2,222% &middot; Tax: &#8377;10.08 Cr</div>
+        <div class="desc">30% slab + 4% cess on 30% &equiv; 31.2% effective. F&amp;O is treated as non-speculative business income under Sec 43(5); this reflects a 30%-bracket individual trader without surcharge.</div>
+      </div>
     </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">05</span><span class="section-title">Strategy Construction &mdash; High Level</span></div>
+    <div class="card">
+      <div class="method">
+        <strong>Structure.</strong> Calendar spread on NSE index options: sell the near-expiry (weekly) leg, buy the same-strike far-expiry (monthly) leg. Profit captured from the differential in theta decay between the two legs. Exits are rule-based across multiple conditions (time-based, order-flow reversal, trend decay, expiry roll-off).
+        <br><br>
+        <strong>Universe.</strong> Four NSE index families &mdash; NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY &mdash; with each side (CE / PE) either active or disabled per the book's locked allocation rules. Capital deployment is capped at 60% of book equity at any time.
+        <br><br>
+        <strong>Sizing.</strong> Per-side allocation is a fraction of book equity, derived from a defensive Kelly-style rule on the per-combo historical edge. VIX level rebalances the CE-vs-PE capital split weekly. <span class="pill">Exact strike rules, allocation percentages, entry filters, and exit thresholds are held in the private research repo.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">06</span><span class="section-title">Exit &amp; Index Breakdown</span></div>
+    <div class="g2">
+      <div class="card">
+        <div class="chtit"><span>Exit distribution by trade count</span></div>
+        <div class="tbl-wrap" style="border:none;box-shadow:none">
+          <table class="tbl">
+            <thead><tr><th>Exit bucket</th><th class="num">Count</th><th class="num">Win rate</th><th class="num">P&amp;L (&#8377;Cr)</th></tr></thead>
+            <tbody>
+              <tr><td>Time-based exit</td><td class="num">182</td><td class="num">62.1%</td><td class="num pos">17.57</td></tr>
+              <tr><td>Order-flow reversal</td><td class="num">112</td><td class="num">59.8%</td><td class="num pos">6.13</td></tr>
+              <tr><td>Trend-decay signal</td><td class="num">32</td><td class="num">84.4%</td><td class="num pos">2.08</td></tr>
+              <tr><td>Expiry roll-off</td><td class="num">48</td><td class="num">50.0%</td><td class="num pos">1.24</td></tr>
+              <tr><td>Year-end close</td><td class="num">3</td><td class="num">66.7%</td><td class="num pos">0.22</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="chtit"><span>Per-index contribution &middot; pre-tax gross P&amp;L</span></div>
+        <div class="ibar-wrap" id="idxBars"></div>
+        <div class="chnote">Strike type (ATM vs ITM) and per-index capital allocation % held private.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="disc">
+    <h4>&#9888; Caveats &mdash; Read These</h4>
+    <ol>
+      <li><strong>Data limited &mdash; not yet fully backtested.</strong> Window is 2020-01 &rarr; 2025-12 (6 years). Out-of-sample robustness claims are not yet available; a walk-forward framework on a wider dataset is pending.</li>
+      <li><strong>Exploring better data sources.</strong> Actively looking for more accurate option-chain and tick-level datasets so the strategy can be backtested more rigorously and on a wider scale than current EOD bhavcopy-based data allows.</li>
+      <li><strong>SEBI Oct 2024 circular limits live executability.</strong> Only NIFTY weekly options remain post-change. BANKNIFTY and FINNIFTY weekly legs in this backtest would NOT be executable today &mdash; treat their contribution as historical research only.</li>
+      <li><strong>Research / simulation only.</strong> No live orders placed. Execution realism depends on accurate entry/exit prices at the option-chain level, which this backtest approximates.</li>
+      <li><strong>Synthesized spot series.</strong> FINNIFTY and MIDCPNIFTY spot are constructed from a linear regression on NIFTY + BANKNIFTY (no direct historical spot). Introduces model risk on those legs.</li>
+      <li><strong>Flat slippage.</strong> 0.2% per leg (0.8% round-trip across 4 legs) is a simple uniform cost. Real execution may differ, especially in illiquid far-expiry strikes or stressed regimes.</li>
+      <li><strong>Tax views are post-processed, not independent backtests.</strong> The three views recompute equity using the same pre-tax annual P&amp;L stream; they do not re-run the strategy at different tax rates. Slippage and cost model stay identical across all three.</li>
+    </ol>
   </div>
-</div>
 
-<!-- DISCLAIMER + CAVEATS -->
-<div class="disc">
-  <h4>&#9888; Caveats &mdash; Read These</h4>
-  <ol>
-    <li><strong>Data limited &mdash; not yet fully backtested.</strong> Window is 2020-01 &rarr; 2025-12 (6 years). Out-of-sample robustness claims are not yet available; a walk-forward framework on a wider dataset is pending.</li>
-    <li><strong>Exploring better data sources.</strong> Actively looking for more accurate option-chain and tick-level datasets so the strategy can be backtested more rigorously and on a wider scale than current EOD bhavcopy-based data allows.</li>
-    <li><strong>SEBI Oct 2024 circular limits live executability.</strong> Only NIFTY weekly options remain post-change. BANKNIFTY and FINNIFTY weekly legs in this backtest would NOT be executable today &mdash; treat their contribution as historical research only.</li>
-    <li><strong>Research / simulation only.</strong> No live orders placed. Execution realism depends on accurate entry/exit prices at the option-chain level, which this backtest approximates.</li>
-    <li><strong>Synthesized spot series.</strong> FINNIFTY and MIDCPNIFTY spot are constructed from a linear regression on NIFTY + BANKNIFTY (no direct historical spot). Introduces model risk on those legs.</li>
-    <li><strong>Flat slippage.</strong> 0.2% per leg (0.8% round-trip across 4 legs) is a simple uniform cost. Real execution may differ, especially in illiquid far-expiry strikes or stressed regimes.</li>
-    <li><strong>Tax views are post-processed, not independent backtests.</strong> The three views recompute equity using the same pre-tax annual P&amp;L stream; they do not re-run the strategy at different tax rates. Slippage and cost model stay identical across all three.</li>
-  </ol>
-</div>
+  <div class="footer">
+    <div>github.com/sathvik-lv/publishing &middot; <a href="index.html">&larr; back to index</a></div>
+    <div>Strategy locked: 2026-03-14 &middot; Last updated: 2026-04-25</div>
+  </div>
+  <div class="footer-bottom">
+    <div>&copy; 2026 Sathvik Lakumarapu V &middot; All Rights Reserved</div>
+    <div>No copying, redistribution, or AI/ML training without written consent</div>
+  </div>
 
-<div class="footer">
-  <div>github.com/sathvik-lv/publishing &middot; <a href="index.html">&larr; back to index</a></div>
-  <div>Strategy locked: 2026-03-14 &middot; Last updated: 2026-04-24</div>
-</div>
-<div class="footer" style="margin-top:8px;opacity:.7">
-  <div>&copy; 2026 Sathvik Lakumarapu V &middot; All Rights Reserved</div>
-  <div>No copying, redistribution, or AI/ML training without written consent</div>
-</div>
-</div>
+</main>
 
 <script>
-// =================== DATA ===================
 const PNL = {2020:3651653.61, 2021:-176841.00, 2022:14365875.34, 2023:14793932.68, 2024:159103457.96, 2025:131293488.28};
 const WR_PER_YEAR = {2020:0.50, 2021:0.55, 2022:0.55, 2023:0.64, 2024:0.71, 2025:0.61};
 const TRADES_PER_YEAR = {2020:40, 2021:38, 2022:49, 2023:58, 2024:96, 2025:95};
-const START = 10000000; // ₹1 Cr
+const START = 10000000;
 
 const RATES = {zero:0.0, corp:0.2517, pers:0.312};
 const LABEL = {zero:'Zero Tax', corp:'Corporate · 115BAA', pers:'Personal Income'};
@@ -293,15 +362,13 @@ const NOTE  = {
   pers: '30% slab + 4% cess on 30% ≡ 31.2% effective. F&O is treated as non-speculative business income under Sec 43(5); a 30%-slab individual trader without surcharge. Tax applied on positive-PnL years only at year-end.'
 };
 
-// Compute equity curve for a given tax rate
 function buildScenario(rate){
   let eq = START, rows = [], totTax = 0, totGross = 0;
   const curve = [{x:'Start 2020', y:START}];
   Object.keys(PNL).sort().forEach(y=>{
     const p = PNL[y];
     const tax = p > 0 ? p*rate : 0;
-    totTax += tax;
-    totGross += p;
+    totTax += tax; totGross += p;
     const preEq = eq + p;
     eq = preEq - tax;
     rows.push({y:+y, trades:TRADES_PER_YEAR[y], wr:WR_PER_YEAR[y], pnl:p, tax:tax, postPnl:p-tax, eq:eq, preEq:preEq});
@@ -309,34 +376,35 @@ function buildScenario(rate){
   });
   return {rows, curve, final:eq, totTax, totGross, ret:(eq/START-1)*100, rate};
 }
-
 const SC = {zero: buildScenario(0.0), corp: buildScenario(0.2517), pers: buildScenario(0.312)};
 
-// Index contribution table (from STRATEGY_LOCKED — values are aggregated results, not strategy parameters)
 const IDX_ROWS = [
-  {name:'FINNIFTY · CE', pnl:14.77, share:54.2, trades:35, wr:80.0, color:'var(--pe)'},
-  {name:'FINNIFTY · PE', pnl:9.49,  share:34.9, trades:29, wr:82.8, color:'var(--ce)'},
-  {name:'BANKNIFTY · PE', pnl:1.63, share:6.0, trades:168, wr:60.7, color:'var(--go)'},
-  {name:'NIFTY · PE', pnl:1.29, share:4.7, trades:98, wr:54.1, color:'var(--tax)'},
-  {name:'NIFTY · CE', pnl:0.60, share:0.2, trades:47, wr:55.3, color:'var(--gr)'}
+  {name:'FINNIFTY · CE', pnl:14.77, share:54.2, trades:35, wr:80.0, varName:'--accent'},
+  {name:'FINNIFTY · PE', pnl:9.49,  share:34.9, trades:29, wr:82.8, varName:'--violet'},
+  {name:'BANKNIFTY · PE', pnl:1.63, share:6.0, trades:168, wr:60.7, varName:'--amber'},
+  {name:'NIFTY · PE', pnl:1.29, share:4.7, trades:98, wr:54.1, varName:'--green'},
+  {name:'NIFTY · CE', pnl:0.60, share:0.2, trades:47, wr:55.3, varName:'--red'}
 ];
-const maxShare = Math.max(...IDX_ROWS.map(r=>r.share));
-document.getElementById('idxBars').innerHTML = IDX_ROWS.map(r=>`
-  <div class="irow">
-    <div class="iname">${r.name}</div>
-    <div class="itrack"><div class="ifill" style="width:${(r.share/maxShare*100).toFixed(1)}%;background:${r.color}"></div></div>
-    <div class="ipnl" style="color:${r.color}">₹${r.pnl.toFixed(2)} Cr</div>
-    <div class="iwr">${r.wr.toFixed(1)}%</div>
-  </div>`).join('');
+function readVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function renderIdxBars(){
+  const maxShare = Math.max(...IDX_ROWS.map(r=>r.share));
+  document.getElementById('idxBars').innerHTML = IDX_ROWS.map(r=>{
+    const c = readVar(r.varName);
+    return `<div class="irow">
+      <div class="iname">${r.name}</div>
+      <div class="itrack"><div class="ifill" style="width:${(r.share/maxShare*100).toFixed(1)}%;background:${c}"></div></div>
+      <div class="ipnl" style="color:${c}">₹${r.pnl.toFixed(2)} Cr</div>
+      <div class="iwr">${r.wr.toFixed(1)}%</div>
+    </div>`;
+  }).join('');
+}
+renderIdxBars();
 
-// =================== HELPERS ===================
 function fmtCr(v){return '₹'+(v/10000000).toFixed(2)+' Cr';}
 function fmtCrShort(v){return '₹'+(v/10000000).toFixed(1)+' Cr';}
 function fmtL(v){return '₹'+(v/100000).toFixed(1)+' L';}
 function fmtPct(v){return v.toFixed(2)+'%';}
-function fmtRet(v){return (v>=0?'+':'')+v.toLocaleString(undefined,{maximumFractionDigits:0})+'%';}
 
-// =================== RENDER HERO ===================
 const hero = document.getElementById('hero');
 const hTagTxt = document.getElementById('hTagTxt');
 const hRet = document.getElementById('hRet');
@@ -362,10 +430,9 @@ function renderHero(mode){
   kRate.textContent = (mode==='zero') ? '0.00%' : fmtPct(s.rate*100);
   const dragVsZero = SC.zero.final - s.final;
   kDrag.textContent = (mode==='zero') ? '—' : ('−'+fmtCrShort(dragVsZero));
-  kDrag.className = 'hst-v' + (mode==='zero' ? '' : ' neg');
+  kDrag.className = 'kpi-value' + (mode==='zero' ? '' : ' neg');
 }
 
-// =================== RENDER YEAR TABLE ===================
 const yrBody = document.getElementById('yrBody');
 function renderYears(mode){
   const s = SC[mode];
@@ -374,65 +441,87 @@ function renderYears(mode){
       <td>${r.y}</td>
       <td class="num">${r.trades}</td>
       <td class="num">${(r.wr*100).toFixed(1)}%</td>
-      <td class="num ${r.pnl>=0?'ppos':'pneg'}">${r.pnl>=0?'+':''}${fmtL(r.pnl)}</td>
-      <td class="num ttax">${r.tax>0?fmtL(r.tax):'—'}</td>
-      <td class="num ${r.postPnl>=0?'ppos':'pneg'}">${r.postPnl>=0?'+':''}${fmtL(r.postPnl)}</td>
+      <td class="num ${r.pnl>=0?'pos':'neg'}">${r.pnl>=0?'+':''}${fmtL(r.pnl)}</td>
+      <td class="num tax-c">${r.tax>0?fmtL(r.tax):'—'}</td>
+      <td class="num ${r.postPnl>=0?'pos':'neg'}">${r.postPnl>=0?'+':''}${fmtL(r.postPnl)}</td>
       <td class="num tmode">${fmtCr(r.eq)}</td>
     </tr>
   `).join('');
 }
 
-// =================== EQUITY CHART ===================
-const ctx = document.getElementById('eqChart').getContext('2d');
-const years = ['Start 2020','2020','2021','2022','2023','2024','2025'];
-const eqChart = new Chart(ctx,{
-  type:'line',
-  data:{
-    labels: years,
-    datasets:[
-      {label:'Zero Tax',            data:SC.zero.curve.map(p=>p.y), borderColor:'#4afe7a', backgroundColor:'rgba(74,254,122,.06)', borderWidth:2.5, fill:false, tension:.15, pointRadius:4, pointHoverRadius:6, pointBackgroundColor:'#4afe7a'},
-      {label:'Corporate · 115BAA',  data:SC.corp.curve.map(p=>p.y), borderColor:'#c89fff', backgroundColor:'rgba(200,159,255,.06)', borderWidth:2.5, fill:false, tension:.15, pointRadius:4, pointHoverRadius:6, pointBackgroundColor:'#c89fff'},
-      {label:'Personal Income',     data:SC.pers.curve.map(p=>p.y), borderColor:'#f5c842', backgroundColor:'rgba(245,200,66,.06)', borderWidth:2.5, fill:false, tension:.15, pointRadius:4, pointHoverRadius:6, pointBackgroundColor:'#f5c842'}
-    ]
-  },
-  options:{
-    responsive:true,maintainAspectRatio:false,
-    plugins:{
-      legend:{position:'top',align:'end',labels:{color:'rgba(255,255,255,.78)',font:{family:'IBM Plex Mono',size:11},boxWidth:14,boxHeight:3,padding:18}},
-      tooltip:{
-        callbacks:{label:c=>' '+c.dataset.label+': '+fmtCr(c.parsed.y)}
-      }
+let eqChart;
+function buildChart(){
+  const el = document.getElementById('eqChart');
+  if (!el) return;
+  const ctx = el.getContext('2d');
+  if (eqChart) eqChart.destroy();
+  const cZero = readVar('--zero');
+  const cCorp = readVar('--corp');
+  const cPers = readVar('--pers');
+  const grid = readVar('--border');
+  const muted = readVar('--text-muted');
+  eqChart = new Chart(ctx,{
+    type:'line',
+    data:{
+      labels: ['Start 2020','2020','2021','2022','2023','2024','2025'],
+      datasets:[
+        {label:'Zero Tax', data:SC.zero.curve.map(p=>p.y), borderColor:cZero, borderWidth:2.5, fill:false, tension:.15, pointRadius:4, pointHoverRadius:6, pointBackgroundColor:cZero},
+        {label:'Corporate · 115BAA', data:SC.corp.curve.map(p=>p.y), borderColor:cCorp, borderWidth:2.5, fill:false, tension:.15, pointRadius:4, pointHoverRadius:6, pointBackgroundColor:cCorp},
+        {label:'Personal Income', data:SC.pers.curve.map(p=>p.y), borderColor:cPers, borderWidth:2.5, fill:false, tension:.15, pointRadius:4, pointHoverRadius:6, pointBackgroundColor:cPers}
+      ]
     },
-    scales:{
-      y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.55)',font:{family:'IBM Plex Mono',size:10},callback:v=>'₹'+(v/10000000).toFixed(0)+'Cr'}},
-      x:{grid:{display:false},ticks:{color:'rgba(255,255,255,.55)',font:{family:'IBM Plex Mono',size:10}}}
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',align:'end',labels:{color:muted,font:{family:"'DM Mono',monospace",size:11},boxWidth:14,boxHeight:3,padding:18}},
+        tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+fmtCr(c.parsed.y)}}},
+      scales:{
+        y:{grid:{color:grid},ticks:{color:muted,font:{family:"'DM Mono',monospace",size:10},callback:v=>'₹'+(v/10000000).toFixed(0)+'Cr'}},
+        x:{grid:{display:false},ticks:{color:muted,font:{family:"'DM Mono',monospace",size:10}}}
+      }
     }
-  }
-});
+  });
+}
 
-// =================== TAX SELECTOR WIRING ===================
 const taxSel = document.getElementById('taxSel');
 taxSel.querySelectorAll('.tax-opt').forEach(btn=>{
   btn.addEventListener('click',()=>{
     const mode = btn.dataset.mode;
-    taxSel.querySelectorAll('.tax-opt').forEach(b=>{
-      b.classList.remove('active','a-zero','a-corp','a-pers');
-    });
-    btn.classList.add('active','a-'+mode);
+    taxSel.querySelectorAll('.tax-opt').forEach(b=>b.classList.remove('a-zero','a-corp','a-pers'));
+    btn.classList.add('a-'+mode);
     renderHero(mode);
     renderYears(mode);
-    // Persist selection in URL hash
     if(history.replaceState) history.replaceState(null,'','#'+mode);
   });
 });
 
-// Init — honour #hash if present
 const initMode = ['zero','corp','pers'].includes(location.hash.replace('#','')) ? location.hash.replace('#','') : 'zero';
 const initBtn = taxSel.querySelector('[data-mode="'+initMode+'"]');
-taxSel.querySelectorAll('.tax-opt').forEach(b=>b.classList.remove('active','a-zero','a-corp','a-pers'));
-initBtn.classList.add('active','a-'+initMode);
+taxSel.querySelectorAll('.tax-opt').forEach(b=>b.classList.remove('a-zero','a-corp','a-pers'));
+initBtn.classList.add('a-'+initMode);
 renderHero(initMode);
 renderYears(initMode);
+buildChart();
+
+// Theme toggle
+const docEl = document.documentElement;
+const togBtn = document.getElementById('themeToggle');
+const iSun = document.getElementById('iconSun');
+const iMoon = document.getElementById('iconMoon');
+function applyTheme(t){
+  docEl.setAttribute('data-theme', t);
+  if (t === 'dark') { iSun.style.display='block'; iMoon.style.display='none'; }
+  else { iSun.style.display='none'; iMoon.style.display='block'; }
+  buildChart();
+  renderIdxBars();
+}
+let initT;
+try { initT = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch(e){ initT = 'light'; }
+applyTheme(initT);
+togBtn.addEventListener('click', () => {
+  const next = (docEl.getAttribute('data-theme') === 'dark') ? 'light' : 'dark';
+  applyTheme(next);
+  try { localStorage.setItem('theme', next); } catch(e){}
+});
 </script>
 </body>
 </html>
