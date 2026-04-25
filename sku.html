@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -9,33 +9,94 @@
 <!-- xlsx-js-style is a maintained fork of SheetJS that supports cell styling
      (so we can write conditional-formatted Excel files entirely in-browser). -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+<script>
+// Apply persisted theme before paint to avoid FOUC
+(function(){try{var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
 <style>
 :root{
   --bg:#08091a;--card:#0e1228;--card2:#111630;--bdr:rgba(255,255,255,.1);
-  --tax:#c89fff;--gr:#4afe7a;--ye:#f5c842;--rd:#ff4060;
+  --tax:#c89fff;--gr:#4afe7a;--ye:#f5c842;--rd:#ff4060;--go:#f5c842;
   --tx:#f0f0f8;--mu:rgba(255,255,255,.55);--mu2:rgba(255,255,255,.78);
+  --row-hover:rgba(255,255,255,.02);--cell-bdr:rgba(255,255,255,.04);
+  --th-bg:rgba(255,255,255,.02);--accent-soft:rgba(200,159,255,.06);
+  --accent-bdr:rgba(200,159,255,.18);--accent-strong:rgba(200,159,255,.35);
   --mono:'IBM Plex Mono',monospace;
 }
+[data-theme="light"]{
+  --bg:#f4f4f0;--card:#ffffff;--card2:#fafaf6;--bdr:rgba(10,10,30,.12);
+  --tax:#7c3aed;--gr:#0a8a3a;--ye:#a06a00;--rd:#c8254a;--go:#a06a00;
+  --tx:#1a1a2e;--mu:rgba(20,20,40,.55);--mu2:rgba(20,20,40,.78);
+  --row-hover:rgba(124,58,237,.05);--cell-bdr:rgba(10,10,30,.06);
+  --th-bg:rgba(10,10,30,.03);--accent-soft:rgba(124,58,237,.06);
+  --accent-bdr:rgba(124,58,237,.22);--accent-strong:rgba(124,58,237,.4);
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Bricolage Grotesque',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:15px}
-a{color:var(--mu2);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.15)}
+html,body{transition:background-color .18s ease,color .18s ease}
+body{font-family:'Bricolage Grotesque',sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden;font-size:15px}
+a{color:var(--mu2);text-decoration:none;border-bottom:1px solid var(--cell-bdr)}
 a:hover{color:var(--tx)}
-.page{max-width:1280px;margin:0 auto;padding:0 28px 80px}
-header{padding:42px 0 28px;border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap}
-.back{font-family:var(--mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mu);border:none;display:inline-block;margin-bottom:8px}
+.page{max-width:1680px;margin:0 auto;padding:0 28px 80px}
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:40px 0 28px;border-bottom:1px solid var(--bdr)}
+.back{font-family:var(--mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mu);display:inline-block;margin-bottom:10px;border:none}
 .back:hover{color:var(--tax)}
-.h-title{font-size:clamp(26px,3.2vw,40px);font-weight:800;letter-spacing:-.6px;line-height:1.15}
+.h-title{font-size:clamp(22px,2.6vw,34px);font-weight:800;letter-spacing:-.5px}
 .h-title .tx{color:var(--tax)}
-.h-meta{margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--mu);line-height:1.85;max-width:680px}
+.h-meta{margin-top:8px;font-family:var(--mono);font-size:12px;color:var(--mu);line-height:1.9;max-width:920px}
 .h-meta strong{color:var(--mu2)}
-.h-right{display:flex;gap:7px;flex-wrap:wrap}
-.hbadge{font-family:var(--mono);font-size:11px;padding:7px 14px;border:1px solid var(--bdr);border-radius:7px;color:var(--mu2);background:rgba(255,255,255,.04);display:flex;align-items:center;gap:7px}
-.pulse{width:7px;height:7px;border-radius:50%;background:var(--tax);box-shadow:0 0 8px var(--tax);animation:pulse 2s infinite}
+.h-right{display:flex;gap:7px;align-items:flex-start;flex-wrap:wrap}
+.hbadge{font-family:var(--mono);font-size:11px;padding:7px 14px;border:1px solid var(--bdr);border-radius:7px;color:var(--mu2);background:var(--card2);display:flex;align-items:center;gap:7px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--gr);box-shadow:0 0 8px var(--gr);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+.theme-tog{font-family:var(--mono);font-size:11px;padding:7px 12px;border:1px solid var(--bdr);border-radius:7px;color:var(--mu2);background:var(--card2);display:flex;align-items:center;gap:7px;cursor:pointer;transition:.18s color,.18s border-color}
+.theme-tog:hover{border-color:var(--accent-strong);color:var(--tax)}
+.theme-tog svg{width:13px;height:13px}
+.theme-tog .lbl{letter-spacing:1px;text-transform:uppercase}
+[data-theme="dark"] .theme-tog .ic-sun{display:inline-block}[data-theme="dark"] .theme-tog .ic-moon{display:none}
+[data-theme="light"] .theme-tog .ic-sun{display:none}[data-theme="light"] .theme-tog .ic-moon{display:inline-block}
 .sec{margin-top:40px}
 .shdr{display:flex;align-items:center;gap:12px;margin-bottom:16px;font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mu2)}
 .shdr::after{content:'';flex:1;height:1px;background:var(--bdr)}
 .snum{color:var(--tax);opacity:.7}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:13px;padding:22px 24px}
+.hero{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--bdr);border-radius:15px;padding:26px 28px;border-top:3px solid var(--tax)}
+.h-tag{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:12px;color:var(--tax)}
+.tdot{width:6px;height:6px;border-radius:50%;background:var(--tax);box-shadow:0 0 8px var(--tax)}
+.h-name{font-size:18px;font-weight:700;margin-bottom:14px;letter-spacing:-.2px;color:var(--tx)}
+.h-main{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.h-ret{font-size:clamp(36px,4vw,60px);font-weight:800;line-height:1;letter-spacing:-1.5px;color:var(--tax)}
+.h-ret sup{font-size:.32em;vertical-align:super}
+.h-sub .lbl{font-family:var(--mono);font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:1px}
+.h-sub .val{font-size:16px;font-weight:700;margin-top:3px;color:var(--tax)}
+.hdiv{height:1px;background:var(--bdr);margin:18px 0}
+.hst{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.hst-v{font-size:17px;font-weight:700;letter-spacing:-.3px;color:var(--tx)}
+.hst-k{font-family:var(--mono);font-size:10px;color:var(--mu);margin-top:3px;text-transform:uppercase;letter-spacing:.7px}
+.pos{color:var(--gr)}.neg{color:var(--rd)}.gold{color:var(--go)}.tax{color:var(--tax)}
+/* Tables */
+.tbl{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px}
+.tbl th{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mu);padding:11px 14px;text-align:left;border-bottom:1px solid var(--bdr);background:var(--th-bg);font-weight:500}
+.tbl td{padding:9px 14px;border-bottom:1px solid var(--cell-bdr);color:var(--mu2)}
+.tbl tr:hover td{background:var(--row-hover)}
+.tbl td.num{text-align:right}
+.tbl td.tax-c{color:var(--tax)}
+.chtit{font-family:var(--mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mu2);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.chnote{font-family:var(--mono);font-size:10px;color:var(--mu);margin-top:10px;line-height:1.7}
+.chart{width:100%;height:340px}
+.pill{display:inline-block;padding:3px 10px;border-radius:5px;font-family:var(--mono);font-size:10px;letter-spacing:.5px}
+.pill.HIGH{background:rgba(74,254,122,.12);color:var(--gr)}
+.pill.MID{background:rgba(245,200,66,.14);color:var(--ye)}
+.pill.LOW{background:rgba(255,64,96,.14);color:var(--rd)}
+.pill.act{background:var(--accent-soft);color:var(--tax);border:1px solid var(--accent-bdr)}
+.pill.m{background:var(--card2);color:var(--mu2);border:1px solid var(--bdr)}
+[data-theme="light"] .pill.HIGH{background:rgba(10,138,58,.12)}
+[data-theme="light"] .pill.MID{background:rgba(160,106,0,.14)}
+[data-theme="light"] .pill.LOW{background:rgba(200,37,74,.14)}
+.method{font-family:var(--mono);font-size:12px;color:var(--mu2);line-height:1.95}
+.method strong{color:var(--tx)}
+/* KPI tiles */
 .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 @media(max-width:1000px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:520px){.kpi-grid{grid-template-columns:1fr}}
@@ -43,45 +104,45 @@ header{padding:42px 0 28px;border-bottom:1px solid var(--bdr);display:flex;justi
 .kpi .k{font-family:var(--mono);font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mu);margin-bottom:10px}
 .kpi .v{font-size:24px;font-weight:700;letter-spacing:-.3px;color:var(--tx)}
 .kpi .s{margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--mu)}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-@media(max-width:900px){.row2{grid-template-columns:1fr}}
-.card{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:18px 20px}
-.card h3{font-size:14px;font-weight:600;color:var(--mu2);margin-bottom:12px}
-.chart{width:100%;height:340px}
-table{width:100%;border-collapse:collapse;font-size:13px;font-family:var(--mono)}
-th{text-align:left;padding:9px 10px;color:var(--mu);font-weight:500;font-size:11px;letter-spacing:.6px;text-transform:uppercase;border-bottom:1px solid var(--bdr)}
-td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--mu2)}
-tbody tr:hover{background:rgba(200,159,255,.04)}
-.pill{display:inline-block;padding:2px 9px;border-radius:9px;font-size:10.5px;letter-spacing:.5px}
-.pill.HIGH{background:rgba(74,254,122,.12);color:var(--gr)}
-.pill.MID {background:rgba(245,200,66,.12);color:var(--ye)}
-.pill.LOW {background:rgba(255,64,96,.14);color:var(--rd)}
-.pill.act {background:rgba(200,159,255,.12);color:var(--tax)}
-.note{font-family:var(--mono);font-size:11px;color:var(--mu);background:rgba(200,159,255,.06);border:1px solid rgba(200,159,255,.18);border-radius:9px;padding:14px 16px;line-height:1.7}
-.note strong{color:var(--tax)}
-.cta{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap}
-.cta a{font-family:var(--mono);font-size:11.5px;letter-spacing:.8px;padding:10px 16px;border:1px solid var(--bdr);border-radius:8px;background:rgba(255,255,255,.04);color:var(--mu2)}
-.cta a:hover{border-color:var(--tax);color:var(--tx)}
-.drop{border:2px dashed rgba(200,159,255,.35);border-radius:14px;padding:28px;text-align:center;background:rgba(200,159,255,.04);transition:.18s border-color,.18s background}
-.drop.hot{border-color:var(--tax);background:rgba(200,159,255,.08)}
+/* Drag-drop block */
+.req-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+@media(max-width:900px){.req-grid{grid-template-columns:1fr}}
+.req-card{background:var(--card2);border:1px solid var(--bdr);border-radius:9px;padding:14px 16px}
+.req-card .hdr{font-family:var(--mono);font-size:11px;color:var(--tax);letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px}
+.req-card .body{font-family:var(--mono);font-size:11.5px;color:var(--mu2);line-height:1.85}
+.req-card .body strong{color:var(--tx)}
+.req-card .body em{color:var(--tax);font-style:normal}
+.req-card .body .indent{margin-left:10px}
+.sample-row{margin-top:10px;display:flex;flex-direction:column;gap:5px}
+.sample-row a{color:var(--tax);border-bottom:1px solid var(--accent-bdr);font-size:11.5px}
+.sample-row a:hover{color:var(--tax);border-bottom-color:var(--tax)}
+.drop{border:2px dashed var(--accent-strong);border-radius:14px;padding:28px;text-align:center;background:var(--accent-soft);transition:.18s border-color,.18s background}
+.drop.hot{border-color:var(--tax);background:var(--accent-soft)}
 .drop p{font-family:var(--mono);font-size:12px;color:var(--mu2);line-height:1.85}
+.drop p strong{color:var(--tax)}
 .drop .small{color:var(--mu);font-size:11px}
 .drop input[type=file]{display:none}
-.drop label{display:inline-block;margin-top:14px;padding:8px 18px;background:rgba(200,159,255,.1);border:1px solid rgba(200,159,255,.3);border-radius:7px;cursor:pointer;color:var(--mu2);font-family:var(--mono);font-size:11.5px;letter-spacing:.5px}
-.drop label:hover{background:rgba(200,159,255,.18);color:var(--tx)}
+.drop label{display:inline-block;margin-top:14px;padding:8px 18px;background:var(--accent-soft);border:1px solid var(--accent-bdr);border-radius:7px;cursor:pointer;color:var(--mu2);font-family:var(--mono);font-size:11.5px;letter-spacing:.5px}
+.drop label:hover{background:var(--accent-soft);border-color:var(--tax);color:var(--tx)}
 .file-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--mu2)}
-.file-row .chip{padding:4px 12px;border:1px solid var(--bdr);border-radius:6px;background:rgba(255,255,255,.04)}
+.file-row .chip{padding:4px 12px;border:1px solid var(--bdr);border-radius:6px;background:var(--card2)}
 .btn{margin-top:16px;padding:9px 22px;background:var(--tax);color:#1a0f2e;border:none;border-radius:7px;cursor:pointer;font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
-.btn:hover{background:#dab8ff}
-.btn:disabled{background:rgba(255,255,255,.1);color:var(--mu);cursor:not-allowed}
+[data-theme="light"] .btn{color:#fff}
+.btn:hover{filter:brightness(1.1)}
+.btn:disabled{background:var(--card2);color:var(--mu);cursor:not-allowed;border:1px solid var(--bdr);filter:none}
 .privacy{margin-top:14px;font-family:var(--mono);font-size:10.5px;color:var(--mu);font-style:italic}
 .upload-result{margin-top:22px}
 .upload-mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
 @media(max-width:720px){.upload-mini-grid{grid-template-columns:repeat(2,1fr)}}
-.umk{background:rgba(200,159,255,.06);border:1px solid rgba(200,159,255,.18);border-radius:9px;padding:14px 16px}
+.umk{background:var(--accent-soft);border:1px solid var(--accent-bdr);border-radius:9px;padding:14px 16px}
 .umk .k{font-family:var(--mono);font-size:9.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
 .umk .v{font-size:18px;font-weight:700;color:var(--tx);letter-spacing:-.2px}
-footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--bdr);font-family:var(--mono);font-size:11px;color:var(--mu);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.disc{margin-top:44px;padding:20px 22px;background:rgba(255,64,96,.05);border:1px solid rgba(255,64,96,.2);border-radius:10px;font-family:var(--mono);font-size:12px;color:var(--mu2);line-height:2}
+[data-theme="light"] .disc{background:rgba(200,37,74,.05);border-color:rgba(200,37,74,.25)}
+.disc h4{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--rd);margin-bottom:10px;text-transform:uppercase}
+.disc strong{color:var(--tx)}
+.footer{margin-top:26px;font-family:var(--mono);font-size:11px;color:var(--mu);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+@media(max-width:900px){.g2{grid-template-columns:1fr}.g3{grid-template-columns:1fr}.hst{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -104,6 +165,11 @@ footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--bdr);font-fam
     <span class="hbadge"><span class="pulse"></span>STATIC SNAPSHOT</span>
     <span class="hbadge">PYTHON &middot; FASTAPI</span>
     <span class="hbadge">POLY_BOT &middot; STATS APIs</span>
+    <button class="theme-tog" id="themeTog" aria-label="Toggle theme" title="Toggle dark / light theme">
+      <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      <svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <span class="lbl" id="themeLbl">Dark</span>
+    </button>
   </div>
 </header>
 
@@ -119,7 +185,7 @@ footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--bdr);font-fam
 
 <div class="sec">
   <div class="shdr"><span class="snum">03</span><span>Mix &amp; Performance</span></div>
-  <div class="row2">
+  <div class="g2">
     <div class="card"><h3>Revenue by category</h3><div id="chart-category" class="chart"></div></div>
     <div class="card"><h3>SKU performance tiers (Bayesian + ensemble composite)</h3><div id="chart-tiers" class="chart"></div></div>
   </div>
@@ -178,35 +244,35 @@ footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--bdr);font-fam
       No projections / PBT / vendor-cost analysis &mdash; that's the daily-batch pipeline.
     </p>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
-      <div style="background:rgba(255,255,255,.03);border:1px solid var(--bdr);border-radius:9px;padding:14px 16px">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--tax);letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">What we need to perform the analysis</div>
-        <div style="font-family:var(--mono);font-size:11.5px;color:var(--mu2);line-height:1.85">
-          <div><strong style="color:var(--tx)">Required &mdash; sales file:</strong></div>
-          <div style="margin-left:10px">&bull; a SKU / item-code column &mdash; any of: <em>sku_id, sku, item, itemcode, code</em></div>
-          <div style="margin-left:10px">&bull; revenue per row &mdash; any of: <em>amount, total, revenue, line_total_inr, sales</em></div>
-          <div style="margin-left:10px">&bull; <em>OR</em> quantity + unit price (revenue is computed): <em>qty/quantity/units</em> &times; <em>price/rate/unit_price</em></div>
-          <div style="margin-top:8px"><strong style="color:var(--tx)">Optional &mdash; sales file:</strong></div>
-          <div style="margin-left:10px">&bull; <em>category / cat / class / department</em> &rarr; enables category mix donut</div>
-          <div style="margin-left:10px">&bull; <em>date / txn_date / transaction_date</em> &rarr; enables date-range detection</div>
-          <div style="margin-top:8px"><strong style="color:var(--tx)">For reconciliation (both optional):</strong></div>
-          <div style="margin-left:10px">&bull; opening file with <em>sku + opening_qty</em> (filename containing "open")</div>
-          <div style="margin-left:10px">&bull; closing file with <em>sku + closing_qty</em> (filename containing "clos")</div>
+    <div class="req-grid">
+      <div class="req-card">
+        <div class="hdr">What we need to perform the analysis</div>
+        <div class="body">
+          <div><strong>Required &mdash; sales file:</strong></div>
+          <div class="indent">&bull; a SKU / item-code column &mdash; any of: <em>sku_id, sku, item, itemcode, code</em></div>
+          <div class="indent">&bull; revenue per row &mdash; any of: <em>amount, total, revenue, line_total_inr, sales</em></div>
+          <div class="indent">&bull; <em>OR</em> quantity + unit price (revenue is computed): <em>qty/quantity/units</em> &times; <em>price/rate/unit_price</em></div>
+          <div style="margin-top:8px"><strong>Optional &mdash; sales file:</strong></div>
+          <div class="indent">&bull; <em>category / cat / class / department</em> &rarr; enables category mix donut</div>
+          <div class="indent">&bull; <em>date / txn_date / transaction_date</em> &rarr; enables date-range detection</div>
+          <div style="margin-top:8px"><strong>For reconciliation (both optional):</strong></div>
+          <div class="indent">&bull; opening file with <em>sku + opening_qty</em> (filename containing "open")</div>
+          <div class="indent">&bull; closing file with <em>sku + closing_qty</em> (filename containing "clos")</div>
         </div>
       </div>
-      <div style="background:rgba(255,255,255,.03);border:1px solid var(--bdr);border-radius:9px;padding:14px 16px">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--tax);letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">Try with sample files</div>
-        <div style="font-family:var(--mono);font-size:11.5px;color:var(--mu2);line-height:1.95">
+      <div class="req-card">
+        <div class="hdr">Try with sample files</div>
+        <div class="body">
           Don't have a file handy? Download a sample, drop it in, watch the analysis appear.
           Each sample uses a different real-world column-naming style so you can see the resolver
           handle whatever your shop uses.
-          <div style="margin-top:10px;display:flex;flex-direction:column;gap:5px">
-            <a href="sku_samples/sample_sales_standard.xlsx" download style="color:var(--tax)">&darr; sample_sales_standard.xlsx</a>
-            <a href="sku_samples/sample_sales_renamed.csv" download style="color:var(--tax)">&darr; sample_sales_renamed.csv (Title-case columns)</a>
-            <a href="sku_samples/sample_sales_minimal.csv" download style="color:var(--tax)">&darr; sample_sales_minimal.csv (just item + total)</a>
-            <a href="sku_samples/sample_sales_qty_price.csv" download style="color:var(--tax)">&darr; sample_sales_qty_price.csv (no revenue, qty x price)</a>
-            <a href="sku_samples/sample_opening.csv" download style="color:var(--tax)">&darr; sample_opening.csv</a>
-            <a href="sku_samples/sample_closing.csv" download style="color:var(--tax)">&darr; sample_closing.csv</a>
+          <div class="sample-row">
+            <a href="sku_samples/sample_sales_standard.xlsx" download>&darr; sample_sales_standard.xlsx</a>
+            <a href="sku_samples/sample_sales_renamed.csv" download>&darr; sample_sales_renamed.csv (Title-case columns)</a>
+            <a href="sku_samples/sample_sales_minimal.csv" download>&darr; sample_sales_minimal.csv (just item + total)</a>
+            <a href="sku_samples/sample_sales_qty_price.csv" download>&darr; sample_sales_qty_price.csv (no revenue, qty x price)</a>
+            <a href="sku_samples/sample_opening.csv" download>&darr; sample_opening.csv</a>
+            <a href="sku_samples/sample_closing.csv" download>&darr; sample_closing.csv</a>
           </div>
           <div style="margin-top:10px;color:var(--mu);font-size:10.5px;font-style:italic">
             For full reconciliation, drop sample_sales_standard.* + sample_opening.csv + sample_closing.csv together.
@@ -215,7 +281,7 @@ footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--bdr);font-fam
       </div>
     </div>
     <div class="drop" id="drop">
-      <p><strong style="color:var(--tax)">Drag &amp; drop</strong> sales file here (.csv or .xlsx).</p>
+      <p><strong>Drag &amp; drop</strong> sales file here (.csv or .xlsx).</p>
       <p class="small">Optional: also drop files with "opening" / "closing" in the filename for a quick reconciliation.</p>
       <input type="file" id="files" multiple accept=".csv,.xlsx,.xls"/>
       <label for="files">or browse files</label>
@@ -226,16 +292,29 @@ footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--bdr);font-fam
       </div>
     </div>
     <div class="upload-result" id="upload-result"></div>
-    <div class="cta" style="margin-top:22px;">
-      <a href="index.html">Back to index</a>
-    </div>
   </div>
 </div>
 
-<footer>
-  <span>Jewellery SKU Analytics &middot; static snapshot</span>
-  <span>generated <span id="gen-ts"></span></span>
-</footer>
+<!-- DISCLAIMER -->
+<div class="disc">
+  <h4>&#9888; Caveats &mdash; Read These</h4>
+  <ol style="margin-left:20px">
+    <li><strong>Synthetic dataset.</strong> The 154-SKU jewellery dataset is generated by a Poisson-driven simulator with explicit COVID-2020 dip and vendor-cost drift. Numbers on this page are properties of that simulator, not of any real shop &mdash; the architecture, reconciliation logic, and PBT-aware recommendations are what's being demonstrated.</li>
+    <li><strong>Drag-drop is preliminary only.</strong> Browser-side analysis identifies SKUs and tiers them by revenue percentile (top 33% HIGH, mid 33% MID, bottom 33% LOW). It does not compute PBT, vendor cost, or projection &mdash; those require the daily-batch pipeline with cost data.</li>
+    <li><strong>Privacy.</strong> Files dropped above never leave your browser. SheetJS reads them in-memory; the formatted Excel download is built client-side and triggered as a local download.</li>
+    <li><strong>Reconciliation accuracy.</strong> 100% shrinkage detection on the synthetic ground-truth set comes from the simulator capping shrink at recorded-closing &gt;= 0; on real data this number depends on inventory-counting cadence and adjustment policies.</li>
+    <li><strong>poly_bot isolation.</strong> Statistical APIs (Bayesian, HMM, GARCH, IsotonicCalibrator, ensemble) are imported read-only from a sister repo with a SHA-256 snapshot guard &mdash; no data flows back from this project to those models.</li>
+  </ol>
+</div>
+
+<div class="footer">
+  <div>Jewellery SKU Analytics &middot; static snapshot &middot; <a href="index.html">&larr; back to index</a></div>
+  <div>generated <span id="gen-ts"></span></div>
+</div>
+<div class="footer" style="margin-top:8px;opacity:.7">
+  <div>&copy; 2026 Sathvik Lakumarapu V &middot; All Rights Reserved</div>
+  <div>No copying, redistribution, or AI/ML training without written consent</div>
+</div>
 </div>
 
 <script>
@@ -252,6 +331,46 @@ const fmt = (n) => {
 
 document.getElementById('gen-ts').textContent = new Date().toISOString().slice(0,10);
 
+// ===== Theme toggle (shared with publishing/index.html via localStorage 'theme') =====
+function readCSSVar(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+function plotTheme(){
+  const bg = readCSSVar('--card');
+  const fg = readCSSVar('--mu2');
+  const muted = readCSSVar('--mu');
+  const grid = readCSSVar('--cell-bdr');
+  return {paper_bgcolor:bg, plot_bgcolor:bg, font:{color:fg, family:"'IBM Plex Mono',monospace", size:11}, gridcolor:grid, mutedcolor:muted};
+}
+const PLOT_IDS = ['chart-yearly','chart-category','chart-tiers'];
+function repaintAllCharts(){
+  const t = plotTheme();
+  PLOT_IDS.concat(['up-tiers','up-cat']).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el || !el.data) return;
+    Plotly.relayout(id, {
+      paper_bgcolor: t.paper_bgcolor, plot_bgcolor: t.plot_bgcolor,
+      'font.color': t.font.color,
+      'xaxis.gridcolor': t.gridcolor, 'yaxis.gridcolor': t.gridcolor,
+      'yaxis2.gridcolor': t.gridcolor,
+    });
+  });
+}
+(function setupThemeToggle(){
+  const tog = document.getElementById('themeTog');
+  const lbl = document.getElementById('themeLbl');
+  function syncLabel(){ lbl.textContent = (document.documentElement.getAttribute('data-theme')||'dark') === 'dark' ? 'Dark' : 'Light'; }
+  syncLabel();
+  tog.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch(e){}
+    syncLabel();
+    repaintAllCharts();
+  });
+})();
+
 const kpis = [
   {k:'Total SKUs',         v: DATA.summary.total_skus},
   {k:'Transactions',       v: fmt(DATA.summary.total_transactions)},
@@ -265,59 +384,71 @@ const kpis = [
 document.getElementById('kpi-grid').innerHTML = kpis.map(k =>
   `<div class="kpi"><div class="k">${k.k}</div><div class="v">${k.v}</div>${k.s?`<div class="s">${k.s}</div>`:''}</div>`).join('');
 
+const PALETTE = ['#c89fff','#a778db','#8b5cf6','#7c3aed','#6d28d9','#581c87','#4338ca','#3b82f6','#06b6d4','#14b8a6','#22c55e','#84cc16'];
+
 const yr = DATA.by_year || [];
-Plotly.newPlot('chart-yearly', [
-  {x:yr.map(d=>d.year), y:yr.map(d=>d.revenue_inr/1e7), type:'bar', name:'Revenue (Cr INR)', marker:{color:'#c89fff'}, opacity:0.9},
-  {x:yr.map(d=>d.year), y:yr.map(d=>d.units), type:'scatter', mode:'lines+markers', name:'Units sold', yaxis:'y2', line:{color:'#f5c842'}},
-],{
-  paper_bgcolor:'#0e1228', plot_bgcolor:'#0e1228', font:{color:'#cbd5ee', family:'IBM Plex Mono', size:11},
-  xaxis:{title:'', gridcolor:'rgba(255,255,255,.05)'},
-  yaxis:{title:'Revenue (Crore INR)', gridcolor:'rgba(255,255,255,.05)'},
-  yaxis2:{title:'Units sold', overlaying:'y', side:'right', showgrid:false},
-  margin:{t:20, r:40, l:60, b:40},
-  legend:{orientation:'h', y:1.12},
-}, {displayModeBar:false, responsive:true});
+{
+  const t = plotTheme();
+  Plotly.newPlot('chart-yearly', [
+    {x:yr.map(d=>d.year), y:yr.map(d=>d.revenue_inr/1e7), type:'bar', name:'Revenue (Cr INR)', marker:{color:readCSSVar('--tax')}, opacity:0.9},
+    {x:yr.map(d=>d.year), y:yr.map(d=>d.units), type:'scatter', mode:'lines+markers', name:'Units sold', yaxis:'y2', line:{color:readCSSVar('--go')}},
+  ],{
+    paper_bgcolor:t.paper_bgcolor, plot_bgcolor:t.plot_bgcolor, font:t.font,
+    xaxis:{title:'', gridcolor:t.gridcolor},
+    yaxis:{title:'Revenue (Crore INR)', gridcolor:t.gridcolor},
+    yaxis2:{title:'Units sold', overlaying:'y', side:'right', showgrid:false},
+    margin:{t:20, r:40, l:60, b:40},
+    legend:{orientation:'h', y:1.12},
+  }, {displayModeBar:false, responsive:true});
+}
 
 const cat = (DATA.by_category || []).slice(0, 12);
-Plotly.newPlot('chart-category', [{
-  labels: cat.map(d=>d.category),
-  values: cat.map(d=>d.revenue_inr),
-  type:'pie', hole:0.55, textinfo:'label+percent', textfont:{size:11},
-  marker:{colors:['#c89fff','#a778db','#8b5cf6','#7c3aed','#6d28d9','#581c87','#4338ca','#3b82f6','#06b6d4','#14b8a6','#22c55e','#84cc16']}
-}],{
-  paper_bgcolor:'#0e1228', plot_bgcolor:'#0e1228', font:{color:'#cbd5ee', family:'IBM Plex Mono', size:11},
-  margin:{t:10, b:10}, showlegend:false,
-}, {displayModeBar:false, responsive:true});
+{
+  const t = plotTheme();
+  Plotly.newPlot('chart-category', [{
+    labels: cat.map(d=>d.category),
+    values: cat.map(d=>d.revenue_inr),
+    type:'pie', hole:0.55, textinfo:'label+percent', textfont:{size:11},
+    marker:{colors: PALETTE}
+  }],{
+    paper_bgcolor:t.paper_bgcolor, plot_bgcolor:t.plot_bgcolor, font:t.font,
+    margin:{t:10, b:10}, showlegend:false,
+  }, {displayModeBar:false, responsive:true});
+}
 
-const t = DATA.tier_counts || {};
-Plotly.newPlot('chart-tiers', [{
-  x:['HIGH','MID','LOW'],
-  y:[t.HIGH||0, t.MID||0, t.LOW||0],
-  type:'bar',
-  marker:{color:['#4afe7a','#f5c842','#ff4060']},
-  text:[t.HIGH||0, t.MID||0, t.LOW||0], textposition:'outside',
-}],{
-  paper_bgcolor:'#0e1228', plot_bgcolor:'#0e1228', font:{color:'#cbd5ee', family:'IBM Plex Mono', size:11},
-  xaxis:{gridcolor:'rgba(255,255,255,.05)'}, yaxis:{title:'# SKUs', gridcolor:'rgba(255,255,255,.05)'},
-  margin:{t:30, r:40, l:60, b:40},
-}, {displayModeBar:false, responsive:true});
+const tc = DATA.tier_counts || {};
+{
+  const t = plotTheme();
+  Plotly.newPlot('chart-tiers', [{
+    x:['HIGH','MID','LOW'],
+    y:[tc.HIGH||0, tc.MID||0, tc.LOW||0],
+    type:'bar',
+    marker:{color:[readCSSVar('--gr'), readCSSVar('--ye'), readCSSVar('--rd')]},
+    text:[tc.HIGH||0, tc.MID||0, tc.LOW||0], textposition:'outside',
+  }],{
+    paper_bgcolor:t.paper_bgcolor, plot_bgcolor:t.plot_bgcolor, font:t.font,
+    xaxis:{gridcolor:t.gridcolor}, yaxis:{title:'# SKUs', gridcolor:t.gridcolor},
+    margin:{t:30, r:40, l:60, b:40},
+  }, {displayModeBar:false, responsive:true});
+}
 
 function renderTable(elId, rows, cols) {
   if (!rows || rows.length === 0) {
     document.getElementById(elId).innerHTML = '<div style="padding:14px;color:var(--mu);font-family:var(--mono);font-size:12px">no rows</div>';
     return;
   }
-  const head = '<tr>' + cols.map(c => `<th>${c.label}</th>`).join('') + '</tr>';
+  const head = '<tr>' + cols.map(c => `<th${c.fmt && (c.fmt==='inr'||c.fmt==='pct'||c.fmt==='num') ? ' class="num"' : ''}>${c.label}</th>`).join('') + '</tr>';
   const body = rows.map(r => '<tr>' + cols.map(c => {
     let v = r[c.key];
+    const numClass = (c.fmt === 'inr' || c.fmt === 'pct' || c.fmt === 'num') ? ' class="num"' : '';
     if (c.fmt === 'inr') v = 'Rs. ' + fmt(v);
     else if (c.fmt === 'pct') v = (v == null ? '-' : (Number(v)*100).toFixed(1) + '%');
     else if (c.fmt === 'num') v = fmt(v);
     if (c.cls === 'tier' && v) return `<td><span class="pill ${v}">${v}</span></td>`;
     if (c.cls === 'act' && v)  return `<td><span class="pill act">${v}</span></td>`;
-    return `<td>${v == null ? '' : v}</td>`;
+    return `<td${numClass}>${v == null ? '' : v}</td>`;
   }).join('') + '</tr>').join('');
-  document.getElementById(elId).innerHTML = `<table><thead>${head}</thead><tbody>${body}</tbody></table>`;
+  document.getElementById(elId).innerHTML = `<div style="overflow:auto"><table class="tbl"><thead>${head}</thead><tbody>${body}</tbody></table></div>`;
 }
 
 renderTable('rec-table', DATA.recommendations_top, [
@@ -373,16 +504,16 @@ renderTable('ageing-table', DATA.ageing_top, [
       '<div style="color:var(--mu);font-family:var(--mono);font-size:12px">no excel files</div>';
     return;
   }
-  const html = '<table>' +
-    '<thead><tr><th>Workbook</th><th>What\'s inside</th><th>Size</th><th></th></tr></thead><tbody>' +
+  const html = '<div style="overflow:auto"><table class="tbl">' +
+    '<thead><tr><th>Workbook</th><th>What\'s inside</th><th class="num">Size</th><th></th></tr></thead><tbody>' +
     files.map(f => `
       <tr>
-        <td><b style="color:var(--tax)">${f.name}</b></td>
+        <td class="tax-c"><b>${f.name}</b></td>
         <td>${f.description}</td>
-        <td>${f.size_kb.toLocaleString('en-IN')} KB</td>
-        <td><a href="sku_excel/${f.name}" download style="color:var(--tax);">Download &darr;</a></td>
+        <td class="num">${f.size_kb.toLocaleString('en-IN')} KB</td>
+        <td><a href="sku_excel/${f.name}" download style="color:var(--tax);border-bottom:1px solid var(--accent-bdr)">Download &darr;</a></td>
       </tr>`).join('') +
-    '</tbody></table>';
+    '</tbody></table></div>';
   document.getElementById('excel-list').innerHTML = html;
 })();
 
@@ -720,9 +851,9 @@ renderTable('ageing-table', DATA.ageing_top, [
         `<div class="umk"><div class="k">Total units</div><div class="v">${fmt(agg.totalQty)}</div></div>` +
         '</div>';
 
-      html += '<div class="row2" style="margin-bottom:18px">';
-      html += '<div class="card" style="padding:14px 16px"><h3 style="margin-bottom:8px">High / Mid / Low performer counts</h3><div id="up-tiers" style="height:240px"></div></div>';
-      html += `<div class="card" style="padding:14px 16px"><h3 style="margin-bottom:8px">Date range &amp; columns detected</h3>
+      html += '<div class="g2" style="margin-bottom:18px">';
+      html += '<div class="card" style="padding:18px 20px"><div class="chtit"><span>High / Mid / Low performer counts</span></div><div id="up-tiers" style="height:240px"></div></div>';
+      html += `<div class="card" style="padding:18px 20px"><div class="chtit"><span>Date range &amp; columns detected</span></div>
         <div style="font-family:var(--mono);font-size:11.5px;color:var(--mu2);line-height:2">
           <div>Date range: <strong style="color:var(--tx)">${dr}</strong></div>
           <div>SKU column: <strong style="color:var(--tx)">${salesCols.sku || '-'}</strong></div>
@@ -733,22 +864,22 @@ renderTable('ageing-table', DATA.ageing_top, [
       </div>`;
       html += '</div>';
 
-      html += '<div class="card" style="padding:14px 16px;margin-bottom:18px"><h3 style="margin-bottom:10px">SKUs by tier (top 30 of ' + tiered.length + ')</h3><div id="up-skus"></div></div>';
+      html += '<div class="card" style="padding:18px 20px;margin-bottom:18px"><div class="chtit"><span>SKUs by tier (top 30 of ' + tiered.length + ')</span></div><div id="up-skus"></div></div>';
 
       if (Object.keys(agg.byCat).length) {
-        html += '<div class="card" style="padding:14px 16px;margin-bottom:18px"><h3 style="margin-bottom:8px">Revenue by category</h3><div id="up-cat" style="height:340px"></div></div>';
+        html += '<div class="card" style="padding:18px 20px;margin-bottom:18px"><div class="chtit"><span>Revenue by category</span></div><div id="up-cat" style="height:340px"></div></div>';
       }
 
       if (recon) {
         const recRows = recon.top5.map(r =>
-          `<tr><td>${r.sku}</td><td>${r.open}</td><td>${r.sold}</td><td>${r.close}</td><td>${r.discrep}</td></tr>`).join('');
-        html += `<div class="card" style="padding:14px 16px"><h3 style="margin-bottom:8px">Reconciliation (Opening - Sales vs Recorded Closing)</h3>
+          `<tr><td>${r.sku}</td><td class="num">${r.open}</td><td class="num">${r.sold}</td><td class="num">${r.close}</td><td class="num neg">${r.discrep}</td></tr>`).join('');
+        html += `<div class="card" style="padding:18px 20px"><div class="chtit"><span>Reconciliation (Opening - Sales vs Recorded Closing)</span></div>
           <div style="font-family:var(--mono);font-size:11.5px;color:var(--mu2);margin-bottom:10px">
             ${fmt(recon.rowsCompared)} SKUs compared &middot;
             ${fmt(recon.rowsWithDiscrepancy)} with discrepancy &middot;
-            <strong style="color:#ff4060">${fmt(recon.totalShrink)}</strong> shrink units total.
+            <strong class="neg">${fmt(recon.totalShrink)}</strong> shrink units total.
           </div>
-          ${recon.top5.length ? '<table><thead><tr><th>SKU</th><th>Open</th><th>Sold</th><th>Close</th><th>Shrink</th></tr></thead><tbody>'+recRows+'</tbody></table>' : '<div style="color:var(--mu);font-family:var(--mono);font-size:11px">no shrinkage detected</div>'}
+          ${recon.top5.length ? '<div style="overflow:auto"><table class="tbl"><thead><tr><th>SKU</th><th class="num">Open</th><th class="num">Sold</th><th class="num">Close</th><th class="num">Shrink</th></tr></thead><tbody>'+recRows+'</tbody></table></div>' : '<div style="color:var(--mu);font-family:var(--mono);font-size:11px">no shrinkage detected</div>'}
         </div>`;
       }
 
@@ -766,37 +897,41 @@ renderTable('ageing-table', DATA.ageing_top, [
       });
 
       // tier bar chart
-      Plotly.newPlot('up-tiers', [{
-        x: ['HIGH','MID','LOW'],
-        y: [tierCounts.HIGH, tierCounts.MID, tierCounts.LOW],
-        type: 'bar', text: [tierCounts.HIGH, tierCounts.MID, tierCounts.LOW], textposition: 'outside',
-        marker: { color: ['#4afe7a','#f5c842','#ff4060'] },
-      }], {
-        paper_bgcolor:'#0e1228', plot_bgcolor:'#0e1228', font:{color:'#cbd5ee', family:'IBM Plex Mono', size:11},
-        margin:{t:20, r:30, l:50, b:30}, xaxis:{gridcolor:'rgba(255,255,255,.05)'},
-        yaxis:{title:'# SKUs', gridcolor:'rgba(255,255,255,.05)'},
-      }, {displayModeBar:false, responsive:true});
+      {
+        const t = plotTheme();
+        Plotly.newPlot('up-tiers', [{
+          x: ['HIGH','MID','LOW'],
+          y: [tierCounts.HIGH, tierCounts.MID, tierCounts.LOW],
+          type: 'bar', text: [tierCounts.HIGH, tierCounts.MID, tierCounts.LOW], textposition: 'outside',
+          marker: { color: [readCSSVar('--gr'), readCSSVar('--ye'), readCSSVar('--rd')] },
+        }], {
+          paper_bgcolor:t.paper_bgcolor, plot_bgcolor:t.plot_bgcolor, font:t.font,
+          margin:{t:20, r:30, l:50, b:30}, xaxis:{gridcolor:t.gridcolor},
+          yaxis:{title:'# SKUs', gridcolor:t.gridcolor},
+        }, {displayModeBar:false, responsive:true});
+      }
 
       // skus table — top 30
       const top30 = tiered.slice(0, 30);
-      document.getElementById('up-skus').innerHTML = '<table><thead><tr><th>SKU</th><th>Category</th><th>Units</th><th>Revenue</th><th>Tier</th></tr></thead><tbody>' +
+      document.getElementById('up-skus').innerHTML = '<div style="overflow:auto"><table class="tbl"><thead><tr><th>SKU</th><th>Category</th><th class="num">Units</th><th class="num">Revenue</th><th>Tier</th></tr></thead><tbody>' +
         top30.map(s => `<tr>
           <td>${s.sku}</td>
           <td>${s.category || ''}</td>
-          <td>${fmt(s.qty)}</td>
-          <td>${fmtINR(s.revenue)}</td>
+          <td class="num">${fmt(s.qty)}</td>
+          <td class="num">${fmtINR(s.revenue)}</td>
           <td><span class="pill ${s.tier}">${s.tier}</span></td>
-        </tr>`).join('') + '</tbody></table>';
+        </tr>`).join('') + '</tbody></table></div>';
 
       // category chart if present
       if (Object.keys(agg.byCat).length) {
         const cats = Object.entries(agg.byCat).sort((a,b)=>b[1].revenue-a[1].revenue).slice(0,12);
+        const t = plotTheme();
         Plotly.newPlot('up-cat', [{
           labels: cats.map(c => c[0]),
           values: cats.map(c => c[1].revenue),
           type:'pie', hole:0.55, textinfo:'label+percent',
-          marker:{colors:['#c89fff','#a778db','#8b5cf6','#7c3aed','#6d28d9','#581c87','#4338ca','#3b82f6','#06b6d4','#14b8a6','#22c55e','#84cc16']}
-        }], { paper_bgcolor:'#0e1228', plot_bgcolor:'#0e1228', font:{color:'#cbd5ee', family:'IBM Plex Mono', size:11}, margin:{t:10, b:10}, showlegend:false}, {displayModeBar:false, responsive:true});
+          marker:{colors: PALETTE}
+        }], { paper_bgcolor:t.paper_bgcolor, plot_bgcolor:t.plot_bgcolor, font:t.font, margin:{t:10, b:10}, showlegend:false}, {displayModeBar:false, responsive:true});
       }
     } catch (err) {
       out.innerHTML = '<p style="color:#ff4060;font-family:var(--mono);font-size:12px;margin-top:14px">Error: ' + (err && err.message ? err.message : err) + '</p>';
