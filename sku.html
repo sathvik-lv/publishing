@@ -173,6 +173,43 @@ footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--bdr);font-fam
       Optionally drop opening &amp; closing inventory files for a basic reconciliation.
       No projections / PBT / vendor-cost analysis &mdash; that's the daily-batch pipeline.
     </p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
+      <div style="background:rgba(255,255,255,.03);border:1px solid var(--bdr);border-radius:9px;padding:14px 16px">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--tax);letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">What we need to perform the analysis</div>
+        <div style="font-family:var(--mono);font-size:11.5px;color:var(--mu2);line-height:1.85">
+          <div><strong style="color:var(--tx)">Required &mdash; sales file:</strong></div>
+          <div style="margin-left:10px">&bull; a SKU / item-code column &mdash; any of: <em>sku_id, sku, item, itemcode, code</em></div>
+          <div style="margin-left:10px">&bull; revenue per row &mdash; any of: <em>amount, total, revenue, line_total_inr, sales</em></div>
+          <div style="margin-left:10px">&bull; <em>OR</em> quantity + unit price (revenue is computed): <em>qty/quantity/units</em> &times; <em>price/rate/unit_price</em></div>
+          <div style="margin-top:8px"><strong style="color:var(--tx)">Optional &mdash; sales file:</strong></div>
+          <div style="margin-left:10px">&bull; <em>category / cat / class / department</em> &rarr; enables category mix donut</div>
+          <div style="margin-left:10px">&bull; <em>date / txn_date / transaction_date</em> &rarr; enables date-range detection</div>
+          <div style="margin-top:8px"><strong style="color:var(--tx)">For reconciliation (both optional):</strong></div>
+          <div style="margin-left:10px">&bull; opening file with <em>sku + opening_qty</em> (filename containing "open")</div>
+          <div style="margin-left:10px">&bull; closing file with <em>sku + closing_qty</em> (filename containing "clos")</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.03);border:1px solid var(--bdr);border-radius:9px;padding:14px 16px">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--tax);letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">Try with sample files</div>
+        <div style="font-family:var(--mono);font-size:11.5px;color:var(--mu2);line-height:1.95">
+          Don't have a file handy? Download a sample, drop it in, watch the analysis appear.
+          Each sample uses a different real-world column-naming style so you can see the resolver
+          handle whatever your shop uses.
+          <div style="margin-top:10px;display:flex;flex-direction:column;gap:5px">
+            <a href="sku_samples/sample_sales_standard.xlsx" download style="color:var(--tax)">&darr; sample_sales_standard.xlsx</a>
+            <a href="sku_samples/sample_sales_renamed.csv" download style="color:var(--tax)">&darr; sample_sales_renamed.csv (Title-case columns)</a>
+            <a href="sku_samples/sample_sales_minimal.csv" download style="color:var(--tax)">&darr; sample_sales_minimal.csv (just item + total)</a>
+            <a href="sku_samples/sample_sales_qty_price.csv" download style="color:var(--tax)">&darr; sample_sales_qty_price.csv (no revenue, qty x price)</a>
+            <a href="sku_samples/sample_opening.csv" download style="color:var(--tax)">&darr; sample_opening.csv</a>
+            <a href="sku_samples/sample_closing.csv" download style="color:var(--tax)">&darr; sample_closing.csv</a>
+          </div>
+          <div style="margin-top:10px;color:var(--mu);font-size:10.5px;font-style:italic">
+            For full reconciliation, drop sample_sales_standard.* + sample_opening.csv + sample_closing.csv together.
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="drop" id="drop">
       <p><strong style="color:var(--tax)">Drag &amp; drop</strong> sales file here (.csv or .xlsx).</p>
       <p class="small">Optional: also drop files with "opening" / "closing" in the filename for a quick reconciliation.</p>
