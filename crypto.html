@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Multi-Strategy Crypto Arbitrage Portfolio &mdash; Backtest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+(function(){try{var s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);}else if(window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();
+</script>
+<style>
+:root {
+  --bg: oklch(0.985 0.004 80); --bg-subtle: oklch(0.960 0.006 80); --bg-card: oklch(1 0 0);
+  --border: oklch(0.880 0.005 80); --border-mid: oklch(0.840 0.005 80);
+  --text: oklch(0.130 0.012 260); --text-mid: oklch(0.380 0.010 260); --text-muted: oklch(0.560 0.008 260);
+  --accent: oklch(0.520 0.185 248); --accent-bg: oklch(0.960 0.025 248); --accent-text: oklch(0.380 0.185 248);
+  --green: oklch(0.520 0.140 155); --green-bg: oklch(0.960 0.030 155);
+  --amber: oklch(0.600 0.140 65); --amber-bg: oklch(0.970 0.030 65);
+  --red: oklch(0.560 0.200 25); --red-bg: oklch(0.965 0.030 25);
+  --violet: oklch(0.520 0.180 290); --violet-bg: oklch(0.960 0.030 290);
+  --shadow-sm: 0 1px 3px oklch(0 0 0 /.06), 0 1px 2px oklch(0 0 0 /.04);
+  --shadow-md: 0 4px 12px oklch(0 0 0 /.07), 0 2px 4px oklch(0 0 0 /.04);
+  --shadow-lg: 0 8px 24px oklch(0 0 0 /.09), 0 2px 6px oklch(0 0 0 /.05);
+  --radius: 10px; --radius-sm: 6px; --transition: 200ms ease;
+}
+[data-theme="dark"] {
+  --bg: oklch(0.105 0.012 260); --bg-subtle: oklch(0.140 0.014 260); --bg-card: oklch(0.155 0.014 260);
+  --border: oklch(0.240 0.016 260); --border-mid: oklch(0.290 0.016 260);
+  --text: oklch(0.935 0.005 80); --text-mid: oklch(0.720 0.006 260); --text-muted: oklch(0.540 0.008 260);
+  --accent: oklch(0.620 0.185 248); --accent-bg: oklch(0.200 0.060 248); --accent-text: oklch(0.720 0.185 248);
+  --green: oklch(0.640 0.140 155); --green-bg: oklch(0.180 0.045 155);
+  --amber: oklch(0.720 0.140 65); --amber-bg: oklch(0.200 0.040 65);
+  --red: oklch(0.660 0.200 25); --red-bg: oklch(0.220 0.060 25);
+  --violet: oklch(0.700 0.180 290); --violet-bg: oklch(0.200 0.050 290);
+  --shadow-sm: 0 1px 3px oklch(0 0 0 /.30); --shadow-md: 0 4px 12px oklch(0 0 0 /.35); --shadow-lg: 0 8px 24px oklch(0 0 0 /.40);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;transition:background var(--transition),color var(--transition);min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:color-mix(in oklch,var(--bg) 85%,transparent);backdrop-filter:blur(12px) saturate(160%);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center}
+.nav-inner{max-width:1280px;margin:0 auto;padding:0 32px;width:100%;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-size:14px;font-weight:500;color:var(--text);text-decoration:none;letter-spacing:-.01em}
+.nav-brand span{color:var(--text-muted);font-weight:400}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav-link{font-size:13px;color:var(--text-muted);text-decoration:none;transition:color var(--transition)}
+.nav-link:hover{color:var(--text)}
+.contact-link{width:36px;height:36px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);color:var(--text-mid);display:flex;align-items:center;justify-content:center;transition:background var(--transition),border-color var(--transition),color var(--transition),box-shadow var(--transition);box-shadow:var(--shadow-sm);text-decoration:none}
+.contact-link:hover{background:var(--bg-subtle);color:var(--text);border-color:var(--border-mid);box-shadow:var(--shadow-md);text-decoration:none}
+.contact-link svg{width:16px;height:16px}
+
+.btn{padding:10px 22px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;font-family:'DM Mono',monospace;font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;transition:.18s}
+.btn:hover{filter:brightness(1.1);box-shadow:var(--shadow-sm)}
+
+.suggest-form{display:flex;flex-direction:column;gap:14px}
+.suggest-form .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.suggest-form .row{grid-template-columns:1fr}}
+.suggest-form input,.suggest-form textarea{font-family:'DM Sans',system-ui,sans-serif;font-size:13.5px;padding:11px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);transition:border-color var(--transition),box-shadow var(--transition);width:100%;resize:vertical}
+.suggest-form input:focus,.suggest-form textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.suggest-form input::placeholder,.suggest-form textarea::placeholder{color:var(--text-muted)}
+.suggest-form .btn{align-self:flex-start;margin-top:0}
+.suggest-status{font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted);margin-top:4px;min-height:14px}
+.theme-toggle{width:36px;height:36px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);color:var(--text-mid);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.18s;box-shadow:var(--shadow-sm)}
+.theme-toggle:hover{background:var(--bg-subtle);color:var(--text);box-shadow:var(--shadow-md)}
+.theme-toggle svg{width:16px;height:16px}
+
+.main{max-width:1280px;margin:0 auto;padding:0 32px;padding-top:56px}
+
+.hero-sec{padding:56px 0 40px;border-bottom:1px solid var(--border)}
+.hero-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;padding:4px 10px;border-radius:99px;border:1px solid}
+.badge-warn{background:var(--amber-bg);color:var(--amber);border-color:color-mix(in oklch,var(--amber) 35%,transparent)}
+.badge-accent{background:var(--accent-bg);color:var(--accent);border-color:color-mix(in oklch,var(--accent) 35%,transparent)}
+.badge-violet{background:var(--violet-bg);color:var(--violet);border-color:color-mix(in oklch,var(--violet) 35%,transparent)}
+.badge-green{background:var(--green-bg);color:var(--green);border-color:color-mix(in oklch,var(--green) 35%,transparent)}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;animation:pulse 2.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.hero-title{font-size:clamp(28px,4vw,40px);font-weight:600;letter-spacing:-.025em;line-height:1.2;margin-bottom:14px}
+.hero-sub{font-size:15px;color:var(--text-muted);max-width:760px;line-height:1.7;font-weight:300}
+.back{display:inline-block;margin-bottom:18px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);text-decoration:none}
+.back:hover{color:var(--text)}
+
+.section{padding:48px 0 0}
+.section-header{display:flex;align-items:baseline;gap:12px;margin-bottom:24px}
+.section-label{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);padding:3px 8px;border:1px solid var(--border-mid);border-radius:4px}
+.section-title{font-size:18px;font-weight:500;letter-spacing:-.015em}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:900px){.g2,.g3{grid-template-columns:1fr}}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:24px 26px}
+
+.hero-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:24px 26px;border-top:3px solid var(--accent)}
+.h-tag{font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:12px;color:var(--accent)}
+.h-tag .tdot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.h-main{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:8px}
+.h-ret{font-family:'DM Mono',monospace;font-size:46px;font-weight:500;color:var(--green);letter-spacing:-.02em;line-height:1}
+.h-ret sup{font-size:24px;color:var(--green);margin-left:2px}
+.h-sub .lbl{font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px}
+.h-sub .val{font-family:'DM Mono',monospace;font-size:14px;color:var(--text)}
+
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);margin-top:18px}
+@media(max-width:760px){.kpi-strip{grid-template-columns:repeat(2,1fr)}}
+.kpi-cell{padding:14px 18px;border-right:1px solid var(--border)}
+.kpi-cell:nth-child(4n){border-right:none}
+@media(max-width:760px){.kpi-cell:nth-child(2n){border-right:none}}
+.kpi-value{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;letter-spacing:-.01em;color:var(--text);margin-bottom:3px;line-height:1.2}
+.kpi-value.pos{color:var(--green)}
+.kpi-value.neg{color:var(--red)}
+.kpi-value.amber{color:var(--amber)}
+.kpi-label{font-size:10.5px;color:var(--text-muted);line-height:1.3;font-weight:400}
+
+.tbl-wrap{border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;background:var(--bg-card)}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{background:var(--bg-subtle);padding:12px 16px;text-align:left;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);font-weight:500}
+.tbl td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--text)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl .num{text-align:right;font-family:'DM Mono',monospace;font-variant-numeric:tabular-nums}
+.tbl .pos{color:var(--green)}
+.tbl .neg{color:var(--red)}
+
+.chart-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:20px 24px}
+.chtit{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.chnote{font-size:12px;color:var(--text-muted);margin-top:14px;line-height:1.6;font-style:italic}
+
+.method{font-size:13.5px;color:var(--text-mid);line-height:1.7}
+.method strong{color:var(--text);font-weight:600}
+.pill{display:inline-block;font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.05em;background:var(--accent-bg);color:var(--accent);padding:2px 8px;border-radius:4px;border:1px solid color-mix(in oklch,var(--accent) 30%,transparent);margin:0 2px}
+
+.disc{margin-top:48px;padding:22px 26px;background:var(--amber-bg);border:1px solid color-mix(in oklch,var(--amber) 30%,transparent);border-radius:var(--radius)}
+.disc h4{font-size:13.5px;color:var(--amber);font-weight:600;margin-bottom:12px;letter-spacing:-.01em}
+.disc ol{padding-left:22px}
+.disc li{font-size:13px;color:var(--text-mid);line-height:1.65;margin-bottom:8px}
+.disc li:last-child{margin-bottom:0}
+.disc strong{color:var(--text)}
+
+.footer{margin-top:48px;padding:24px 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12.5px;color:var(--text-muted);flex-wrap:wrap;gap:12px}
+.footer-bottom{padding:18px 0 32px;display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-muted);flex-wrap:wrap;gap:8px}
+
+@media(max-width:700px){
+  .main{padding:0 20px;padding-top:56px}
+  .nav-inner{padding:0 20px}
+  .h-ret{font-size:36px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">Sathvik Lakumarapu V <span>· Research</span></a>
+    <div class="nav-right">
+      <a class="nav-link" href="index.html">Index</a>
+      <a class="contact-link" href="mailto:lakumarapuvsathvik@gmail.com" title="Email" aria-label="Email">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+      </a>
+      <a class="contact-link" href="https://www.linkedin.com/in/lakumarapu-v-sathvik" target="_blank" rel="noopener" title="LinkedIn" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+
+  <section class="hero-sec">
+    <a class="back" href="index.html">&larr; Back to index</a>
+    <div class="hero-eyebrow">
+      <span class="badge badge-warn"><span class="badge-dot"></span>Backtest only</span>
+      <span class="badge badge-accent">Resume &middot; Project 4</span>
+      <span class="badge badge-green">Walk-forward validated</span>
+      <span class="badge badge-violet">Multi-strategy ensemble</span>
+    </div>
+    <h1 class="hero-title">Multi-Strategy Crypto Arbitrage Portfolio</h1>
+    <p class="hero-sub">Four orthogonal arbitrage signal types pooled into one shared bankroll &middot; 10-year daily-cadence backtest &middot; 22,497 simulated trades &middot; walk-forward parameter selection &middot; transaction-cost-adjusted &middot; specific instruments, venues, parameters, and class-level allocations are kept private.</p>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">01</span><span class="section-title">Headline Performance &mdash; Combined Portfolio</span></div>
+    <div class="hero-card">
+      <div class="h-tag"><span class="tdot"></span><span>Compound mode &middot; shared bankroll &middot; depth-capped sizing</span></div>
+      <div class="h-main">
+        <div class="h-ret">+97.19<sup>%</sup></div>
+        <div class="h-sub">
+          <div class="lbl">Compound Annual Growth Rate</div>
+          <div class="val">10-year backtest window &middot; ending 2026-04-29</div>
+        </div>
+      </div>
+      <div class="kpi-strip">
+        <div class="kpi-cell"><div class="kpi-value pos">+11.02</div><div class="kpi-label">Sharpe ratio</div></div>
+        <div class="kpi-cell"><div class="kpi-value pos">+215.65</div><div class="kpi-label">Sortino ratio</div></div>
+        <div class="kpi-cell"><div class="kpi-value neg">&minus;0.13%</div><div class="kpi-label">Max drawdown</div></div>
+        <div class="kpi-cell"><div class="kpi-value pos">+776.13</div><div class="kpi-label">Calmar ratio</div></div>
+        <div class="kpi-cell"><div class="kpi-value pos">+88,192%</div><div class="kpi-label">Total return (10y)</div></div>
+        <div class="kpi-cell"><div class="kpi-value">22,497</div><div class="kpi-label">Simulated trades</div></div>
+        <div class="kpi-cell"><div class="kpi-value">4</div><div class="kpi-label">Strategy types</div></div>
+        <div class="kpi-cell"><div class="kpi-value pos">75.8%</div><div class="kpi-label">Win rate</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">02</span><span class="section-title">Performance by Strategy Type</span></div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr>
+          <th>Strategy type</th>
+          <th class="num">CAGR</th>
+          <th class="num">Max drawdown</th>
+          <th class="num">Sharpe</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>Cross-Exchange Spread Arbitrage</td><td class="num pos">+61.84%</td><td class="num neg">&minus;0.10%</td><td class="num pos">+10.57</td></tr>
+          <tr><td>Triangular Arbitrage</td><td class="num pos">+4.61%</td><td class="num">&plusmn;0.00%</td><td class="num pos">+12.27</td></tr>
+          <tr><td>Statistical Pairs Arbitrage</td><td class="num pos">+5.89%</td><td class="num neg">&minus;4.61%</td><td class="num pos">+5.81</td></tr>
+          <tr><td>Basis Carry Arbitrage</td><td class="num pos">+1.28%</td><td class="num neg">&minus;0.03%</td><td class="num pos">+18.14</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="chnote">Each row reflects the type's standalone result on a fixed-notional basis.
+    Specific venues, instruments, parameter values, and intra-type allocations are not disclosed.</div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">03</span><span class="section-title">Benchmark Comparison &mdash; CAGR</span></div>
+    <div class="chart-card">
+      <div class="chtit"><span>Annual compound growth: strategy vs major buy-and-hold benchmarks</span></div>
+      <div style="height:300px"><canvas id="benchChart"></canvas></div>
+      <div class="chnote">BTC and ETH buy-and-hold computed from the same daily-close window. 60/40 stocks-bonds and S&amp;P 500 reflect long-run public reference (~30y). T-bill rate reflects current 4-week U.S. Treasury yield.</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">04</span><span class="section-title">Benchmark Detail</span></div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>Benchmark</th><th class="num">CAGR</th><th class="num">Max drawdown</th><th class="num">Sharpe</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Strategy &mdash; combined portfolio</strong></td><td class="num pos">+97.19%</td><td class="num neg">&minus;0.13%</td><td class="num pos">+11.02</td></tr>
+          <tr><td>BTC buy-and-hold</td><td class="num pos">+39.27%</td><td class="num neg">&minus;83.19%</td><td class="num">&mdash;</td></tr>
+          <tr><td>ETH buy-and-hold</td><td class="num pos">+26.22%</td><td class="num neg">&minus;93.97%</td><td class="num">&mdash;</td></tr>
+          <tr><td>S&amp;P 500 (long-run avg)</td><td class="num pos">+10.00%</td><td class="num neg">&minus;56.00%</td><td class="num">+0.45</td></tr>
+          <tr><td>60/40 stocks-bonds (long-run avg)</td><td class="num pos">+7.50%</td><td class="num neg">&minus;50.00%</td><td class="num">+0.55</td></tr>
+          <tr><td>U.S. 4-week T-bills (current)</td><td class="num pos">+4.50%</td><td class="num">&plusmn;0.00%</td><td class="num">&mdash;</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">05</span><span class="section-title">Strategy Construction &mdash; High Level</span></div>
+    <div class="card">
+      <div class="method">
+        <strong>Universe.</strong> Four orthogonal arbitrage signal types operating simultaneously on a shared bankroll: cross-venue spread arbitrage on liquid spot markets, single-venue triangular cycles, statistical pairs trading on cointegrated instrument pairs, and delta-neutral basis carry on perpetual derivatives. Daily cadence; intra-day execution upgrades are out of scope for this backtest.
+        <br><br>
+        <strong>Sizing.</strong> Each fire deploys 25% of the current shared bankroll, subject to a tier-based depth ceiling that scales with capital ($250k / $500k / $2M tiers). The depth cap reflects realistic top-of-book liquidity and binds on essentially every trade past the first $1M of bankroll.
+        <br><br>
+        <strong>Risk gates.</strong> Five hard filters precede every fill: minimum-net-bps gate, per-trade stop-loss, depth cap, Kelly-fraction cap, and a live news high-impact filter (operator-only; not active in the historical backtest because chaos days carry positive expected value). Parameters were chosen by 4-fold walk-forward Sharpe-maximization on the cross-exchange engine; the same K and SL were selected by every fold of every asset, indicating low parameter-overfit risk.
+        <br><br>
+        <strong>Validation.</strong> Walk-forward gives in-sample-vs-out-of-sample Sharpe decay of <span class="pill">&lt; 2</span> across all five top assets. Bootstrap resampling (n=1,000) gives win-rate 90% confidence intervals tight at <span class="pill">74&ndash;78%</span>. Cross-strategy daily-PnL correlations cluster below 0.1 outside the cross-exchange family, providing the diversification that drops portfolio MDD below &minus;0.2%.
+        <br><br>
+        <strong>What is private.</strong> <span class="pill">Specific venues, instrument symbols, exact entry/exit thresholds, K and SL values, depth-cap tier numbers, class-level allocations, and per-asset trade examples are held in the private research repository.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">06</span><span class="section-title">Suggestions</span></div>
+    <div class="card">
+      <p style="font-family:'DM Mono',monospace;font-size:12.5px;color:var(--text-mid);line-height:1.7;margin-bottom:18px">
+        Saw something off, missing, or have an idea? Drop a quick note &mdash; on submit it opens your email client with a pre-filled message to <strong style="color:var(--accent)">lakumarapuvsathvik@gmail.com</strong>. No signup, no backend, nothing logged in the page or repo.
+      </p>
+      <form class="suggest-form" onsubmit="return sendSuggestion(event,'crypto.html')">
+        <div class="row">
+          <input type="text" id="sugName" placeholder="Your name (optional)" />
+          <input type="email" id="sugEmail" placeholder="Your email (optional)" />
+        </div>
+        <textarea id="sugMsg" rows="5" required placeholder="Your suggestion or feedback..."></textarea>
+        <button type="submit" class="btn">Send via email</button>
+        <div class="suggest-status" id="sugStatus"></div>
+      </form>
+    </div>
+  </section>
+
+  <div class="disc">
+    <h4>&#9888; Caveats &mdash; Read These</h4>
+    <ol>
+      <li><strong>Backtested, not live.</strong> Figures are derived from a walk-forward historical simulation on publicly-quoted exchange data via the open-source CCXT library. No live capital has been deployed.</li>
+      <li><strong>Compounding artifact at scale.</strong> The headline +88,192% total return is a compound-math outcome on $1M starting capital with no operational capital constraints. Realistic deployment past mid-eight-figure AUM hits depth, regulatory, and operational ceilings the model does not capture.</li>
+      <li><strong>Pre-tax, pre-friction.</strong> Tax, capital gains, financing, KYC/AML operational drag, withdrawal-time market drift, and venue outages are not modeled. Net realisable performance after these would be materially lower.</li>
+      <li><strong>Cost model.</strong> Tier-0 retail taker fees are applied per leg, plus per-asset withdrawal cost amortized over notional, plus a fixed slippage budget. Stop-loss applied per trade. The OHLCV-based cross-venue close-to-close model is an idealization of true bid/ask execution.</li>
+      <li><strong>Crowding decay assumed away.</strong> Spreads in the historical record reflect what was available before the same idea was at scale. Live deployment of similar capital would compress spreads. Treat the headline figures as upper bounds, not point estimates.</li>
+      <li><strong>Depth assumptions.</strong> Realistic top-of-book depth on liquid CEX BTC pairs is approximately $50k&ndash;$500k. The strategy caps trade size by tier, so 99%+ of trades operate at the cap rather than at 25% of bankroll once the bankroll passes $1M.</li>
+      <li><strong>Sample period.</strong> May 2016 &rarr; April 2026. The 2017&ndash;2021 era contributed disproportionately due to wider venue spreads and higher cross-currency premiums; the post-2022 regime is materially tighter.</li>
+    </ol>
+  </div>
+
+  <div class="footer">
+    <div><a href="index.html">&larr; back to index</a></div>
+    <div>Strategy locked: 2026-04-28 &middot; Last updated: 2026-04-29</div>
+  </div>
+  <div class="footer-bottom">
+    <div>&copy; 2026 Sathvik Lakumarapu V &middot; All Rights Reserved</div>
+    <div>No copying, redistribution, or AI/ML training without written consent</div>
+  </div>
+
+</main>
+
+<script>
+const html = document.documentElement;
+const toggle = document.getElementById('themeToggle');
+const iconSun = document.getElementById('iconSun');
+const iconMoon = document.getElementById('iconMoon');
+function applyTheme(t){html.setAttribute('data-theme',t);if(t==='dark'){iconSun.style.display='block';iconMoon.style.display='none';}else{iconSun.style.display='none';iconMoon.style.display='block';}}
+function getSavedTheme(){try{return localStorage.getItem('theme');}catch{return null;}}
+function saveTheme(t){try{localStorage.setItem('theme',t);}catch{}}
+const saved = getSavedTheme();
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+applyTheme(saved || (prefersDark ? 'dark' : 'light'));
+toggle.addEventListener('click', () => {
+  const next = (html.getAttribute('data-theme') === 'dark') ? 'light' : 'dark';
+  applyTheme(next); saveTheme(next);
+});
+
+function sendSuggestion(ev, pageId){
+  ev.preventDefault();
+  const name = (document.getElementById('sugName').value || '').trim();
+  const email = (document.getElementById('sugEmail').value || '').trim();
+  const msg = (document.getElementById('sugMsg').value || '').trim();
+  const status = document.getElementById('sugStatus');
+  if (!msg) { status.textContent = 'Please enter a suggestion before sending.'; status.style.color = 'var(--red, #c00)'; return false; }
+  const subject = encodeURIComponent('Suggestion - ' + pageId);
+  const lines = ['Suggestion / feedback on ' + pageId + ':', '', msg, '', '---', 'From: ' + (name || '(anonymous)') + (email ? ' <' + email + '>' : '')];
+  const body = encodeURIComponent(lines.join('\n'));
+  window.location.href = 'mailto:lakumarapuvsathvik@gmail.com?subject=' + subject + '&body=' + body;
+  status.textContent = 'Opening your email client...';
+  status.style.color = '';
+  return false;
+}
+
+// Benchmark chart
+const ctx = document.getElementById('benchChart').getContext('2d');
+const isDark = () => document.documentElement.getAttribute('data-theme') === 'dark';
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const labels = ['Strategy','BTC HODL','ETH HODL','S&P 500','60/40','T-bills'];
+const data = [97.19, 39.27, 26.22, 10.00, 7.50, 4.50];
+const colors = data.map((v, i) => i === 0 ? cssVar('--accent') : (v >= 25 ? cssVar('--green') : v >= 8 ? cssVar('--amber') : cssVar('--text-muted')));
+new Chart(ctx, {
+  type: 'bar',
+  data: { labels, datasets: [{ label: 'CAGR %', data, backgroundColor: colors, borderRadius: 4, barThickness: 36 }] },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.parsed.y.toFixed(2) + '%' } } },
+    scales: {
+      x: { ticks: { color: cssVar('--text-muted'), font: { family: 'DM Mono, monospace', size: 11 } }, grid: { color: cssVar('--border') } },
+      y: { ticks: { color: cssVar('--text-muted'), font: { family: 'DM Mono, monospace', size: 11 }, callback: v => v + '%' }, grid: { color: cssVar('--border') } }
+    }
+  }
+});
+</script>
+</body>
+</html>
