@@ -187,18 +187,6 @@
     .btn-open:hover { background: color-mix(in oklch, var(--accent) 15%, transparent); box-shadow: var(--shadow-sm); }
     .btn-open svg { width: 12px; height: 12px; }
 
-    .planned-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 56px; }
-    .planned-card {
-      background: var(--amber-bg);
-      border: 1px dashed color-mix(in oklch, var(--amber) 50%, transparent);
-      border-radius: var(--radius); padding: 24px;
-      display: flex; flex-direction: column; gap: 10px;
-    }
-    .planned-status { display: inline-flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; font-size: 10.5px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--amber); }
-    .planned-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); opacity: 0.85; }
-    .planned-title { font-size: 15px; font-weight: 600; letter-spacing: -0.015em; color: var(--text); }
-    .planned-desc { font-size: 13px; color: var(--text-mid); line-height: 1.65; font-weight: 400; }
-
     .footer { border-top: 1px solid var(--border); padding: 40px 0 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
     .footer-block-title { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
     .footer-block-text { font-size: 13px; color: var(--text-muted); line-height: 1.7; font-weight: 300; }
@@ -206,8 +194,6 @@
     .footer-bottom-text { font-size: 12px; color: var(--text-muted); }
     .footer-link { font-size: 12px; color: var(--accent); text-decoration: none; }
     .footer-link:hover { text-decoration: underline; }
-
-    .divider { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding-top: 40px; border-top: 1px solid var(--border); }
 
     @media (max-width: 700px) {
       .main { padding: 0 20px; padding-top: 56px; }
@@ -400,21 +386,8 @@
       </div>
     </section>
 
-    <div class="divider">
-      <span class="section-label">02</span>
-      <span class="section-title">Planned Extensions</span>
-    </div>
-
-    <div class="planned-grid">
-      <div class="planned-card">
-        <div class="planned-status"><span class="planned-dot"></span>Data sourcing</div>
-        <div class="planned-title">XAU / INR &mdash; MCX Contract Rebuild</div>
-        <div class="planned-desc">Rebuilding the rupee-gold book on actual MCX futures contracts rather than the synthetic series &mdash; adding import duty, the daily domestic premium, and contract rollover. Estimated impact is a 5&ndash;9 percentage-point reduction in CAGR. Blocked on exchange data access.</div>
-      </div>
-    </div>
-
     <section class="section">
-      <div class="section-header"><span class="section-label">03</span><span class="section-title">Suggestions</span></div>
+      <div class="section-header"><span class="section-label">02</span><span class="section-title">Suggestions</span></div>
       <div class="dash-card" style="padding:24px 26px">
         <p style="font-family:'DM Mono',monospace;font-size:12.5px;color:var(--text-mid);line-height:1.7;margin-bottom:18px">
           Saw something off, missing, or have an idea? Drop a quick note &mdash; on submit it opens your email client with a pre-filled message to <strong style="color:var(--accent)">lakumarapuvsathvik@gmail.com</strong>. No signup, no backend, nothing logged in the page or repo.

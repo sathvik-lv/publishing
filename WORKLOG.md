@@ -2,6 +2,14 @@
 
 Newest entries at the top. Each device: pull + read this before working, append + push after working.
 
+## 2026-08-05 — Windows PC (later)
+- **Removed the "02 Planned Extensions" section from `index.html`** — the MCX contract-rebuild
+  card was the only item in it, so the divider, the grid, and the orphaned `.planned-*` /
+  `.divider` CSS all came out with it. `--amber` vars kept (still used by `.badge-warn`).
+- Suggestions section renumbered 03 → 02. Tag balance verified.
+- Note: the roadmap item itself is no longer surfaced anywhere public. If it should still be
+  tracked, it needs a home outside `index.html`.
+
 ## 2026-08-05 — Windows PC
 - **Added `xau_inr.html`** — 5th dashboard. Systematic long-only rupee-gold book,
   22.4-year backtest. Headline 29.30% CAGR, Sharpe 1.709, MDD −22.69%, 24/24 positive years.
