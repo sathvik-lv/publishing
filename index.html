@@ -371,6 +371,32 @@
           </div>
         </a>
 
+        <a class="dash-card" href="xau_inr.html">
+          <div class="dash-card-top">
+            <div class="dash-card-meta">
+              <span class="dash-card-tag">Precious metals &middot; INR-denominated</span>
+              <span class="dash-card-index">05</span>
+            </div>
+            <div class="dash-card-title">XAU / INR &mdash; Gold Priced in Rupees</div>
+            <div class="dash-card-desc" style="margin-top:8px; margin-bottom: 20px;">Systematic long-only gold book denominated in rupees. 22.4-year daily backtest spanning two bull markets and the 2011&ndash;2015 gold bear. Parameters selected on a training window only; validated against 2,000 exposure-matched random-entry simulations. Runs on a synthetic series &mdash; not yet on MCX contract prices.</div>
+          </div>
+          <div class="kpi-strip">
+            <div class="kpi-cell"><div class="kpi-value positive">29.30%</div><div class="kpi-label">CAGR (22.4y backtest)</div></div>
+            <div class="kpi-cell"><div class="kpi-value">1.709</div><div class="kpi-label">Sharpe ratio</div></div>
+            <div class="kpi-cell"><div class="kpi-value positive">24 / 24</div><div class="kpi-label">Positive years</div></div>
+            <div class="kpi-cell"><div class="kpi-value negative">&minus;22.7%</div><div class="kpi-label">Max drawdown</div></div>
+          </div>
+          <div class="dash-card-footer">
+            <span class="dash-card-footer-note">2003&ndash;2026 &middot; 995 trades &middot; long-only</span>
+            <span class="btn-open">
+              Open dashboard
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+              </svg>
+            </span>
+          </div>
+        </a>
+
       </div>
     </section>
 
@@ -382,8 +408,8 @@
     <div class="planned-grid">
       <div class="planned-card">
         <div class="planned-status"><span class="planned-dot"></span>Data sourcing</div>
-        <div class="planned-title">XAU / INR &mdash; Gold Priced in Rupees</div>
-        <div class="planned-desc">Adding gold (XAU) denominated in INR to the multi-asset book for currency-hedged precious-metal exposure. Data sourcing stage.</div>
+        <div class="planned-title">XAU / INR &mdash; MCX Contract Rebuild</div>
+        <div class="planned-desc">Rebuilding the rupee-gold book on actual MCX futures contracts rather than the synthetic series &mdash; adding import duty, the daily domestic premium, and contract rollover. Estimated impact is a 5&ndash;9 percentage-point reduction in CAGR. Blocked on exchange data access.</div>
       </div>
     </div>
 
@@ -409,7 +435,7 @@
       <div class="footer">
         <div>
           <div class="footer-block-title">About</div>
-          <div class="footer-block-text">Public results hub for research work across quant trading (FX, indices, index derivatives) and retail analytics (SKU-level). Underlying strategy source and proprietary data stay in private repos &mdash; this site only surfaces rendered dashboards. Nothing here is investment advice.</div>
+          <div class="footer-block-text">Public results hub for research work across quant trading (FX, indices, index derivatives, precious metals) and retail analytics (SKU-level). Underlying strategy source and proprietary data stay in private repos &mdash; this site only surfaces rendered dashboards. Nothing here is investment advice.</div>
         </div>
         <div>
           <div class="footer-block-title">Disclaimer</div>

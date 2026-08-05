@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>XAU/INR &mdash; Gold Priced in Rupees &middot; Systematic Long-Only Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+(function(){try{var s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);}else if(window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();
+</script>
+<style>
+:root {
+  --bg: oklch(0.985 0.004 80); --bg-subtle: oklch(0.960 0.006 80); --bg-card: oklch(1 0 0);
+  --border: oklch(0.880 0.005 80); --border-mid: oklch(0.840 0.005 80);
+  --text: oklch(0.130 0.012 260); --text-mid: oklch(0.380 0.010 260); --text-muted: oklch(0.560 0.008 260);
+  --accent: oklch(0.520 0.185 248); --accent-bg: oklch(0.960 0.025 248); --accent-text: oklch(0.380 0.185 248);
+  --green: oklch(0.520 0.140 155); --green-bg: oklch(0.960 0.030 155);
+  --amber: oklch(0.600 0.140 65); --amber-bg: oklch(0.970 0.030 65);
+  --red: oklch(0.560 0.200 25); --red-bg: oklch(0.965 0.030 25);
+  --violet: oklch(0.520 0.180 290); --violet-bg: oklch(0.960 0.030 290);
+  --shadow-sm: 0 1px 3px oklch(0 0 0 /.06), 0 1px 2px oklch(0 0 0 /.04);
+  --shadow-md: 0 4px 12px oklch(0 0 0 /.07), 0 2px 4px oklch(0 0 0 /.04);
+  --shadow-lg: 0 8px 24px oklch(0 0 0 /.09), 0 2px 6px oklch(0 0 0 /.05);
+  --radius: 10px; --radius-sm: 6px; --transition: 200ms ease;
+}
+[data-theme="dark"] {
+  --bg: oklch(0.105 0.012 260); --bg-subtle: oklch(0.140 0.014 260); --bg-card: oklch(0.155 0.014 260);
+  --border: oklch(0.240 0.016 260); --border-mid: oklch(0.290 0.016 260);
+  --text: oklch(0.935 0.005 80); --text-mid: oklch(0.720 0.006 260); --text-muted: oklch(0.540 0.008 260);
+  --accent: oklch(0.620 0.185 248); --accent-bg: oklch(0.200 0.060 248); --accent-text: oklch(0.720 0.185 248);
+  --green: oklch(0.640 0.140 155); --green-bg: oklch(0.180 0.045 155);
+  --amber: oklch(0.720 0.140 65); --amber-bg: oklch(0.200 0.040 65);
+  --red: oklch(0.660 0.200 25); --red-bg: oklch(0.220 0.060 25);
+  --violet: oklch(0.700 0.180 290); --violet-bg: oklch(0.200 0.050 290);
+  --shadow-sm: 0 1px 3px oklch(0 0 0 /.30); --shadow-md: 0 4px 12px oklch(0 0 0 /.35); --shadow-lg: 0 8px 24px oklch(0 0 0 /.40);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;transition:background var(--transition),color var(--transition);min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:color-mix(in oklch,var(--bg) 85%,transparent);backdrop-filter:blur(12px) saturate(160%);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center}
+.nav-inner{max-width:1280px;margin:0 auto;padding:0 32px;width:100%;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-size:14px;font-weight:500;color:var(--text);text-decoration:none;letter-spacing:-.01em}
+.nav-brand span{color:var(--text-muted);font-weight:400}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav-link{font-size:13px;color:var(--text-muted);text-decoration:none;transition:color var(--transition)}
+.nav-link:hover{color:var(--text)}
+.contact-link{width:36px;height:36px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);color:var(--text-mid);display:flex;align-items:center;justify-content:center;transition:background var(--transition),border-color var(--transition),color var(--transition),box-shadow var(--transition);box-shadow:var(--shadow-sm);text-decoration:none}
+.contact-link:hover{background:var(--bg-subtle);color:var(--text);border-color:var(--border-mid);box-shadow:var(--shadow-md);text-decoration:none}
+.contact-link svg{width:16px;height:16px}
+
+.btn{padding:10px 22px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;font-family:'DM Mono',monospace;font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;transition:.18s}
+.btn:hover{filter:brightness(1.1);box-shadow:var(--shadow-sm)}
+
+.suggest-form{display:flex;flex-direction:column;gap:14px}
+.suggest-form .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.suggest-form .row{grid-template-columns:1fr}}
+.suggest-form input,.suggest-form textarea{font-family:'DM Sans',system-ui,sans-serif;font-size:13.5px;padding:11px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);transition:border-color var(--transition),box-shadow var(--transition);width:100%;resize:vertical}
+.suggest-form input:focus,.suggest-form textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.suggest-form input::placeholder,.suggest-form textarea::placeholder{color:var(--text-muted)}
+.suggest-form .btn{align-self:flex-start;margin-top:0}
+.suggest-status{font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text-muted);margin-top:4px;min-height:14px}
+.theme-toggle{width:36px;height:36px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);color:var(--text-mid);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.18s;box-shadow:var(--shadow-sm)}
+.theme-toggle:hover{background:var(--bg-subtle);color:var(--text);box-shadow:var(--shadow-md)}
+.theme-toggle svg{width:16px;height:16px}
+
+.main{max-width:1280px;margin:0 auto;padding:0 32px;padding-top:56px}
+
+.hero-sec{padding:56px 0 40px;border-bottom:1px solid var(--border)}
+.hero-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;padding:4px 10px;border-radius:99px;border:1px solid}
+.badge-warn{background:var(--amber-bg);color:var(--amber);border-color:color-mix(in oklch,var(--amber) 35%,transparent)}
+.badge-accent{background:var(--accent-bg);color:var(--accent);border-color:color-mix(in oklch,var(--accent) 35%,transparent)}
+.badge-violet{background:var(--violet-bg);color:var(--violet);border-color:color-mix(in oklch,var(--violet) 35%,transparent)}
+.badge-green{background:var(--green-bg);color:var(--green);border-color:color-mix(in oklch,var(--green) 35%,transparent)}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;animation:pulse 2.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.hero-title{font-size:clamp(28px,4vw,40px);font-weight:600;letter-spacing:-.025em;line-height:1.2;margin-bottom:14px}
+.hero-sub{font-size:15px;color:var(--text-muted);max-width:760px;line-height:1.7;font-weight:300}
+.back{display:inline-block;margin-bottom:18px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);text-decoration:none}
+.back:hover{color:var(--text)}
+
+.section{padding:48px 0 0}
+.section-header{display:flex;align-items:baseline;gap:12px;margin-bottom:24px}
+.section-label{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);padding:3px 8px;border:1px solid var(--border-mid);border-radius:4px}
+.section-title{font-size:18px;font-weight:500;letter-spacing:-.015em}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:900px){.g2,.g3{grid-template-columns:1fr}}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:24px 26px}
+
+.hero-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:24px 26px;border-top:3px solid var(--accent)}
+.h-tag{font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:12px;color:var(--accent)}
+.h-tag .tdot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.h-main{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:8px}
+.h-ret{font-family:'DM Mono',monospace;font-size:46px;font-weight:500;color:var(--green);letter-spacing:-.02em;line-height:1}
+.h-ret sup{font-size:24px;color:var(--green);margin-left:2px}
+.h-sub .lbl{font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px}
+.h-sub .val{font-family:'DM Mono',monospace;font-size:14px;color:var(--text)}
+
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);margin-top:18px}
+@media(max-width:760px){.kpi-strip{grid-template-columns:repeat(2,1fr)}}
+.kpi-cell{padding:14px 18px;border-right:1px solid var(--border)}
+.kpi-cell:nth-child(4n){border-right:none}
+@media(max-width:760px){.kpi-cell:nth-child(2n){border-right:none}}
+.kpi-value{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;letter-spacing:-.01em;color:var(--text);margin-bottom:3px;line-height:1.2}
+.kpi-value.pos{color:var(--green)}
+.kpi-value.neg{color:var(--red)}
+.kpi-value.amber{color:var(--amber)}
+.kpi-label{font-size:10.5px;color:var(--text-muted);line-height:1.3;font-weight:400}
+
+.tbl-wrap{border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;background:var(--bg-card)}
+.tbl-scroll{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{background:var(--bg-subtle);padding:12px 16px;text-align:left;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);font-weight:500;white-space:nowrap}
+.tbl td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--text)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl .num{text-align:right;font-family:'DM Mono',monospace;font-variant-numeric:tabular-nums}
+.tbl .pos{color:var(--green)}
+.tbl .neg{color:var(--red)}
+.tbl tr.hl td{background:var(--accent-bg)}
+
+.chart-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:20px 24px}
+.chtit{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.chnote{font-size:12px;color:var(--text-muted);margin-top:14px;line-height:1.6;font-style:italic}
+
+.method{font-size:13.5px;color:var(--text-mid);line-height:1.7}
+.method strong{color:var(--text);font-weight:600}
+.pill{display:inline-block;font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.05em;background:var(--accent-bg);color:var(--accent);padding:2px 8px;border-radius:4px;border:1px solid color-mix(in oklch,var(--accent) 30%,transparent);margin:0 2px}
+
+.callout{background:var(--green-bg);border:1px solid color-mix(in oklch,var(--green) 30%,transparent);border-radius:var(--radius);padding:20px 24px}
+.callout h4{font-size:13.5px;color:var(--green);font-weight:600;margin-bottom:10px;letter-spacing:-.01em}
+.callout p{font-size:13px;color:var(--text-mid);line-height:1.7}
+.callout strong{color:var(--text)}
+
+.blocker{background:var(--amber-bg);border:1px solid color-mix(in oklch,var(--amber) 30%,transparent);border-radius:var(--radius);padding:20px 24px}
+.blocker h4{font-size:13.5px;color:var(--amber);font-weight:600;margin-bottom:10px;letter-spacing:-.01em}
+.blocker p{font-size:13px;color:var(--text-mid);line-height:1.7}
+.blocker strong{color:var(--text)}
+
+.disc{margin-top:48px;padding:22px 26px;background:var(--amber-bg);border:1px solid color-mix(in oklch,var(--amber) 30%,transparent);border-radius:var(--radius)}
+.disc h4{font-size:13.5px;color:var(--amber);font-weight:600;margin-bottom:12px;letter-spacing:-.01em}
+.disc ol{padding-left:22px}
+.disc li{font-size:13px;color:var(--text-mid);line-height:1.65;margin-bottom:8px}
+.disc li:last-child{margin-bottom:0}
+.disc strong{color:var(--text)}
+
+.footer{margin-top:48px;padding:24px 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12.5px;color:var(--text-muted);flex-wrap:wrap;gap:12px}
+.footer-bottom{padding:18px 0 32px;display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-muted);flex-wrap:wrap;gap:8px}
+
+@media(max-width:700px){
+  .main{padding:0 20px;padding-top:56px}
+  .nav-inner{padding:0 20px}
+  .h-ret{font-size:36px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">Sathvik Lakumarapu V <span>· Research</span></a>
+    <div class="nav-right">
+      <a class="nav-link" href="index.html">Index</a>
+      <a class="contact-link" href="mailto:lakumarapuvsathvik@gmail.com" title="Email" aria-label="Email">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+      </a>
+      <a class="contact-link" href="https://www.linkedin.com/in/lakumarapu-v-sathvik" target="_blank" rel="noopener" title="LinkedIn" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+
+  <section class="hero-sec">
+    <a class="back" href="index.html">&larr; Back to index</a>
+    <div class="hero-eyebrow">
+      <span class="badge badge-warn"><span class="badge-dot"></span>Backtest only</span>
+      <span class="badge badge-accent">Resume &middot; Project 5</span>
+      <span class="badge badge-green">Out-of-sample selected</span>
+      <span class="badge badge-violet">22-year window</span>
+      <span class="badge badge-warn">Proxy series &middot; not MCX</span>
+    </div>
+    <h1 class="hero-title">XAU/INR &mdash; Gold Priced in Rupees</h1>
+    <p class="hero-sub">Systematic long-only gold book denominated in rupees &middot; 22.4-year daily backtest (2003&ndash;2026) &middot; 995 trades &middot; parameters selected on a training window only and scored on untouched data &middot; validated against 2,000 exposure-matched random-entry simulations &middot; runs on a synthetic XAU/INR series, <strong style="color:var(--amber)">not yet on MCX contract prices</strong>.</p>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">01</span><span class="section-title">Headline Performance</span></div>
+    <div class="hero-card">
+      <div class="h-tag"><span class="tdot"></span><span>Long or flat &middot; no leverage &middot; 16 bp round-trip costs applied</span></div>
+      <div class="h-main">
+        <div class="h-ret">+29.30<sup>%</sup></div>
+        <div class="h-sub">
+          <div class="lbl">Compound Annual Growth Rate</div>
+          <div class="val">22.4-year window &middot; 2003-12-02 &rarr; 2026-04-16 &middot; 5,782 daily bars</div>
+        </div>
+      </div>
+      <div class="kpi-strip">
+        <div class="kpi-cell"><div class="kpi-value pos">+1.709</div><div class="kpi-label">Sharpe ratio</div></div>
+        <div class="kpi-cell"><div class="kpi-value pos">+2.009</div><div class="kpi-label">Sortino ratio</div></div>
+        <div class="kpi-cell"><div class="kpi-value neg">&minus;22.69%</div><div class="kpi-label">Max drawdown</div></div>
+        <div class="kpi-cell"><div class="kpi-value pos">+1.291</div><div class="kpi-label">Calmar ratio</div></div>
+        <div class="kpi-cell"><div class="kpi-value pos">24 / 24</div><div class="kpi-label">Positive years</div></div>
+        <div class="kpi-cell"><div class="kpi-value">995</div><div class="kpi-label">Trades</div></div>
+        <div class="kpi-cell"><div class="kpi-value pos">67.4%</div><div class="kpi-label">Win rate</div></div>
+        <div class="kpi-cell"><div class="kpi-value">49.9%</div><div class="kpi-label">Time in market</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">02</span><span class="section-title">Benchmark Comparison &mdash; CAGR</span></div>
+    <div class="chart-card">
+      <div class="chtit"><span>Annual compound growth: strategy vs the alternatives, same window</span></div>
+      <div style="height:300px"><canvas id="benchChart"></canvas></div>
+      <div class="chnote">Buy &amp; hold gold and the exposure-matched line are computed on the identical daily series. Nifty 50 covers 2017&ndash;2026 only (shorter history available). Indian FD reflects a representative 7% deposit rate. &ldquo;Random entry&rdquo; is the mean of 2,000 simulations described in section 03.</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">03</span><span class="section-title">Validation &mdash; Is the Timing Real?</span></div>
+    <div class="g2">
+      <div class="card">
+        <div class="method" style="margin-bottom:16px"><strong>The test that matters.</strong> Gold rose roughly 23&times; in rupee terms over this window, so almost any long-biased rule shows a profit. The question is whether the <em>timing</em> adds anything beyond simply being in gold. To test it, 2,000 random-entry strategies were run with the <strong>same number of trades</strong> and the <strong>same holding-period distribution</strong> &mdash; differing only in <em>when</em> they traded.</div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Random-entry simulations (n=2,000)</th><th class="num">CAGR</th></tr></thead>
+            <tbody>
+              <tr class="hl"><td><strong>Strategy</strong></td><td class="num pos"><strong>+29.30%</strong></td></tr>
+              <tr><td>Random &mdash; best of 2,000</td><td class="num">+12.81%</td></tr>
+              <tr><td>Random &mdash; 99th percentile</td><td class="num">+10.53%</td></tr>
+              <tr><td>Random &mdash; 95th percentile</td><td class="num">+9.10%</td></tr>
+              <tr><td>Random &mdash; median</td><td class="num">+6.00%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="chnote">The strategy beats 100.0% of random-entry simulations (p = 0.0000). The single luckiest of 2,000 random attempts does not come close.</div>
+      </div>
+      <div class="card">
+        <div class="method" style="margin-bottom:16px"><strong>Exposure-matched control.</strong> The book is in the market only 49.9% of the time. Holding a constant 49.9% gold position over the same window returns <span class="pill">+7.37% CAGR</span> at <span class="pill">Sharpe 0.795</span>. The timing therefore contributes <strong>+21.9 pp of CAGR</strong> and <strong>+0.91 of Sharpe</strong> over passively holding the same average exposure.</div>
+        <div class="method"><strong>Bootstrap precision.</strong> Resampling the 995 individual trades (n=2,000) gives a 95% confidence interval on CAGR of <span class="pill">22.65% &ndash; 36.30%</span>, with <span class="pill">P(worse than buy &amp; hold) = 0%</span>.
+        <br><br>
+        <strong>Selection discipline.</strong> Parameters were chosen using only a training window and then scored on data the search never touched. An earlier iteration of this study selected on the full sample and reported a materially better out-of-sample figure; that result was discarded as contaminated. The numbers here are from the corrected procedure.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">04</span><span class="section-title">Performance Across Gold Regimes</span></div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>Regime</th><th class="num">Strategy</th><th class="num">Buy &amp; hold</th><th class="num">Trades</th><th class="num">Max drawdown</th></tr></thead>
+        <tbody>
+          <tr><td>2009&ndash;2011 gold boom</td><td class="num pos">+154.01%</td><td class="num pos">+85.73%</td><td class="num">106</td><td class="num neg">&minus;8.27%</td></tr>
+          <tr class="hl"><td><strong>2011&ndash;2015 gold bear</strong></td><td class="num pos"><strong>+100.31%</strong></td><td class="num neg"><strong>&minus;19.19%</strong></td><td class="num">183</td><td class="num neg">&minus;15.74%</td></tr>
+          <tr><td>2016&ndash;2019 recovery</td><td class="num pos">+116.47%</td><td class="num pos">+53.75%</td><td class="num">168</td><td class="num neg">&minus;10.58%</td></tr>
+          <tr><td>2020&ndash;2026 bull</td><td class="num pos">+346.51%</td><td class="num pos">+313.27%</td><td class="num">279</td><td class="num neg">&minus;22.69%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout" style="margin-top:18px">
+      <h4>&#10003; The bear market is the load-bearing evidence</h4>
+      <p>Gold fell roughly 45% in USD between 2011 and 2015 and did not recover until 2020. A long-only gold rule tested exclusively on bull markets proves nothing. Over that four-year decline the book returned <strong>+100.31%</strong> against buy &amp; hold&rsquo;s <strong>&minus;19.19%</strong>, because the entry condition simply stops firing when gold is not advancing &mdash; capital sits flat rather than fighting the trend. Extending the window back to 2003 specifically to capture this regime was the single most important robustness step in the study.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">05</span><span class="section-title">Year by Year</span></div>
+    <div class="tbl-wrap tbl-scroll">
+      <table class="tbl">
+        <thead><tr><th>Year</th><th class="num">Strategy</th><th class="num">Buy &amp; hold</th><th class="num">Difference</th><th class="num">Trades</th><th class="num">Worst drawdown</th></tr></thead>
+        <tbody id="yearBody"></tbody>
+      </table>
+    </div>
+    <div class="chnote">2003 covers December only; 2026 runs to 16 April. Every year is positive, and the book outperforms buy &amp; hold in 18 of 24 years. Returns compound on the running account balance, not on the original stake.</div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">06</span><span class="section-title">Adjusting for Real-World Frictions</span></div>
+    <div class="blocker" style="margin-bottom:18px">
+      <h4>&#9888; This runs on a synthetic series, not MCX contract prices</h4>
+      <p>The backtest prices XAU/INR as international gold &times; USD/INR. Indian domestic gold additionally carries import duty and GST, trades at a local premium or discount that moves daily, and is accessed through expiring futures contracts. <strong>MCX historical data could not be obtained programmatically</strong> &mdash; the exchange blocks automated access &mdash; so the sensitivity below estimates how much of the result would survive rather than measuring it directly.</p>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>Scenario</th><th class="num">Basis noise</th><th class="num">Carry</th><th class="num">CAGR</th><th class="num">vs headline</th></tr></thead>
+        <tbody>
+          <tr><td>Headline (unadjusted)</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num pos">+29.30%</td><td class="num">&mdash;</td></tr>
+          <tr><td>Optimistic</td><td class="num">35 bp/day</td><td class="num">0%</td><td class="num pos">+26.47%</td><td class="num neg">&minus;2.82 pp</td></tr>
+          <tr class="hl"><td><strong>Central estimate</strong></td><td class="num">52 bp/day</td><td class="num">3%</td><td class="num pos"><strong>+22.09%</strong></td><td class="num neg"><strong>&minus;7.21 pp</strong></td></tr>
+          <tr><td>Pessimistic</td><td class="num">75 bp/day</td><td class="num">6.5%</td><td class="num pos">+16.20%</td><td class="num neg">&minus;13.10 pp</td></tr>
+          <tr><td>Worst case</td><td class="num">100 bp/day</td><td class="num">10%</td><td class="num amber">+9.63%</td><td class="num neg">&minus;19.67 pp</td></tr>
+          <tr><td colspan="3"><em>Buy &amp; hold, same window</em></td><td class="num">+15.33%</td><td class="num">&mdash;</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="chnote">Basis noise dominates, not roll cost. The signal is computed on international gold while profit and loss accrue on domestic gold; the premium between them is pure noise to this rule, and with short holds there is little room to absorb it. Roll <em>transaction</em> cost is minor &mdash; average holding period is under three sessions, so only 8&ndash;15% of trades ever span a contract expiry. The July 2024 import-duty cut (15% &rarr; 6%) costs a one-off 0.57 pp and does not compound. On the central estimate the edge over buy &amp; hold survives; on the worst case it does not.</div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">07</span><span class="section-title">Construction &mdash; High Level</span></div>
+    <div class="card">
+      <div class="method">
+        <strong>Instrument.</strong> Gold denominated in Indian rupees, daily bars. The book is <strong>long or flat only</strong> &mdash; never short. Shorting the reverse signal was tested and rejected: it lost in every paired comparison, won only 9% of its trades, and failed even when restricted to confirmed downtrends. Rupee gold carried a structural upward drift of roughly 14.6% per year across the window, and fighting that proved uneconomic.
+        <br><br>
+        <strong>Signal.</strong> A trend condition on international gold combined with a volatility-regime gate, both computed only from information available at the prior close. Entries execute at the following session&rsquo;s open; a position is held until the trend condition reverses or a profit target is reached. <span class="pill">Exact lookbacks, thresholds and target sizing are held in the private research repository.</span>
+        <br><br>
+        <strong>Exits.</strong> Roughly 85% of trades close at the profit target and 15% on trend reversal. The reversal path is the loss-taking mechanism and holds materially longer than the winners. A <strong>stop-loss sweep across 17 levels and five windows found no level worth adopting</strong> &mdash; the average losing trade is small, so any stop tight enough to matter cuts normal noise instead of tail risk. At a 1% stop the strategy is stopped out of 54% of trades and drawdown more than triples. Wide stops (5&ndash;7.5%) function purely as disaster insurance, costing 0.6&ndash;1.6 pp of CAGR to halve the worst single trade.
+        <br><br>
+        <strong>Costs.</strong> 16 bp round trip applied throughout. This is deliberately conservative: the equivalent charge on Indian gold futures, including brokerage, exchange fees, commodities transaction tax, GST, stamp duty and one tick of slippage, works out closer to <span class="pill">2.3 bp</span>. Results are therefore understated on the cost dimension.
+        <br><br>
+        <strong>What was tested and rejected.</strong> An initial sweep of <span class="pill">1,146 configurations</span> spanning moving-average crosses, Donchian breakouts, Fibonacci structure, liquidity sweeps, volume-profile breakouts, mean-reversion ensembles and a walk-forward XGBoost + neural-network ensemble produced <strong>nothing that survived a deflated-Sharpe test</strong>, and none beat buy &amp; hold out of sample. Momentum oscillators, Bollinger-width filters and a dollar-index confirmation gate were each tested and dropped for measurably reducing returns. The surviving rule is deliberately small.
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">08</span><span class="section-title">Suggestions</span></div>
+    <div class="card">
+      <p style="font-family:'DM Mono',monospace;font-size:12.5px;color:var(--text-mid);line-height:1.7;margin-bottom:18px">
+        Saw something off, missing, or have an idea? Drop a quick note &mdash; on submit it opens your email client with a pre-filled message to <strong style="color:var(--accent)">lakumarapuvsathvik@gmail.com</strong>. No signup, no backend, nothing logged in the page or repo.
+      </p>
+      <form class="suggest-form" onsubmit="return sendSuggestion(event,'xau_inr.html')">
+        <div class="row">
+          <input type="text" id="sugName" placeholder="Your name (optional)" />
+          <input type="email" id="sugEmail" placeholder="Your email (optional)" />
+        </div>
+        <textarea id="sugMsg" rows="5" required placeholder="Your suggestion or feedback..."></textarea>
+        <button type="submit" class="btn">Send via email</button>
+        <div class="suggest-status" id="sugStatus"></div>
+      </form>
+    </div>
+  </section>
+
+  <div class="disc">
+    <h4>&#9888; Caveats &mdash; Read These</h4>
+    <ol>
+      <li><strong>Not the tradeable instrument.</strong> The series is international gold &times; USD/INR, not MCX contract prices. Indian domestic gold carries import duty, GST, a daily-varying local premium, and contract expiries. Section 06 estimates the impact; it has not been measured. <strong>The central estimate after adjustment is roughly 22%, not 29%.</strong></li>
+      <li><strong>Backtested, not live.</strong> No capital has been deployed against this rule. Figures are a historical simulation.</li>
+      <li><strong>Long-biased in a rising market.</strong> Rupee gold appreciated at roughly 14.6% per year across the window. A long-only book inherits that. The exposure-matched and random-entry controls in section 03 exist precisely to separate skill from that drift, but they cannot remove the dependence on gold being an appreciating asset over the next two decades.</li>
+      <li><strong>Negative skew.</strong> The win rate is high while the average loss slightly exceeds the average win. Sharpe flatters this shape. A cluster of reversal exits will hurt more than the headline ratios imply; the worst single trade in the record is &minus;15.25%.</li>
+      <li><strong>Futures introduce leverage by default.</strong> On Indian gold futures a single standard mini lot exceeds the notional most retail accounts hold, and margin is roughly 6% of contract value. Position size must be set from notional, not from margin. At maximum available leverage a 6% adverse move is a total loss.</li>
+      <li><strong>Multiple-testing exposure.</strong> Over a thousand configurations were evaluated across this project. The reported rule passes a deflated-Sharpe test that penalises for that search, and an earlier contaminated result was discarded, but the risk of selection bias never reaches zero.</li>
+      <li><strong>Data provenance.</strong> Price history was cross-checked against a second independent vendor: levels agreed to a 0.19% median deviation, but daily returns disagreed by roughly 52 bp, almost entirely in the rupee leg (onshore versus offshore convention). That disagreement sets a floor below which no edge can be claimed, and is the basis for the noise sensitivity in section 06.</li>
+    </ol>
+  </div>
+
+  <div class="footer">
+    <div><a href="index.html">&larr; back to index</a></div>
+    <div>Study window: 2003-12-02 &rarr; 2026-04-16 &middot; Last updated: 2026-08-05</div>
+  </div>
+  <div class="footer-bottom">
+    <div>&copy; 2026 Sathvik Lakumarapu V &middot; All Rights Reserved</div>
+    <div>No copying, redistribution, or AI/ML training without written consent</div>
+  </div>
+
+</main>
+
+<script>
+const html = document.documentElement;
+const toggle = document.getElementById('themeToggle');
+const iconSun = document.getElementById('iconSun');
+const iconMoon = document.getElementById('iconMoon');
+function applyTheme(t){html.setAttribute('data-theme',t);if(t==='dark'){iconSun.style.display='block';iconMoon.style.display='none';}else{iconSun.style.display='none';iconMoon.style.display='block';}}
+function getSavedTheme(){try{return localStorage.getItem('theme');}catch{return null;}}
+function saveTheme(t){try{localStorage.setItem('theme',t);}catch{}}
+const saved = getSavedTheme();
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+applyTheme(saved || (prefersDark ? 'dark' : 'light'));
+toggle.addEventListener('click', () => {
+  const next = (html.getAttribute('data-theme') === 'dark') ? 'light' : 'dark';
+  applyTheme(next); saveTheme(next);
+  if (window._benchChart) restyleChart();
+});
+
+function sendSuggestion(ev, pageId){
+  ev.preventDefault();
+  const name = (document.getElementById('sugName').value || '').trim();
+  const email = (document.getElementById('sugEmail').value || '').trim();
+  const msg = (document.getElementById('sugMsg').value || '').trim();
+  const status = document.getElementById('sugStatus');
+  if (!msg) { status.textContent = 'Please enter a suggestion before sending.'; status.style.color = 'var(--red, #c00)'; return false; }
+  const subject = encodeURIComponent('Suggestion - ' + pageId);
+  const lines = ['Suggestion / feedback on ' + pageId + ':', '', msg, '', '---', 'From: ' + (name || '(anonymous)') + (email ? ' <' + email + '>' : '')];
+  const body = encodeURIComponent(lines.join('\n'));
+  window.location.href = 'mailto:lakumarapuvsathvik@gmail.com?subject=' + subject + '&body=' + body;
+  status.textContent = 'Opening your email client...';
+  status.style.color = '';
+  return false;
+}
+
+// ── Year-by-year table ──
+const YEARS = [
+  {y:2003, s:1.86,  b:2.73,  t:1,  d:-0.70},
+  {y:2004, s:19.85, b:0.25,  t:46, d:-8.44},
+  {y:2005, s:40.06, b:22.32, t:52, d:-7.34},
+  {y:2006, s:80.95, b:20.78, t:66, d:-7.09},
+  {y:2007, s:58.70, b:16.77, t:61, d:-11.64},
+  {y:2008, s:31.37, b:29.36, t:30, d:-7.35},
+  {y:2009, s:16.40, b:20.25, t:22, d:-5.07},
+  {y:2010, s:56.93, b:25.01, t:54, d:-7.38},
+  {y:2011, s:49.61, b:30.44, t:40, d:-7.05},
+  {y:2012, s:15.93, b:10.56, t:43, d:-9.28},
+  {y:2013, s:4.54,  b:-18.78,t:48, d:-15.50},
+  {y:2014, s:30.17, b:0.76,  t:46, d:-8.90},
+  {y:2015, s:16.76, b:-6.03, t:39, d:-4.06},
+  {y:2016, s:32.92, b:10.91, t:47, d:-6.14},
+  {y:2017, s:26.40, b:6.70,  t:35, d:-2.86},
+  {y:2018, s:1.33,  b:7.45,  t:37, d:-8.02},
+  {y:2019, s:27.15, b:20.67, t:49, d:-10.58},
+  {y:2020, s:13.40, b:28.30, t:29, d:-8.10},
+  {y:2021, s:8.31,  b:-1.92, t:37, d:-10.76},
+  {y:2022, s:34.34, b:10.95, t:36, d:-3.40},
+  {y:2023, s:21.23, b:12.38, t:43, d:-5.52},
+  {y:2024, s:36.32, b:32.61, t:53, d:-6.98},
+  {y:2025, s:62.26, b:72.21, t:59, d:-12.37},
+  {y:2026, s:0.83,  b:15.41, t:22, d:-22.69}
+];
+const fmt = v => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2) + '%';
+document.getElementById('yearBody').innerHTML = YEARS.map(r => {
+  const diff = r.s - r.b;
+  return `<tr>
+    <td>${r.y}${r.y===2003?' <span style="color:var(--text-muted);font-size:11px">(Dec only)</span>':''}${r.y===2026?' <span style="color:var(--text-muted);font-size:11px">(to 16 Apr)</span>':''}</td>
+    <td class="num ${r.s>=0?'pos':'neg'}">${fmt(r.s)}</td>
+    <td class="num ${r.b>=0?'pos':'neg'}">${fmt(r.b)}</td>
+    <td class="num ${diff>=0?'pos':'neg'}">${(diff>=0?'+':'−') + Math.abs(diff).toFixed(2)} pp</td>
+    <td class="num">${r.t}</td>
+    <td class="num neg">${fmt(r.d)}</td>
+  </tr>`;
+}).join('');
+
+// ── Benchmark chart ──
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const BLABELS = ['Strategy','Buy & hold gold','Exposure-matched','Nifty 50','Indian FD','Random entry'];
+const BDATA   = [29.30, 15.33, 7.37, 7.64, 7.18, 6.00];
+function barColors(){
+  return BDATA.map((v,i) => i===0 ? cssVar('--accent') : (v>=12 ? cssVar('--green') : v>=7 ? cssVar('--amber') : cssVar('--text-muted')));
+}
+const ctx = document.getElementById('benchChart').getContext('2d');
+window._benchChart = new Chart(ctx, {
+  type:'bar',
+  data:{ labels:BLABELS, datasets:[{ label:'CAGR %', data:BDATA, backgroundColor:barColors(), borderRadius:4, barThickness:38 }] },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c => c.parsed.y.toFixed(2) + '%' } } },
+    scales:{
+      x:{ ticks:{ color:cssVar('--text-muted'), font:{family:'DM Mono, monospace', size:11} }, grid:{ color:cssVar('--border') } },
+      y:{ ticks:{ color:cssVar('--text-muted'), font:{family:'DM Mono, monospace', size:11}, callback:v => v + '%' }, grid:{ color:cssVar('--border') } }
+    }
+  }
+});
+function restyleChart(){
+  const c = window._benchChart;
+  c.data.datasets[0].backgroundColor = barColors();
+  c.options.scales.x.ticks.color = cssVar('--text-muted');
+  c.options.scales.y.ticks.color = cssVar('--text-muted');
+  c.options.scales.x.grid.color = cssVar('--border');
+  c.options.scales.y.grid.color = cssVar('--border');
+  c.update();
+}
+</script>
+</body>
+</html>
