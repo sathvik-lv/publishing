@@ -36,6 +36,15 @@ labels exactly (`brain` parses the field). Full protocol in `CLAUDE.md`.
   re-keying step into Tally) and *What makes it different* (no subscription, works with the
   cable out, margin that cannot drift, the vendor-wax correction, s.269ST at the till, and
   every figure explainable because there is no model anywhere in it).
+- **Re-shot the screenshots on a fuller demo year, because the first set led with zeros.**
+  The generator seeds its RNG from the start date and draws bills per day, so at `--scale 0.5`
+  today had a real chance of drawing none — the hero screenshot read ₹0.00, which undersells
+  the thing badly on a public page. Regenerated April 2025 → today at scale 1.4: 6,292 pieces,
+  2,313 invoices, 1,223 customers, and ₹19.4 lakh on the day shown.
+- The stock screenshot is now **filtered to what is on the shelf** (2,452 in stock) rather than
+  opening on a year of sold pieces, which read like a dead-stock list.
+- **"1,538 tests passing" is now just "1,538 tests."** Two of them are macOS icon-tool tests
+  that skip on Windows, so on any single machine the honest count is 1,536 + 2 skipped.
 - **Next:** nothing open here. The ERP app's own interface work continues in `SKU_Analysis`.
 
 ## 2026-09-07 — Mobile (3-device worklog sync)
