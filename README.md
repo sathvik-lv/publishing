@@ -9,6 +9,7 @@ Open [`index.html`](index.html) to start.
 | Alfa &amp; Beta — multi-asset systematic books (FX + indices) | [`alfa_beta.html`](alfa_beta.html) |
 | Indian F&O — Mixed Calendar v1 with 3 tax views | [`fno.html`](fno.html) |
 | SKU Live Dashboard — coming soon | [`sku.html`](sku.html) |
+| Jewellery ERP — billing, stock, GST and books, offline | [`erp.html`](erp.html) |
 
 Static HTML + Chart.js (via CDN). No build step. Opens locally or on GitHub Pages.
 

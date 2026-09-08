@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jewellery ERP · Sathvik Lakumarapu V</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>
+    (function(){try{var s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);}else if(window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();
+  </script>
+  <style>
+    :root {
+      --bg:          oklch(0.985 0.004 80);
+      --bg-subtle:   oklch(0.960 0.006 80);
+      --bg-card:     oklch(1.000 0.000 0);
+      --border:      oklch(0.880 0.005 80);
+      --border-mid:  oklch(0.840 0.005 80);
+      --text:        oklch(0.130 0.012 260);
+      --text-mid:    oklch(0.380 0.010 260);
+      --text-muted:  oklch(0.560 0.008 260);
+      --accent:      oklch(0.520 0.185 248);
+      --accent-bg:   oklch(0.960 0.025 248);
+      --accent-text: oklch(0.380 0.185 248);
+      --green:       oklch(0.520 0.140 155);
+      --green-bg:    oklch(0.960 0.030 155);
+      --amber:       oklch(0.600 0.140 65);
+      --amber-bg:    oklch(0.970 0.030 65);
+      --shadow-sm:   0 1px 3px oklch(0 0 0 / 0.06), 0 1px 2px oklch(0 0 0 / 0.04);
+      --shadow-md:   0 4px 12px oklch(0 0 0 / 0.07), 0 2px 4px oklch(0 0 0 / 0.04);
+      --shadow-lg:   0 8px 24px oklch(0 0 0 / 0.09), 0 2px 6px oklch(0 0 0 / 0.05);
+      --radius:      10px;
+      --radius-sm:   6px;
+      --transition:  200ms ease;
+    }
+    [data-theme="dark"] {
+      --bg:          oklch(0.105 0.012 260);
+      --bg-subtle:   oklch(0.140 0.014 260);
+      --bg-card:     oklch(0.155 0.014 260);
+      --border:      oklch(0.240 0.016 260);
+      --border-mid:  oklch(0.290 0.016 260);
+      --text:        oklch(0.935 0.005 80);
+      --text-mid:    oklch(0.720 0.006 260);
+      --text-muted:  oklch(0.540 0.008 260);
+      --accent:      oklch(0.620 0.185 248);
+      --accent-bg:   oklch(0.200 0.060 248);
+      --accent-text: oklch(0.720 0.185 248);
+      --green:       oklch(0.640 0.140 155);
+      --green-bg:    oklch(0.180 0.045 155);
+      --amber:       oklch(0.720 0.140 65);
+      --amber-bg:    oklch(0.200 0.040 65);
+      --shadow-sm:   0 1px 3px oklch(0 0 0 / 0.30);
+      --shadow-md:   0 4px 12px oklch(0 0 0 / 0.35);
+      --shadow-lg:   0 8px 24px oklch(0 0 0 / 0.40);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg); color: var(--text);
+      line-height: 1.6; -webkit-font-smoothing: antialiased;
+      transition: background var(--transition), color var(--transition);
+      min-height: 100vh;
+    }
+
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: color-mix(in oklch, var(--bg) 85%, transparent);
+      backdrop-filter: blur(12px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 56px;
+      display: flex; align-items: center;
+    }
+    .nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 32px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
+    .nav-brand { font-size: 14px; font-weight: 500; color: var(--text); text-decoration: none; letter-spacing: -0.01em; }
+    .nav-brand span { color: var(--text-muted); font-weight: 400; }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-link { font-size: 13px; color: var(--text-muted); text-decoration: none; transition: color var(--transition); }
+    .nav-link:hover { color: var(--text); }
+    .contact-link { color: var(--text-muted); display: flex; transition: color var(--transition); }
+    .contact-link:hover { color: var(--text); }
+    .contact-link svg { width: 16px; height: 16px; }
+
+    .theme-toggle {
+      width: 36px; height: 36px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--bg-card); color: var(--text-mid);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background var(--transition), border-color var(--transition), color var(--transition), box-shadow var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+    .theme-toggle:hover { background: var(--bg-subtle); color: var(--text); box-shadow: var(--shadow-md); }
+    .theme-toggle svg { width: 16px; height: 16px; }
+
+    .main { max-width: 1100px; margin: 0 auto; padding: 0 32px; padding-top: 56px; }
+
+    .hero { padding: 72px 0 56px; border-bottom: 1px solid var(--border); }
+    .hero-eyebrow { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 99px; border: 1px solid;
+    }
+    .badge-live { background: var(--green-bg); color: var(--green); border-color: color-mix(in oklch, var(--green) 35%, transparent); }
+    .badge-warn { background: var(--amber-bg); color: var(--amber); border-color: color-mix(in oklch, var(--amber) 35%, transparent); }
+    .badge-neutral { background: var(--bg-subtle); color: var(--text-muted); border-color: var(--border-mid); }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .hero-title { font-size: clamp(28px, 4vw, 40px); font-weight: 600; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 14px; }
+    .hero-sub { font-size: 15px; color: var(--text-muted); max-width: 640px; line-height: 1.7; font-weight: 300; }
+
+    .section { padding: 56px 0 0; }
+    .section-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 28px; }
+    .section-label {
+      font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted);
+      padding: 3px 8px; border: 1px solid var(--border-mid); border-radius: 4px;
+    }
+    .section-title { font-size: 18px; font-weight: 500; letter-spacing: -0.015em; }
+    .section-note { font-size: 14px; color: var(--text-mid); line-height: 1.75; max-width: 760px; margin-bottom: 26px; font-weight: 300; }
+
+    .kpi-strip {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      border-top: 1px solid var(--border); border-left: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; margin-top: 34px;
+      background: var(--bg-card);
+    }
+    .kpi-cell { padding: 18px 20px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .kpi-value { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; letter-spacing: -0.02em; }
+    .kpi-value.pos { color: var(--green); }
+    .kpi-label { font-size: 11.5px; color: var(--text-muted); margin-top: 5px; line-height: 1.45; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 18px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow-sm);
+    }
+    .card-title { font-size: 15px; font-weight: 500; letter-spacing: -0.01em; margin-bottom: 8px; }
+    .card-body { font-size: 13.5px; color: var(--text-mid); line-height: 1.7; font-weight: 300; }
+    .card-tag {
+      font-family: 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.05em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; display: block;
+    }
+
+    .dept-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 0;
+                 border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--bg-card); }
+    .dept { padding: 16px 20px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
+    .dept-name { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+    .dept-sections { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; font-weight: 300; }
+
+    .rule { display: flex; gap: 14px; padding: 18px 0; border-bottom: 1px solid var(--border); }
+    .rule:last-child { border-bottom: none; }
+    .rule-mark { flex: none; width: 26px; height: 26px; border-radius: 6px; display: grid; place-items: center;
+                 background: var(--bg-subtle); border: 1px solid var(--border); margin-top: 2px; }
+    .rule-mark svg { width: 14px; height: 14px; color: var(--text-mid); }
+    .rule-text { font-size: 13.5px; color: var(--text-mid); line-height: 1.75; font-weight: 300; }
+    .rule-text strong { color: var(--text); font-weight: 500; }
+
+    figure { margin: 0 0 22px; }
+    figure img { width: 100%; height: auto; display: block; border: 1px solid var(--border);
+                 border-radius: var(--radius); box-shadow: var(--shadow-md); }
+    figcaption { font-size: 12.5px; color: var(--text-muted); margin-top: 10px; line-height: 1.6; font-weight: 300; }
+
+    .stack-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    .stack-table th { text-align: left; font-family: 'DM Mono', monospace; font-size: 10.5px;
+                      letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);
+                      font-weight: 500; padding: 0 0 10px; border-bottom: 1px solid var(--border); }
+    .stack-table td { padding: 11px 0; border-bottom: 1px solid var(--border); color: var(--text-mid); font-weight: 300; vertical-align: top; }
+    .stack-table td:first-child { color: var(--text); font-weight: 400; width: 190px; padding-right: 20px; }
+    .stack-table tr:last-child td { border-bottom: none; }
+
+    .caveats { list-style: none; counter-reset: c; }
+    .caveats li { counter-increment: c; position: relative; padding: 0 0 16px 34px; font-size: 13.5px;
+                  color: var(--text-mid); line-height: 1.75; font-weight: 300; }
+    .caveats li::before { content: counter(c, decimal-leading-zero); position: absolute; left: 0; top: 1px;
+                          font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
+    .caveats strong { color: var(--text); font-weight: 500; }
+
+    .footer { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+              padding: 40px 0 20px; margin-top: 56px; border-top: 1px solid var(--border);
+              font-family: 'DM Mono', monospace; font-size: 11.5px; color: var(--text-muted); }
+    .footer a { color: var(--text-mid); text-decoration: none; }
+    .footer a:hover { color: var(--text); }
+    .footer-bottom { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+                     padding-bottom: 40px; font-family: 'DM Mono', monospace; font-size: 10.5px; color: var(--text-muted); }
+
+    @media (max-width: 700px) {
+      .nav-inner, .main { padding-left: 20px; padding-right: 20px; }
+      .stack-table td:first-child { width: auto; }
+      .stack-table, .stack-table tbody, .stack-table tr, .stack-table td { display: block; width: 100%; }
+      .stack-table thead { display: none; }
+      .stack-table td { border-bottom: none; padding: 3px 0; }
+      .stack-table tr { border-bottom: 1px solid var(--border); padding: 12px 0; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">Sathvik Lakumarapu V <span>&middot; Research</span></a>
+    <div class="nav-right">
+      <a class="nav-link" href="index.html">Index</a>
+      <a class="contact-link" href="mailto:lakumarapuvsathvik@gmail.com" title="Email" aria-label="Email">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+      </a>
+      <a class="contact-link" href="https://www.linkedin.com/in/lakumarapu-v-sathvik" target="_blank" rel="noopener" title="LinkedIn" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+
+  <section class="hero">
+    <div class="hero-eyebrow">
+      <span class="badge badge-live"><span class="badge-dot"></span>In daily use</span>
+      <span class="badge badge-neutral">Windows &amp; macOS</span>
+      <span class="badge badge-neutral">Offline</span>
+    </div>
+    <h1 class="hero-title">A jewellery business, end to end, on one computer</h1>
+    <p class="hero-sub">
+      Billing, stock, the workshop, GST returns and double-entry books for a working
+      jewellery shop &mdash; built as a desktop application that runs with the network
+      cable out and costs nothing to operate. Eleven departments, 281 endpoints and
+      1,538 tests. No subscriptions, no server, no AI in the product.
+    </p>
+
+    <div class="kpi-strip">
+      <div class="kpi-cell"><div class="kpi-value">11</div><div class="kpi-label">departments / 74 screens</div></div>
+      <div class="kpi-cell"><div class="kpi-value">281</div><div class="kpi-label">API endpoints</div></div>
+      <div class="kpi-cell"><div class="kpi-value">90</div><div class="kpi-label">database tables</div></div>
+      <div class="kpi-cell"><div class="kpi-value pos">1,538</div><div class="kpi-label">tests passing</div></div>
+      <div class="kpi-cell"><div class="kpi-value">&#8377;0</div><div class="kpi-label">running cost</div></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">01</span><span class="section-title">What it actually does</span></div>
+    <p class="section-note">
+      Not a dashboard over someone else's system &mdash; it <em>is</em> the system. A piece is
+      tagged when it arrives, priced from the rate fixed that morning, sold at the counter,
+      posted to the books, and reported to the GST portal, without leaving the application.
+    </p>
+
+    <div class="dept-list">
+      <div class="dept">
+        <div class="dept-name">Sales &amp; Billing</div>
+        <div class="dept-sections">Counter / POS &middot; tray custody &middot; invoices &middot; customer orders &middot; repairs &middot; approval memo &middot; returns and exchange</div>
+      </div>
+      <div class="dept">
+        <div class="dept-name">Inventory &amp; Stock</div>
+        <div class="dept-sections">Tagged pieces &middot; design catalogue &middot; stone codes &middot; piece breakdown &middot; rate of the day &middot; estimates &middot; branch transfers &middot; stock-take &middot; hallmarking &middot; ageing &middot; bullion &middot; packing</div>
+      </div>
+      <div class="dept">
+        <div class="dept-name">Finance &amp; Accounts</div>
+        <div class="dept-sections">Day book &middot; day close and cash-up &middot; accountant hand-off &middot; ledgers &middot; payables &middot; bank reconciliation &middot; GST returns &middot; metal balance &middot; year-end close</div>
+      </div>
+      <div class="dept">
+        <div class="dept-name">Manufacturing</div>
+        <div class="dept-sections">Karigars &middot; job cards &middot; metal issue and receipt &middot; wastage &middot; melting and refining</div>
+      </div>
+      <div class="dept">
+        <div class="dept-name">Purchase</div>
+        <div class="dept-sections">Vendors &middot; purchase orders &middot; goods receipt &middot; purchase returns</div>
+      </div>
+      <div class="dept">
+        <div class="dept-name">Customers &amp; CRM</div>
+        <div class="dept-sections">Customers &middot; gold schemes &middot; loyalty &middot; walk-in enquiries &middot; follow-ups</div>
+      </div>
+      <div class="dept">
+        <div class="dept-name">Analytics</div>
+        <div class="dept-sections">Overview &middot; SKU performance &middot; PBT analysis &middot; reallocation recommendations &middot; MIS reports</div>
+      </div>
+      <div class="dept">
+        <div class="dept-name">Staff, Expenses, Marketing</div>
+        <div class="dept-sections">Register &middot; attendance &middot; salaries &middot; performance &middot; expense book &middot; campaigns &middot; channel figures &middot; customer sources</div>
+      </div>
+      <div class="dept">
+        <div class="dept-name">Administration</div>
+        <div class="dept-sections">Users and roles &middot; branches &middot; document numbering &middot; data import &middot; pricing policy &middot; bill stationery &middot; backup and restore &middot; branch sync &middot; audit trail</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">02</span><span class="section-title">The rules it refuses to break</span></div>
+    <p class="section-note">
+      Most of the engineering here is not features &mdash; it is making the shop's own rules
+      impossible to violate, including by a future version of the software. Each of these is
+      enforced in the service layer and covered by tests that fail if the rule is loosened.
+    </p>
+
+    <div class="card" style="padding: 4px 24px;">
+      <div class="rule">
+        <div class="rule-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></div>
+        <div class="rule-text"><strong>No customer credit, ever.</strong> A bill cannot be posted while
+          anything is unpaid &mdash; there is no override parameter and no counter it can be switched
+          off for. "Credit" was also removed as a tender, because paying by credit would have
+          zeroed the balance without money arriving.</div>
+      </div>
+      <div class="rule">
+        <div class="rule-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+        <div class="rule-text"><strong>The accounts are the owner's alone.</strong> Any attempt to grant a
+          finance permission to a role other than <em>owner</em> is refused outright, rather than being
+          a convention someone can click past.</div>
+      </div>
+      <div class="rule">
+        <div class="rule-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></div>
+        <div class="rule-text"><strong>One making charge, one gem price.</strong> Making is the shop's fixed
+          percentage on everything, whatever a piece cost to buy; a gem prices at the rate in the
+          stone master, not what that parcel cost. Neither can be typed per piece &mdash; a better
+          price for one customer is a recorded discount at the till, not a quiet edit.</div>
+      </div>
+      <div class="rule">
+        <div class="rule-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M7 8l5-5 5 5"/></svg></div>
+        <div class="rule-text"><strong>Weights are derived, never typed.</strong> Gross, net and stone weight
+          are computed from the piece's own priced lines &mdash; metal in grams, stones in carats,
+          converted at the 1907 definition. The lines are the truth; the scale reading is a check
+          against them.</div>
+      </div>
+      <div class="rule">
+        <div class="rule-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+        <div class="rule-text"><strong>Cash over two lakh is refused</strong> under section 269ST, and cash
+          payments over ten thousand to one person in a day are flagged with their tax cost under
+          40A(3). The refusal happens at the till, where it can still be acted on.</div>
+      </div>
+      <div class="rule">
+        <div class="rule-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></div>
+        <div class="rule-text"><strong>Document numbers are gapless</strong> per branch, per Indian financial
+          year, allocated under a row lock at the moment of posting &mdash; so an abandoned draft leaves
+          no hole for an auditor to ask about.</div>
+      </div>
+      <div class="rule">
+        <div class="rule-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10H9"/></svg></div>
+        <div class="rule-text"><strong>Nothing financial is edited &mdash; only reversed.</strong> Posted vouchers
+          are corrected by a reversing entry, the audit log is an append-only hash chain, and the
+          metal ledger is signed and append-only in fine weight.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">03</span><span class="section-title">The application</span></div>
+    <p class="section-note">
+      Screens below run on a synthetic demo dataset &mdash; a generated year of trading, not the
+      shop's real books. The interface is plain HTML, CSS and JavaScript with no framework and
+      no build step, and every chart is drawn with CSS and inline SVG rather than a charting
+      library, because the whole thing ships as one downloadable binary with no network.
+    </p>
+
+    <figure>
+      <img src="erp_shots/morning.jpg" alt="The morning screen: sales today, bills, average bill, old gold taken in, cash taken, a week of sales, and where customers came from." loading="lazy" />
+      <figcaption>The morning screen, read once a day with a cup of tea. The figure it leads with is
+        the day's takings against what a typical day of that weekday brings &mdash; not a raw number
+        with nothing to judge it by. The source ranking states its own coverage, because a
+        conversion rate computed from a half-filled form measures diligence rather than performance.</figcaption>
+    </figure>
+
+    <figure>
+      <img src="erp_shots/stock.jpg" alt="Tagged pieces: a table of 1,619 pieces with tag, design, purity, gross and net weight, value, age and status." loading="lazy" />
+      <figcaption>Serialised stock. Every physical piece is its own row with its own weights and
+        history &mdash; distinct from the design it was made to &mdash; which is what makes a stock-take,
+        an ageing report and a barcode on a bill possible at all.</figcaption>
+    </figure>
+
+    <figure>
+      <img src="erp_shots/morning-dark.jpg" alt="The same morning screen in the dark theme." loading="lazy" />
+      <figcaption>The same screen in the dark theme. Both are taken from the shop's own two brand
+        colours rather than a theme being inverted programmatically.</figcaption>
+    </figure>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">04</span><span class="section-title">How it is built</span></div>
+    <table class="stack-table">
+      <thead><tr><th>Decision</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Desktop app, not a service</td>
+          <td>A shop should not lose its billing system because a card expired or the internet
+              is down during a wedding season. It installs under the user's own account, needs no
+              administrator rights, and holds its data in one file that a backup can carry.</td>
+        </tr>
+        <tr>
+          <td>Money and weight as integers</td>
+          <td>Paise and milligrams in scaled integers through a SQLAlchemy type, with floats
+              rejected at the boundary. Money that drifts by a paisa per bill is money that will
+              not reconcile at year end.</td>
+        </tr>
+        <tr>
+          <td>SQLite, Postgres-compatible</td>
+          <td>One shop with one till is comfortably a SQLite workload &mdash; 60 bills a day for ten
+              years is about 150k lines. The schema avoids Postgres-only types, so scaling up is a
+              connection-string change and nothing else.</td>
+        </tr>
+        <tr>
+          <td>No LLM anywhere in the product</td>
+          <td>A bill has to be reproducible and explainable to a tax officer. Every figure comes
+              from arithmetic that can be pointed at in the source.</td>
+        </tr>
+        <tr>
+          <td>Vanilla JS, no build step</td>
+          <td>No <code>node_modules</code>, no toolchain to drift between machines, and the shipped
+              JavaScript is the JavaScript that was written.</td>
+        </tr>
+        <tr>
+          <td>Barcodes written from scratch</td>
+          <td>Code 128 subset B is 144 lines, checksum included. A dependency for it would have
+              been a dependency to keep current for the next decade.</td>
+        </tr>
+        <tr>
+          <td>Branches converge by file</td>
+          <td>Each branch keeps its own hash-chained run of events and they meet by exchanging a
+              bundle. A bundle carries the shop's own key, so another business's file is refused
+              rather than merged into the books.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">05</span><span class="section-title">What it is not</span></div>
+    <ol class="caveats">
+      <li><strong>It is not a product for sale.</strong> This was built for one specific shop, and the
+        rules above are that shop's rules &mdash; the fixed making percentage, the refusal of credit,
+        the owner-only accounts. Another jeweller would want several of them to be settings.</li>
+      <li><strong>The builds are unsigned.</strong> Windows SmartScreen and macOS Gatekeeper both warn on
+        first run. Clearing that needs a paid certificate on each platform, which is a deliberate
+        non-decision rather than an oversight.</li>
+      <li><strong>The screenshots are synthetic data.</strong> A generated year of trading is used for
+        development and for these images. Real books are never published, and the source repository
+        is private.</li>
+      <li><strong>Multi-branch is built but lightly exercised.</strong> The sync engine, its hash chain and
+        the shop-key check are tested, but they have not yet run for a year across two real
+        showrooms, which is the only test that finally counts.</li>
+    </ol>
+  </section>
+
+  <div class="footer">
+    <div><a href="index.html">&larr; back to index</a></div>
+    <div>Windows &amp; macOS &middot; 1,538 tests &middot; Last updated: 2026-09-08</div>
+  </div>
+  <div class="footer-bottom">
+    <div>&copy; 2026 Sathvik Lakumarapu V &middot; All Rights Reserved</div>
+    <div>No copying, redistribution, or AI/ML training without written consent</div>
+  </div>
+
+</main>
+
+<script>
+const html = document.documentElement;
+const toggle = document.getElementById('themeToggle');
+const iconSun = document.getElementById('iconSun');
+const iconMoon = document.getElementById('iconMoon');
+function applyTheme(t){html.setAttribute('data-theme',t);if(t==='dark'){iconSun.style.display='block';iconMoon.style.display='none';}else{iconSun.style.display='none';iconMoon.style.display='block';}}
+function getSavedTheme(){try{return localStorage.getItem('theme');}catch{return null;}}
+function saveTheme(t){try{localStorage.setItem('theme',t);}catch{}}
+const saved = getSavedTheme();
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+applyTheme(saved || (prefersDark ? 'dark' : 'light'));
+toggle.addEventListener('click', () => {
+  const next = (html.getAttribute('data-theme') === 'dark') ? 'light' : 'dark';
+  applyTheme(next); saveTheme(next);
+});
+</script>
+
+</body>
+</html>

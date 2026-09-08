@@ -6,6 +6,32 @@ share this file and nothing else: no shared chat, memory or disk. Each device:
 working. Work recorded here is done — don't redo it. Use one of those three device
 labels exactly (`brain` parses the field). Full protocol in `CLAUDE.md`.
 
+## 2026-09-08 — Windows PC (the jewellery ERP joins the hub)
+
+- **New `erp.html`, card 06 on the index, and a README row** — the jewellery ERP now sits
+  beside the five research dashboards in the same card anatomy (tag, index, KPI strip,
+  footer note, "Open dashboard"). Deliberately not a separate aesthetic: it is a sibling
+  of the other five, not a landing page.
+- **The page leads with what the system does, not how it looks** — the eleven departments
+  by name, then the rules it will not break (no customer credit, owner-only accounts, one
+  fixed making charge and one gem price, derived weights, s.269ST, gapless numbering,
+  reversal never edit), then screenshots, then the build decisions, then what it is not.
+- **Every figure on it was counted from the source, not recalled**: 281 endpoints, 90
+  tables, 11 departments / 74 screens, 1,538 tests, 144-line barcode encoder. One claim
+  was corrected before publishing — the barcode module had been written up as "about a
+  hundred lines" and is 144.
+- **Screenshots (`erp_shots/`) are the synthetic demo year, and the page says so.** Real
+  books are never published and the ERP repo stays private, so a live demo was rejected:
+  it would mean publishing the application itself, which contradicts the rule at the top
+  of `CLAUDE.md`. A showcase page exposes nothing and cannot go down.
+- Rejected: hosting a clickable instance on a free tier (Hugging Face Spaces sleeps after
+  48h idle, Render spins down after 15 min) — both need the source public, and a
+  cold-start on a resume click is worse than a page that always loads.
+- **Reordered the hub**: SKU analytics is now 01 and the ERP 02, with the four trading
+  dashboards following in their existing relative order (03-06). The two dashboards that
+  are actual built systems now lead, rather than sitting fourth and sixth.
+- **Next:** nothing open here. The ERP app's own interface work continues in `SKU_Analysis`.
+
 ## 2026-09-07 — Mobile (3-device worklog sync)
 
 - Set the cross-device protocol up for **three** devices — Windows PC, MacBook and
