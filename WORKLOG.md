@@ -31,7 +31,18 @@ labels exactly (`brain` parses the field). Full protocol in `CLAUDE.md`.
   in the `alfa_beta.html` filename, against the standing rule that they stay private. The card
   title on the hub is correct (uses the resume title). Renaming the file breaks a live URL, so
   it needs a decision rather than a quiet fix.
-- **Next:** add Open Graph tags to all five pages, and decide the `alfa_beta.html` rename.
+- **Open Graph tags added to all six pages** (later the same day), because a new LinkedIn post
+  was about to be written and posting first would have re-scraped an untagged hub — which is
+  exactly how the live post came to advertise "02 Planned Extensions". Each page now carries
+  `description`, `og:type/site_name/title/description/url` and twitter equivalents. Only the hub
+  and `erp.html` carry `og:image` (`erp_shots/morning.jpg`, the one real screenshot on the site);
+  putting an ERP screenshot on the gold or F&O card would misrepresent them, so those get the
+  small `summary` card instead. The XAU/INR description carries its own caveat inline — proxy
+  series, adjusted central estimate ~22% not 29% — so the preview cannot oversell the page.
+- Note for whoever posts: LinkedIn caches preview cards **per URL**, so the existing 4-month-old
+  post keeps its wrong card forever. Only a new post picks the new tags up.
+- **Next:** decide the `alfa_beta.html` rename (codenames still leak in the README row and the
+  filename); LinkedIn headline and About still to be updated to drop crypto and six→five.
 
 ## 2026-09-08 — Windows PC (the jewellery ERP joins the hub)
 
