@@ -30,6 +30,12 @@ labels exactly (`brain` parses the field). Full protocol in `CLAUDE.md`.
 - **Reordered the hub**: SKU analytics is now 01 and the ERP 02, with the four trading
   dashboards following in their existing relative order (03-06). The two dashboards that
   are actual built systems now lead, rather than sitting fourth and sixth.
+- **Added the usefulness and the USP, which the first cut was missing.** It described what
+  the system does without saying why anyone should care. Two new sections lead the page
+  now: *What it replaces* (four systems that do not talk to each other, plus a monthly
+  re-keying step into Tally) and *What makes it different* (no subscription, works with the
+  cable out, margin that cannot drift, the vendor-wax correction, s.269ST at the till, and
+  every figure explainable because there is no model anywhere in it).
 - **Next:** nothing open here. The ERP app's own interface work continues in `SKU_Analysis`.
 
 ## 2026-09-07 — Mobile (3-device worklog sync)

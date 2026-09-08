@@ -131,7 +131,7 @@
     .kpi-label { font-size: 11.5px; color: var(--text-muted); margin-top: 5px; line-height: 1.45; }
 
     .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 18px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 18px; }
 
     .card {
       background: var(--bg-card); border: 1px solid var(--border);
@@ -228,9 +228,9 @@
     <h1 class="hero-title">A jewellery business, end to end, on one computer</h1>
     <p class="hero-sub">
       Billing, stock, the workshop, GST returns and double-entry books for a working
-      jewellery shop &mdash; built as a desktop application that runs with the network
-      cable out and costs nothing to operate. Eleven departments, 281 endpoints and
-      1,538 tests. No subscriptions, no server, no AI in the product.
+      jewellery shop &mdash; in one chain, on one computer, with the network cable out.
+      It replaces four systems that do not talk to each other and the monthly re-keying
+      between them, and it costs nothing to run: no subscription, no server, no AI.
     </p>
 
     <div class="kpi-strip">
@@ -243,7 +243,80 @@
   </section>
 
   <section class="section">
-    <div class="section-header"><span class="section-label">01</span><span class="section-title">What it actually does</span></div>
+    <div class="section-header"><span class="section-label">01</span><span class="section-title">What it replaces</span></div>
+    <p class="section-note">
+      A jewellery shop of this size typically runs on four things that do not talk to each
+      other: a billing package, a stock register, a spreadsheet for the karigars, and an
+      accountant who re-keys the lot into Tally once a month. Every boundary between them
+      is a place where weight, money or tax quietly goes missing.
+    </p>
+    <div class="grid-2">
+      <div class="card">
+        <span class="card-tag">Before</span>
+        <div class="card-title">Four systems and a re-keying step</div>
+        <div class="card-body">
+          A tag is written by hand. The bill is raised somewhere else. Old gold taken in
+          exchange is a note on paper. Metal issued to a karigar lives in a diary. At month
+          end somebody types it all into accounting software, and any figure that does not
+          reconcile is argued about weeks after the customer left.
+        </div>
+      </div>
+      <div class="card">
+        <span class="card-tag">After</span>
+        <div class="card-title">One chain, one file</div>
+        <div class="card-body">
+          A piece is tagged from its own priced lines, priced at the rate fixed that morning,
+          sold at the counter, and the voucher posts to double-entry books in the same
+          instant. Old gold, karigar metal and GST are inside that chain rather than
+          alongside it. The books are one file that a backup can carry.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">02</span><span class="section-title">What makes it different</span></div>
+    <p class="section-note">
+      Jewellery ERPs exist. Almost all of them are per-till monthly subscriptions that stop
+      working when the line goes down or the card expires, and almost none of them encode the
+      trade's actual practices. These are the choices that separate this one.
+    </p>
+    <div class="grid-3">
+      <div class="card">
+        <span class="card-tag">Cost</span>
+        <div class="card-title">No subscription, ever</div>
+        <div class="card-body">It runs on the shop's own computer. There is no server to rent, no per-till licence and no renewal that can lapse in the middle of a wedding season.</div>
+      </div>
+      <div class="card">
+        <span class="card-tag">Availability</span>
+        <div class="card-title">The cable can be out</div>
+        <div class="card-body">Billing does not depend on a connection. A shop that cannot raise a bill because the internet is down is a shop that cannot trade &mdash; the most expensive possible failure.</div>
+      </div>
+      <div class="card">
+        <span class="card-tag">Margin</span>
+        <div class="card-title">The margin cannot drift</div>
+        <div class="card-body">Making is the shop's one fixed percentage and a gem sells at the master's rate. Neither is typeable per piece, so the price is never quietly negotiated down at the tagging desk.</div>
+      </div>
+      <div class="card">
+        <span class="card-tag">Trade practice</span>
+        <div class="card-title">It knows what wax is</div>
+        <div class="card-body">A vendor's declared wax is corrected on the way in &mdash; the shop's rule is that half of it is really metal &mdash; and both figures are kept, so a tag can be checked back against the vendor's own bill.</div>
+      </div>
+      <div class="card">
+        <span class="card-tag">Statute</span>
+        <div class="card-title">Compliance at the till</div>
+        <div class="card-body">Cash over two lakh is refused under s.269ST while the customer is still standing there, not discovered by an auditor a year later. Numbering is gapless per branch, per financial year.</div>
+      </div>
+      <div class="card">
+        <span class="card-tag">Trust</span>
+        <div class="card-title">Every figure is explainable</div>
+        <div class="card-body">No model, no inference, no AI anywhere in the product. Each number on a bill comes from arithmetic that can be pointed at in the source and defended to a tax officer.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><span class="section-label">03</span><span class="section-title">What it actually does</span></div>
     <p class="section-note">
       Not a dashboard over someone else's system &mdash; it <em>is</em> the system. A piece is
       tagged when it arrives, priced from the rate fixed that morning, sold at the counter,
@@ -291,7 +364,7 @@
   </section>
 
   <section class="section">
-    <div class="section-header"><span class="section-label">02</span><span class="section-title">The rules it refuses to break</span></div>
+    <div class="section-header"><span class="section-label">04</span><span class="section-title">The rules it refuses to break</span></div>
     <p class="section-note">
       Most of the engineering here is not features &mdash; it is making the shop's own rules
       impossible to violate, including by a future version of the software. Each of these is
@@ -348,7 +421,7 @@
   </section>
 
   <section class="section">
-    <div class="section-header"><span class="section-label">03</span><span class="section-title">The application</span></div>
+    <div class="section-header"><span class="section-label">05</span><span class="section-title">The application</span></div>
     <p class="section-note">
       Screens below run on a synthetic demo dataset &mdash; a generated year of trading, not the
       shop's real books. The interface is plain HTML, CSS and JavaScript with no framework and
@@ -379,7 +452,7 @@
   </section>
 
   <section class="section">
-    <div class="section-header"><span class="section-label">04</span><span class="section-title">How it is built</span></div>
+    <div class="section-header"><span class="section-label">06</span><span class="section-title">How it is built</span></div>
     <table class="stack-table">
       <thead><tr><th>Decision</th><th>Why</th></tr></thead>
       <tbody>
@@ -427,7 +500,7 @@
   </section>
 
   <section class="section">
-    <div class="section-header"><span class="section-label">05</span><span class="section-title">What it is not</span></div>
+    <div class="section-header"><span class="section-label">07</span><span class="section-title">What it is not</span></div>
     <ol class="caveats">
       <li><strong>It is not a product for sale.</strong> This was built for one specific shop, and the
         rules above are that shop's rules &mdash; the fixed making percentage, the refusal of credit,
