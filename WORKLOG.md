@@ -6,6 +6,33 @@ share this file and nothing else: no shared chat, memory or disk. Each device:
 working. Work recorded here is done — don't redo it. Use one of those three device
 labels exactly (`brain` parses the field). Full protocol in `CLAUDE.md`.
 
+## 2026-09-08 — Windows PC (crypto dashboard removed; LinkedIn mirrored to the site)
+
+- **Deleted `crypto.html` and its hub card.** XAU/INR renumbered 06 → 05; the hub now carries
+  five dashboards. The asset class is no longer being pursued, but the stronger reason is that
+  the page was the weakest thing on the site: Sharpe 11.02, max drawdown -0.13% and Calmar 776
+  read as an execution model not capturing real fills, which is exactly the doubt the gold
+  page spends a whole section (2,000 random-entry controls) earning its way out of. One page
+  of implausible numbers taxes the credibility of the four beside it.
+- Rejected: unlinking the card but leaving the page reachable by URL (numbers stay public and
+  findable, so it does not achieve the point), and re-badging it as retired (keeps the figures
+  on the site under a banner). Full deletion chosen. Recoverable from git history if wanted.
+- **README corrected while in there** — it still called the SKU dashboard "coming soon" and had
+  no row for `xau_inr.html` at all, a month after that page went up.
+- **LinkedIn now mirrors the site.** The profile had 3 projects against the site's 6; it now
+  carries the ERP, XAU/INR and the rewritten SKU and multi-asset entries. The SKU project had
+  been described as an Excel exercise when the published page is a Python/FastAPI statistical
+  stack. Crypto was never added there, which is now the correct outcome.
+- **Open, and the reason this is worth carrying across devices:** no page in the repo has
+  `og:title`, `og:description` or `og:image`. LinkedIn consequently scraped a section heading
+  when the hub was last shared, so the live post advertises "02 Planned Extensions" — a section
+  deleted on 2026-08-05. Every future share of any dashboard previews just as badly.
+- **Also open:** the "Alfa & Beta" codenames are still surfacing publicly in the README row and
+  in the `alfa_beta.html` filename, against the standing rule that they stay private. The card
+  title on the hub is correct (uses the resume title). Renaming the file breaks a live URL, so
+  it needs a decision rather than a quiet fix.
+- **Next:** add Open Graph tags to all five pages, and decide the `alfa_beta.html` rename.
+
 ## 2026-09-08 — Windows PC (the jewellery ERP joins the hub)
 
 - **New `erp.html`, card 06 on the index, and a README row** — the jewellery ERP now sits
