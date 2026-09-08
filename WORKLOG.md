@@ -45,6 +45,13 @@ labels exactly (`brain` parses the field). Full protocol in `CLAUDE.md`.
   opening on a year of sold pieces, which read like a dead-stock list.
 - **"1,538 tests passing" is now just "1,538 tests."** Two of them are macOS icon-tool tests
   that skip on Windows, so on any single machine the honest count is 1,536 + 2 skipped.
+- **Added section 07, "Where it goes next"** — the work that is actually planned rather than
+  done: a silver-line Shopify storefront with Razorpay taking its catalogue from the ERP,
+  Canva for festival collateral generated against pieces really in stock, Claude Design for
+  editing and posting the piece photography the system already stores, social connectors
+  feeding the Marketing department that already exists, and the same books on a phone.
+  Marked plainly as intent, not features — none of it is built. The sixth card states the
+  constraint all of it has to hold: nothing may become a subscription or stop working offline.
 - **Next:** nothing open here. The ERP app's own interface work continues in `SKU_Analysis`.
 
 ## 2026-09-07 — Mobile (3-device worklog sync)
